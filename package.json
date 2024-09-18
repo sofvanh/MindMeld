@@ -1,0 +1,14 @@
+{
+  "name": "mindmeld",
+  "version": "1.0.0",
+  "description": "MindMeld deliberation tool",
+  "scripts": {
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^6.2.0"
+  }
+}
