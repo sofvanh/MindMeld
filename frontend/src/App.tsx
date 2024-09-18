@@ -1,4 +1,6 @@
+import React from 'react';
 import Layout from './components/Layout';
+import Chat from './components/Chat';
 
 function App() {
   return (
@@ -6,6 +8,7 @@ function App() {
       <div className="text-center">
         <h2 className="text-xl font-semibold mb-4">Welcome to MindMeld!</h2>
         <p>Work in progress :)</p>
+        <Chat />
       </div>
     </Layout>
   );
