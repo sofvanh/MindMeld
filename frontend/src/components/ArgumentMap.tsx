@@ -27,8 +27,8 @@ const ArgumentMap: React.FC = () => {
       { id: '3', name: 'Wildfires are not good for the world', val: 1 },
     ],
     links: [
-      // { source: '1', target: '2', strength: 0.5 },
-      // { source: '2', target: '3', strength: 0.8 },
+      { source: '1', target: '2' },
+      { source: '2', target: '3' },
     ],
   });
 
