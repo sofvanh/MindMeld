@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
+import io from 'socket.io-client';
 
 interface Node {
   id: string;
@@ -18,35 +19,41 @@ interface GraphData {
   links: Link[];
 }
 
+const socket = io('http://localhost:3001');
+
 const ArgumentMap: React.FC = () => {
   const [newArgument, setNewArgument] = useState('');
   const [graphData, setGraphData] = useState<GraphData>({
-    nodes: [
-      { id: '1', name: 'Rain is useful', val: 1 },
-      { id: '2', name: 'Rain is reduces quality of life', val: 1 },
-      { id: '3', name: 'Wildfires are not good for the world', val: 1 },
-    ],
-    links: [
-      { source: '1', target: '2' },
-      { source: '2', target: '3' },
-    ],
+    nodes: [],
+    links: [],
   });
 
+  useEffect(() => {
+    // Listen for initial graph data
+    socket.on('initial graph data', (data: GraphData) => {
+      setGraphData(data);
+    });
+
+    // Listen for graph updates
+    socket.on('graph update', (data: GraphData) => {
+      setGraphData(data);
+    });
+
+    // Request initial graph data
+    socket.emit('get graph data');
+
+    return () => {
+      socket.off('initial graph data');
+      socket.off('graph update');
+    };
+  }, []);
+
   const handleNodeClick = useCallback((node: Node) => {
-    // Here you can implement logic for when a node is clicked
     console.log('Clicked node:', node);
   }, []);
 
   const handleAddArgument = (text: string) => {
-    const newNode: Node = {
-      id: String(graphData.nodes.length + 1),
-      name: text,
-      val: 1,
-    };
-    setGraphData(prevData => ({
-      nodes: [...prevData.nodes, newNode],
-      links: prevData.links,
-    }));
+    socket.emit('add argument', text);
   };
 
   return (
