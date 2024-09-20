@@ -3,24 +3,25 @@ import http from 'http';
 import { Server } from 'socket.io';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
 
-dotenv.config();
+
+const backendUrl = process.env.BACKEND_URL || 'http://localhost';
+const port = process.env.PORT || 3001;
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const environment = process.env.NODE_ENV || 'development';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: frontendUrl,
     methods: ["GET", "POST"]
   }
 });
 
-const port = process.env.PORT || 3001;
-
 let graphData: { nodes: any[], links: any[] };
 
-if (process.env.NODE_ENV === 'development') {
+if (environment === 'development') {
   const testDataPath = path.join(__dirname, '../testdata.json');
   const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf-8'));
   graphData = testData;
@@ -82,6 +83,6 @@ io.on('connection', (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`Server running at ${backendUrl}:${port}`);
+  console.log(`Environment: ${environment}`);
 });
