@@ -9,9 +9,9 @@ primary_region = 'cdg'
 [build]
 
 [env]
-  BACKEND_URL = 'https://mindmeld.fly.dev/'
+  BACKEND_URL = 'https://mindmeld.fly.dev'
   PORT = 3000
-  FRONTEND_URL = 'https://mindmeldtool.netlify.app/'
+  FRONTEND_URL = 'https://mindmeldtool.netlify.app'
   NODE_ENV = 'production'
 
 [http_service]
