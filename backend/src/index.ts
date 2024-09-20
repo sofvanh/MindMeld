@@ -1,6 +1,11 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
@@ -13,20 +18,23 @@ const io = new Server(server, {
 
 const port = process.env.PORT || 3001;
 
-// In-memory storage for graph data
-let graphData = {
-  nodes: [
-    { id: '0', name: 'Rain is useful', val: 1 },
-    { id: '1', name: 'Rain reduces quality of life', val: 1 },
-    { id: '2', name: 'Wildfires are not good for the world', val: 1 },
-  ],
-  links: [
-    { source: '0', target: '1' },
-    { source: '0', target: '2' },
-  ],
-};
+let graphData: { nodes: any[], links: any[] };
 
-// Function to recalculate links
+if (process.env.NODE_ENV === 'development') {
+  const testDataPath = path.join(__dirname, '../testdata.json');
+  const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf-8'));
+  graphData = testData;
+  recalculateLinks();
+  console.log('Loaded test data for development');
+} else {
+  graphData = {
+    nodes: [],
+    links: []
+  };
+  console.log('Initialized empty graph data for production');
+}
+
+// Placeholder - assigns random links to nodes
 function recalculateLinks() {
   const nodeCount = graphData.nodes.length;
   const newLinks = [];
@@ -64,10 +72,7 @@ io.on('connection', (socket) => {
       val: 1,
     };
     graphData.nodes.push(newNode);
-
-    // Recalculate links after adding a new node
     recalculateLinks();
-
     io.emit('graph update', graphData);
   });
 
@@ -78,4 +83,5 @@ io.on('connection', (socket) => {
 
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
 });
