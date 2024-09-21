@@ -2,23 +2,815 @@
     "nodes": [
         {
             "id": "0",
-            "name": "Climate change is a serious threat"
+            "name": "The top team at FTX made poor decisions"
         },
         {
             "id": "1",
-            "name": "Renewable energy can mitigate climate change"
+            "name": "It's fun to be part of a global community of people trying to help the world"
         },
         {
             "id": "2",
-            "name": "Economic growth is necessary for progress"
+            "name": "There should be a clear way to express that you are concerned about fraud/ sexual harassment in EA spaces/organisations and a thing to do if not listened to"
         },
         {
             "id": "3",
-            "name": "Environmental regulations hinder economic growth"
+            "name": "There should be a community-elected board in EA"
         },
         {
             "id": "4",
-            "name": "Technology can solve environmental problems"
+            "name": "There should be prediction markets on top EA figures and whether they will be found guilty of scandals"
+        },
+        {
+            "id": "5",
+            "name": "Democratization is a means to an end not an end in itself"
+        },
+        {
+            "id": "6",
+            "name": "I had concerns about crypto"
+        },
+        {
+            "id": "7",
+            "name": "I feel grossed out by what happened at FTX"
+        },
+        {
+            "id": "8",
+            "name": "I thought someone was checking if FTX was legit"
+        },
+        {
+            "id": "9",
+            "name": "EA should not aim to be a community"
+        },
+        {
+            "id": "10",
+            "name": "EAGs should have more robust questioning of key community figures"
+        },
+        {
+            "id": "11",
+            "name": "There should be a financial investigation team of at least 1 person to vet billionaires"
+        },
+        {
+            "id": "12",
+            "name": "We took SBF's money, we didn't have to invest in him reputationally as well"
+        },
+        {
+            "id": "13",
+            "name": "Some members of EA knew SBF had acted dishonestly in the past. It's bad that this information didn't flow to those who needed it"
+        },
+        {
+            "id": "14",
+            "name": "We shouldn't blame ourselves for not spotting fraud faster than billions of dollars of crypto money"
+        },
+        {
+            "id": "15",
+            "name": "People in EA knew the EAs in FTX. We are partially to blame for FTX not being found out sooner"
+        },
+        {
+            "id": "16",
+            "name": "This has been a hard week"
+        },
+        {
+            "id": "17",
+            "name": "EAs should be more wary of utilitarianism as a result."
+        },
+        {
+            "id": "18",
+            "name": "Others would call me an EA"
+        },
+        {
+            "id": "19",
+            "name": "I work in an EA cause area"
+        },
+        {
+            "id": "20",
+            "name": "I think Longtermism is true"
+        },
+        {
+            "id": "21",
+            "name": "I think Longtermism is less important than just reducing x-risk"
+        },
+        {
+            "id": "22",
+            "name": "Most of the responses people are suggesting are things they thought anyway that have nothing to do with FTX"
+        },
+        {
+            "id": "23",
+            "name": "High trust communities should act very harshly when they catch deception"
+        },
+        {
+            "id": "24",
+            "name": "Lantern lost money in the FTX collapse, so even though they didn't like Sam they probably didn't suspect outright fraud."
+        },
+        {
+            "id": "25",
+            "name": "ETG through a crypto exchange should've rung alarm bells to begin with"
+        },
+        {
+            "id": "26",
+            "name": "Daytime at EAGs should be a place for meetings, not flirting, however well intentioned."
+        },
+        {
+            "id": "27",
+            "name": "\"EA should democratise\", without any detail on how this could happen or would have prevented FTX, is just an applause light."
+        },
+        {
+            "id": "28",
+            "name": "What SBF did was wrong regardless of how likely it was to succeed."
+        },
+        {
+            "id": "29",
+            "name": "I feel sad about how much recent criticism has taken the form of attacks on individuals."
+        },
+        {
+            "id": "30",
+            "name": "SBF's utility should not have been linear - $10Bn for x-risk reduction is better than 50% $20Bn or $50% 0."
+        },
+        {
+            "id": "31",
+            "name": "The FTX top team did not consider the downside risk of their actions on EA. These harms should have been in their calculations."
+        },
+        {
+            "id": "32",
+            "name": "It sucks that something I care about is now tainted with harm to FTX depositors."
+        },
+        {
+            "id": "33",
+            "name": "I am strongly considering giving my grant back, or intend to."
+        },
+        {
+            "id": "34",
+            "name": "Most reactions at this point are overreactions and we should take a month or two to look back before we make significant changes."
+        },
+        {
+            "id": "35",
+            "name": "If most members of EA would think your action was wrong if they knew about it, then if it's $100m or more, don't do it."
+        },
+        {
+            "id": "36",
+            "name": "EA leaders should be transparent about what they knew about SBF and when"
+        },
+        {
+            "id": "37",
+            "name": "EA leaders should be transparent about what they knew about SBF and when - but it's okay if this takes a few months"
+        },
+        {
+            "id": "38",
+            "name": "EA is being criticised more than usual right now even about topics that are totally unrelated to FTX"
+        },
+        {
+            "id": "39",
+            "name": "EA could benefit from more diversity and epistemological humility."
+        },
+        {
+            "id": "40",
+            "name": "Flirting at EAGs should be heavily discouraged even after daytime."
+        },
+        {
+            "id": "41",
+            "name": "EAGs should not have raves."
+        },
+        {
+            "id": "42",
+            "name": "EA orgs should be transparent about who makes important decisions and how"
+        },
+        {
+            "id": "43",
+            "name": "\"EA leaders\" are the people who control the money and the brand"
+        },
+        {
+            "id": "44",
+            "name": "Distribution of money in EA should be controlled by a much broader group than it is now"
+        },
+        {
+            "id": "45",
+            "name": "People have been building up frustrations and are now airing them"
+        },
+        {
+            "id": "46",
+            "name": "Democratic and transparent processes of decision making are better for both quality and oversight"
+        },
+        {
+            "id": "47",
+            "name": "I think EA is epistemically humble but external people don't seem to think so"
+        },
+        {
+            "id": "48",
+            "name": "EA \"leadership\" needs to do a better job managing and disclosing potential conflicts of interest."
+        },
+        {
+            "id": "49",
+            "name": "Key organizations in EA need better safeguards to prevent their viewpoints and leadership activities from being compromised by a megadonor."
+        },
+        {
+            "id": "50",
+            "name": "Will MacAskill should expand on his statement, not commenting on FTX due to legal exposure, but on his role in SBF rep. laundering prior to"
+        },
+        {
+            "id": "51",
+            "name": "I feel that the long term future is worth caring about, regardless of whether some longtermism\u2122\ufe0f is true\u00ae\ufe0f"
+        },
+        {
+            "id": "52",
+            "name": "There needs to be an organization or voice within EA that is financially and otherwise independent of any megadonors."
+        },
+        {
+            "id": "53",
+            "name": "CEA should publish an annual bubble size/influence map of power players within greater EA and which orgs/what size funds do they influence"
+        },
+        {
+            "id": "54",
+            "name": "CEA should annually publish salaries & extras of everyone within the EA ecosystem, CEA employees, organisers, local EAs, conf \"volunteers\" etc"
+        },
+        {
+            "id": "55",
+            "name": "Donor-led EA massively undervalues direct constructive action without money, such as food not bombs"
+        },
+        {
+            "id": "56",
+            "name": "It seems likely that most of the value in effective altruism is communicating to existing billionaires how to not be a billionaire better"
+        },
+        {
+            "id": "57",
+            "name": "The actual loss to EA cause areas is not that great. The supposed $16bn of FTX money was never ours and probably didn't even exist."
+        },
+        {
+            "id": "58",
+            "name": "CEA should list the donors, amounts and where exactly their particular money flows in great amount of digestible graphic detail"
+        },
+        {
+            "id": "59",
+            "name": "Public and media commentary on EA overemphasises utilitarianism."
+        },
+        {
+            "id": "60",
+            "name": "There should be quality control and challenging content selection at EAG/x to prevent timewasting on half-baked self-promoting ideas"
+        },
+        {
+            "id": "61",
+            "name": "Individuals and orgs may be at fault but it makes little sense to assign blame to the entire community/movement."
+        },
+        {
+            "id": "62",
+            "name": "There are tractable approaches to improving whistleblower systems in EA"
+        },
+        {
+            "id": "63",
+            "name": "It's all well and good to ask for less harassment, but how to implement it?"
+        },
+        {
+            "id": "64",
+            "name": "There should be a single website with all EA grants, searchable."
+        },
+        {
+            "id": "65",
+            "name": "Neither FTXFF nor OpenPhil have evidence of being captured by their donors."
+        },
+        {
+            "id": "66",
+            "name": "The community part of EA is valuable but often not cost effective or charitable (professional orgs or clubs?). It should be more separated"
+        },
+        {
+            "id": "67",
+            "name": "Less harassment is implemented by \u201cculture\u201d; culture norms spread by influential/high rep ppl visibly reinforcing good behaviours."
+        },
+        {
+            "id": "68",
+            "name": "It was a mistake for FTX to get so involved in partisan politics"
+        },
+        {
+            "id": "69",
+            "name": "It is important to be vegetarian/vegan."
+        },
+        {
+            "id": "70",
+            "name": "Neartermism is important."
+        },
+        {
+            "id": "71",
+            "name": "Longtermist causes are orders of magnitude more important than neartermist causes."
+        },
+        {
+            "id": "72",
+            "name": "I think climate change is an important EA cause area."
+        },
+        {
+            "id": "73",
+            "name": "I have a high level of trust in EA leadership, broadly construed."
+        },
+        {
+            "id": "74",
+            "name": "I find the philosophy of longtermism compelling."
+        },
+        {
+            "id": "75",
+            "name": "I feel comfortable criticising EA leadership publicly."
+        },
+        {
+            "id": "76",
+            "name": "I had no idea that SBF had a $40 mil penthouse in the Bahamas."
+        },
+        {
+            "id": "77",
+            "name": "The people who attend EAGs are representative of the broader community."
+        },
+        {
+            "id": "78",
+            "name": "CEA should make public its admission criteria for EAGs."
+        },
+        {
+            "id": "79",
+            "name": "I don't believe in longtermism and I don't feel like I can mention that to other EAs."
+        },
+        {
+            "id": "80",
+            "name": "Many EAs take no significant, costly action, like donating 10% of their income."
+        },
+        {
+            "id": "81",
+            "name": "It was bad that there wasn't a way to gather information about FTX and people's concerns."
+        },
+        {
+            "id": "82",
+            "name": "It was a mistake at the time for FTX to be involved in politics"
+        },
+        {
+            "id": "83",
+            "name": "EA organizations should be at least as transparent as governments, subject to disclosed exceptions for compelling reasons."
+        },
+        {
+            "id": "84",
+            "name": "I identify myself as in full-time EA-related work."
+        },
+        {
+            "id": "85",
+            "name": "People working in fun jobs at EA organisations is a lesser sacrifice than giving 10% of income"
+        },
+        {
+            "id": "86",
+            "name": "I derive a significant (to me) amount of my income from meta EA organizations or work (not direct work on AI, poverty, etc.)"
+        },
+        {
+            "id": "87",
+            "name": "I think my personal financial contributions are a sizable portion of my overall contribution to the EA movement."
+        },
+        {
+            "id": "88",
+            "name": "I am dissatisfied or disagree with the political strategy SBF and SBF's orbit pursued"
+        },
+        {
+            "id": "89",
+            "name": "\"Be cause neutral\" means \"do the best thing regardless of your favourite cause\", not \"split effort evenly between causes people like\""
+        },
+        {
+            "id": "90",
+            "name": "I am dissatisfied or disagree with Protect Our Future PAC's political giving. (the org that did most of SBF's giving in political races)."
+        },
+        {
+            "id": "91",
+            "name": "Consequentialism implies you should be the sort of person that would be best for the world, not calculate the EV of each individual action"
+        },
+        {
+            "id": "92",
+            "name": "I was concerned that SBF's political giving was led by his brother's friend but felt that I could not voice my concern to any relevant EAs."
+        },
+        {
+            "id": "93",
+            "name": "Will MacAskill has received more hate from the EA community in the last week than Sam Bankman-Fried. That seems unfair."
+        },
+        {
+            "id": "94",
+            "name": "Stories from \"ordinary EAs\" should be articulated and shared, so ppl have wider understanding of the community."
+        },
+        {
+            "id": "95",
+            "name": "There's only so many times you can claim you're afraid of being silenced in an interview in a major newspaper without losing credibility"
+        },
+        {
+            "id": "96",
+            "name": "It's really upsetting to see people hating on poly people because of FTX rumours"
+        },
+        {
+            "id": "97",
+            "name": "It's really upsetting to see people hating on neurodivergent people because of FTX rumours"
+        },
+        {
+            "id": "98",
+            "name": "I am or know someone who needs stims to manage ADHD, and would rather not see overblown claims about them turning SBF into a degen gambler"
+        },
+        {
+            "id": "99",
+            "name": "I noticed that 'dying with dignity' was mostly about consequentialism, bounded rationality, and the unilateralist's curse, not AI risk."
+        },
+        {
+            "id": "100",
+            "name": "We know too little about the future to be effective longtermists, because of that, longtermist research is often unaccountable."
+        },
+        {
+            "id": "101",
+            "name": "The lack of diversity in people's educational and occupational background in the EA Community is a red flag."
+        },
+        {
+            "id": "102",
+            "name": "Sexual harassment is bad and preventing it is important for our community, but I'm confused about what it has to do with FTX"
+        },
+        {
+            "id": "103",
+            "name": "I consider myself to be extremely invested in EA or the EA community; it is a major focus of my life."
+        },
+        {
+            "id": "104",
+            "name": "It's frustrating how much criticism of EA gets labelled \"bad faith\". A community trying to improve the world needs to understand it better"
+        },
+        {
+            "id": "105",
+            "name": "The reasons to believe EA leaders didn't deserve the celebration they get predates FTX - FTX just highlights it more"
+        },
+        {
+            "id": "106",
+            "name": "The EA community needs to understand how to interact with the world outside it better. A tight knit community can easily become insular"
+        },
+        {
+            "id": "107",
+            "name": "Will MacAskill should stop being the face of EA. EA shouldn't have a single public face."
+        },
+        {
+            "id": "108",
+            "name": "Longtermism is mostly a motte and bailey. Motte = future people matter, bailey = AI might kill us in 2-3 decades. This is dishonest"
+        },
+        {
+            "id": "109",
+            "name": "CEA isn't good enough at leadership to play the central controlling role in the community it tries to play"
+        },
+        {
+            "id": "110",
+            "name": "A crisis is also an opportunity. This is a good time to consider what the good and bad in EA is."
+        },
+        {
+            "id": "111",
+            "name": "I've lost faith in the EA community's ability to live up to its high aspirations. The people are good but systemic issues are neglected"
+        },
+        {
+            "id": "112",
+            "name": "Sam Bankman-Fried looks like he's dark triad - Machiavellian, psychopathy, narcissism. He was never driven by empathy or maximizing utility"
+        },
+        {
+            "id": "113",
+            "name": "This (Polis) is a useful tool: useful for highlighting perspectives and clusters, not representativeness"
+        },
+        {
+            "id": "114",
+            "name": "How EA comes off in news articles is relatively unimportant - good EA work will eventually speak for itself."
+        },
+        {
+            "id": "115",
+            "name": "It's really bad that EAs don't feel comfortable questioning longtermism. This points to deeper groupthink inside EA."
+        },
+        {
+            "id": "116",
+            "name": "EA systematically neglects its risks and negative effects based on the false assumption that good intentions, smarts and community are enough"
+        },
+        {
+            "id": "117",
+            "name": "If anyone is at fault it is a few EA community leaders who knew about the SBF issue and not the Global EA community who didn't know anything"
+        },
+        {
+            "id": "118",
+            "name": "The poll suggests that there are two different subgroups within EA: \"democratic\" and \"technocratic\". Perhaps EA should split to reflect this"
+        },
+        {
+            "id": "119",
+            "name": "EA could benefit by consulting a wider range of outside experts in areas like politics, org governance, sexual assault, vetting megafunders"
+        },
+        {
+            "id": "120",
+            "name": "I feel less connected to EA in light of the FTX situation."
+        },
+        {
+            "id": "121",
+            "name": "EA was better before it went in the longtermist direction."
+        },
+        {
+            "id": "122",
+            "name": "It would have been worse if FTX continued for years stealing and fraudulently funding EA causes before collapsing"
+        },
+        {
+            "id": "123",
+            "name": "We shouldn't beat ourselves up for not finding out FTX sooner but we should take steps to better investigate future concerns & megafunders"
+        },
+        {
+            "id": "124",
+            "name": "EA underappreciates/neglects the impactfulness of the government of the United States--the world's superpower"
+        },
+        {
+            "id": "125",
+            "name": "Sam Bankman Fried used EA to whitewash his reputation and business"
+        },
+        {
+            "id": "126",
+            "name": "Too many of these statements assert \"A and B\", when I agree with A or B but not both."
+        },
+        {
+            "id": "127",
+            "name": "The lack of contingency planning for FTX's collapse was a bigger mistake than the failure to anticipate it with higher probability"
+        },
+        {
+            "id": "128",
+            "name": "My degree or career is in STEM"
+        },
+        {
+            "id": "129",
+            "name": "Making clusters explicit using polis will promote tribalism without any benefit"
+        },
+        {
+            "id": "130",
+            "name": "The current fiasco might have been prevented if EA emphasized moral pluralism more"
+        },
+        {
+            "id": "131",
+            "name": "Longtermism and global health would be better off as separate communities"
+        },
+        {
+            "id": "132",
+            "name": "More emphasis on criticism/red teaming could've prevented the current fiasco"
+        },
+        {
+            "id": "133",
+            "name": "Anonymous prediction markets on relevant topics (FTX failure say, or broad reputation crisis risk) could've prevented the current fiasco"
+        },
+        {
+            "id": "134",
+            "name": "The EA community would be stronger if we showed more warmth and appreciation to each other (leadership to members, & members to leadership)"
+        },
+        {
+            "id": "135",
+            "name": "It's a good thing if people are more comfortable criticizing EA in the wake of this, even if most critiques aren't FTX-relevant"
+        },
+        {
+            "id": "136",
+            "name": "EA needs to understand the psychology behind what SBF/Caroline/Nishad did, in order to develop safeguards against it"
+        },
+        {
+            "id": "137",
+            "name": "It would be good for EA if Caroline or Nishad explained what went wrong, even if they get more jail time due to speaking publicly"
+        },
+        {
+            "id": "138",
+            "name": "EA was not the primary contributor to the FTX fiasco"
+        },
+        {
+            "id": "139",
+            "name": "We should be more concerned about how effective a governance method is than how democratic it is"
+        },
+        {
+            "id": "140",
+            "name": "Top EAs should be encouraged to take more vacations and get less attached to their work, in order to see a broader perspective"
+        },
+        {
+            "id": "141",
+            "name": "Criticizing EA, or the work of people in it, is bad for your EA career"
+        },
+        {
+            "id": "142",
+            "name": "EA got duped by SBF because of wishful thinking"
+        },
+        {
+            "id": "143",
+            "name": "Even with agree/disagree voting, the EA Forum voting system encourages conformity too much"
+        },
+        {
+            "id": "144",
+            "name": "I self-censor regularly in discussions with EAs"
+        },
+        {
+            "id": "145",
+            "name": "EA leadership should engage carefully with the media instead of letting negative articles get written with no EA input"
+        },
+        {
+            "id": "146",
+            "name": "We should consider abandoning our moral intuitions if a mathematical argument suggests the intuition is incoherent"
+        },
+        {
+            "id": "147",
+            "name": "We should try & identify every point at which the FTX fiasco could've been stopped, and implement new safeguards for as many as possible"
+        },
+        {
+            "id": "148",
+            "name": "If EA deferred to mainstream opinion more, it would lose something valuable"
+        },
+        {
+            "id": "149",
+            "name": "When answering a pol.is statement, it can be hard to consider the claim in isolation on its merits, without confusing it for related claims"
+        },
+        {
+            "id": "150",
+            "name": "The FTX fiasco is the worst thing that ever happened to EA"
+        },
+        {
+            "id": "151",
+            "name": "We should be concerned that broad popularization of longtermism could be used to justify actions that are actually harmful on expectation"
+        },
+        {
+            "id": "152",
+            "name": "It is easy to suggest safeguards but safeguards have costs as well as benefits. These need to be considered."
+        },
+        {
+            "id": "153",
+            "name": "EA should rerun the criticism contest at least every 5 years"
+        },
+        {
+            "id": "154",
+            "name": "Even if EA couldn't have caught SBF's fraud, there are other important lessons we can take away here"
+        },
+        {
+            "id": "155",
+            "name": "The FTX fiasco is a single data point; we shouldn't update overmuch"
+        },
+        {
+            "id": "156",
+            "name": "Criticism & transparency are complementary goods--criticism is of little use without transparency to know what to criticize, and vice versa"
+        },
+        {
+            "id": "157",
+            "name": "EA underrates risks from poor governance."
+        },
+        {
+            "id": "158",
+            "name": "A significant harm from transparency is an incentive to look good without actually being good"
+        },
+        {
+            "id": "159",
+            "name": "At least 30% of pol.is statements should have a number in them, and you agree/disagree based on whether the number is too high or low"
+        },
+        {
+            "id": "160",
+            "name": "EA thought leaders were largely misguided in their turn from near-termist to long-termist priorities"
+        },
+        {
+            "id": "161",
+            "name": "Utilitarianism is the one true normative ethical theory"
+        },
+        {
+            "id": "162",
+            "name": "Consequentialism is the one true family of normative ethical theories"
+        },
+        {
+            "id": "163",
+            "name": "Utilitarianism provides an effective way for humans to calculate the moral rightness or wrongness of their actions"
+        },
+        {
+            "id": "164",
+            "name": "The actions of FTX and SBF provides some meaningful update on the consequences of promoting consequentialism"
+        },
+        {
+            "id": "165",
+            "name": "Enough has been done by the EA community to guide against ends-justifying-means moral reasoning."
+        },
+        {
+            "id": "166",
+            "name": "More emphasis should be placed in the EA community on rules or virtues to protect against ends-justifying-means moral reasoning."
+        },
+        {
+            "id": "167",
+            "name": "There should be more engagement with ethical theories besides utilitarianism in the EA community moving forward."
+        },
+        {
+            "id": "168",
+            "name": "There should be less hero-worship of early or influential people within EA, moving forward."
+        },
+        {
+            "id": "169",
+            "name": "Virtue ethics is largely useless."
+        },
+        {
+            "id": "170",
+            "name": "Deontological ethics is largely useless."
+        },
+        {
+            "id": "171",
+            "name": "There should be more engagement and understanding of moral philosophers outside of Singer and Parfit in the EA community."
+        },
+        {
+            "id": "172",
+            "name": "I am proud to be called an effective altruist."
+        },
+        {
+            "id": "173",
+            "name": "I am happy with the level and quality of dialogue on the EA online forum."
+        },
+        {
+            "id": "174",
+            "name": "Utilitarianism is intuitive to me."
+        },
+        {
+            "id": "175",
+            "name": "Utilitarianism is unintuitive to me."
+        },
+        {
+            "id": "176",
+            "name": "EA should improve towards greater diversity in gender and race."
+        },
+        {
+            "id": "177",
+            "name": "The global EA community is incredibly valuable for people outside of EA hubs"
+        },
+        {
+            "id": "178",
+            "name": "Donors should be a minority on a charity board"
+        },
+        {
+            "id": "179",
+            "name": "It's not that hard to design a democratic structure for the EA movement."
+        },
+        {
+            "id": "180",
+            "name": "I have no idea about the actual process how the opinions of EA leaders get the status of quasi-official opinions of \"the EA community\"."
+        },
+        {
+            "id": "181",
+            "name": "I have no idea how some people become \"EA leaders\" in the first place."
+        },
+        {
+            "id": "182",
+            "name": "I live in continental Europe."
+        },
+        {
+            "id": "183",
+            "name": "I have read the reporting by The Economist about the EA / FTX thing."
+        },
+        {
+            "id": "184",
+            "name": "I have listened to the Sam Harris podcast episode about the EA / FTX thing."
+        },
+        {
+            "id": "185",
+            "name": "I have listened to the \"Ones and Tooze\" podcast episode about FTX."
+        },
+        {
+            "id": "186",
+            "name": "I am younger than 40 years."
+        },
+        {
+            "id": "187",
+            "name": "I am older than 30 years."
+        },
+        {
+            "id": "188",
+            "name": "I have a background in economics."
+        },
+        {
+            "id": "189",
+            "name": "The FTX thing does not tell us much about the relative value of different moral philosophies."
+        },
+        {
+            "id": "190",
+            "name": "I don't care per se how expensive SBF's real estate was."
+        },
+        {
+            "id": "191",
+            "name": "The opinions of the \"EA leadership\" are often not representative of most of the EA community, but are treated as such."
+        },
+        {
+            "id": "192",
+            "name": "The word \"longtermism\" is divisive."
+        },
+        {
+            "id": "193",
+            "name": "I consider myself part of the EA community."
+        },
+        {
+            "id": "194",
+            "name": "I frequently read posts in the EA forum."
+        },
+        {
+            "id": "195",
+            "name": "I frequently read Lesswrong."
+        },
+        {
+            "id": "196",
+            "name": "I consider myself part of the rationalist community."
+        },
+        {
+            "id": "197",
+            "name": "What is perceived and represented as the opinion of the \"EA community\" will not be changed by surveys like this one."
+        },
+        {
+            "id": "198",
+            "name": "What is perceived and represented as the opinion of the \"EA community\" does not reflect opinions of most EAs."
+        },
+        {
+            "id": "199",
+            "name": "I think it's somewhat likely I would've acted similarly to SBF if put in a similar situation."
+        },
+        {
+            "id": "200",
+            "name": "It's actually okay to accept fraudulent money, as long as you don't cover it up or give favors."
+        },
+        {
+            "id": "201",
+            "name": "The Boards at EA orgs routinely lack the skills and experience you would expect of Board members"
+        },
+        {
+            "id": "202",
+            "name": "Boards of EA orgs would be more effective if they recruited fewer moral philosophers and more people with relevant governance expertise"
         }
     ]
 }
