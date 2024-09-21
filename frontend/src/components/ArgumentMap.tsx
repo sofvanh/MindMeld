@@ -19,7 +19,7 @@ interface GraphData {
   links: Link[];
 }
 
-const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
 const socket = io(backendUrl);
 
 const ArgumentMap: React.FC = () => {
