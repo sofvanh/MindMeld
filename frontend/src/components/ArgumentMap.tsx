@@ -20,6 +20,7 @@ interface GraphData {
 }
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+console.log('Attempting to connect to backend at:', backendUrl);
 const socket = io(backendUrl);
 
 const ArgumentMap: React.FC = () => {
@@ -30,6 +31,16 @@ const ArgumentMap: React.FC = () => {
   });
 
   useEffect(() => {
+    console.log('Initializing socket connection');
+
+    socket.on('connect', () => {
+      console.log('Socket connected successfully');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
     // Listen for initial graph data
     socket.on('initial graph data', (data: GraphData) => {
       setGraphData(data);
@@ -42,10 +53,13 @@ const ArgumentMap: React.FC = () => {
 
     // Request initial graph data
     socket.emit('get graph data');
+    console.log('Requested initial graph data');
 
     return () => {
       socket.off('initial graph data');
       socket.off('graph update');
+      socket.off('connect');
+      socket.off('connect_error');
     };
   }, []);
 
@@ -89,7 +103,6 @@ const ArgumentMap: React.FC = () => {
         nodeLabel="name"
         nodeAutoColorBy="id"
         onNodeClick={handleNodeClick}
-        // d3Force={('link', d3.forceLink().id((d: any) => d.id).strength((d: any) => d.strength))}
         enableNodeDrag={false}
       />
     </div>

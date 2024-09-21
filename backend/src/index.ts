@@ -60,13 +60,15 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('A user connected, socket ID:', socket.id);
 
   socket.on('get graph data', () => {
+    console.log('Sending initial graph data to socket:', socket.id);
     socket.emit('initial graph data', graphData);
   });
 
   socket.on('add argument', (text: string) => {
+    console.log('Received new argument from socket', socket.id, ':', text);
     const newNode = {
       id: String(graphData.nodes.length),
       name: text,
@@ -74,15 +76,17 @@ io.on('connection', (socket) => {
     };
     graphData.nodes.push(newNode);
     recalculateLinks();
+    console.log('Updated graph data, emitting to all clients');
     io.emit('graph update', graphData);
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('User disconnected, socket ID:', socket.id);
   });
 });
 
 server.listen(port, () => {
   console.log(`Server running at ${backendUrl}:${port}`);
   console.log(`Environment: ${environment}`);
+  console.log(`Allowing CORS for origin: ${frontendUrl}`);
 });
