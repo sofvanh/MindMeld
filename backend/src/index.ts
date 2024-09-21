@@ -20,25 +20,28 @@ const io = new Server(server, {
   }
 });
 
-let graphData: { nodes: any[], links: any[] };
+let graphData: { nodes: any[], links: any[] } = {
+  nodes: [],
+  links: []
+};
 
 if (environment === 'development') {
   const testDataPath = path.join(__dirname, '../testdata.json');
   const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf-8'));
 
   // Add embedding to each node in testData
-  testData.nodes.forEach((node: any) => {
-    node.embedding = embedText(node.name);
-  });
-
-  graphData = testData;
-  recalculateLinks();
-  console.log('Loaded test data for development');
+  (async () => {
+    const nodeNames = testData.nodes.map((node: { name: string }) => node.name);
+    const embeddings = await embedText(nodeNames);
+    testData.nodes.forEach((node: { embedding: number[] }, index: number) => {
+      node.embedding = embeddings[index];
+    });
+    graphData = testData;
+    recalculateLinks();
+    console.log('Loaded test data for development');
+    io.emit('graph update', graphData);
+  })();
 } else {
-  graphData = {
-    nodes: [],
-    links: []
-  };
   console.log('Initialized empty graph data for production');
 }
 
@@ -83,13 +86,13 @@ io.on('connection', (socket) => {
     socket.emit('initial graph data', graphData);
   });
 
-  socket.on('add argument', (text: string) => {
+  socket.on('add argument', async (text: string) => {
     console.log('Received new argument from socket', socket.id, ':', text);
     const newNode = {
       id: String(graphData.nodes.length),
       name: text,
       val: 1,
-      embedding: embedText(text)
+      embedding: (await embedText([text]))[0]
     };
     graphData.nodes.push(newNode);
     recalculateLinks();
