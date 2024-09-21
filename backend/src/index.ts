@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import fs from 'fs';
 import path from 'path';
 
+import { embedText, cosineSimilarity } from './embeddingHandler';
 
 const backendUrl = process.env.BACKEND_URL || 'http://localhost';
 const port = process.env.PORT || 3001;
@@ -24,6 +25,12 @@ let graphData: { nodes: any[], links: any[] };
 if (environment === 'development') {
   const testDataPath = path.join(__dirname, '../testdata.json');
   const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf-8'));
+
+  // Add embedding to each node in testData
+  testData.nodes.forEach((node: any) => {
+    node.embedding = embedText(node.name);
+  });
+
   graphData = testData;
   recalculateLinks();
   console.log('Loaded test data for development');
@@ -35,21 +42,30 @@ if (environment === 'development') {
   console.log('Initialized empty graph data for production');
 }
 
-// Placeholder - assigns random links to nodes
-function recalculateLinks() {
+// K-nearest neighbors algorithm
+function recalculateLinks(k = 3) {
   const nodeCount = graphData.nodes.length;
-  const newLinks = [];
+  const newLinks: { source: string, target: string }[] = [];
 
-  for (let i = 0; i < nodeCount + 1; i++) {
-    const source = Math.floor(Math.random() * nodeCount).toString();
-    let target = Math.floor(Math.random() * nodeCount).toString();
+  for (let i = 0; i < nodeCount; i++) {
+    const sourceNode = graphData.nodes[i];
+    const similarities = graphData.nodes.map((targetNode, index) => {
+      if (index === i) { // Skip self
+        return { index, similarity: -1 };
+      } 
+      return {
+        index,
+        similarity: cosineSimilarity(sourceNode.embedding, targetNode.embedding)
+      };
+    });
 
-    // Ensure source and target are different
-    while (target === source) {
-      target = Math.floor(Math.random() * nodeCount).toString();
-    }
+    const nearestNeighbors = similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
 
-    newLinks.push({ source, target });
+    nearestNeighbors.forEach(neighbor => {
+      newLinks.push({ source: i.toString(), target: neighbor.index.toString() });
+    });
   }
 
   graphData.links = newLinks;
@@ -73,6 +89,7 @@ io.on('connection', (socket) => {
       id: String(graphData.nodes.length),
       name: text,
       val: 1,
+      embedding: embedText(text)
     };
     graphData.nodes.push(newNode);
     recalculateLinks();
