@@ -29,10 +29,37 @@ if (environment === 'development') {
   console.log('Loaded test data for development');
 } else {
   graphData = {
-    nodes: [],
-    links: []
+    nodes: [
+      {
+        "id": "0",
+        "name": "Climate change is a serious threat"
+      },
+      {
+        "id": "1",
+        "name": "Renewable energy can mitigate climate change"
+      },
+      {
+        "id": "2",
+        "name": "Economic growth is necessary for progress"
+      },
+      {
+        "id": "3",
+        "name": "Environmental regulations hinder economic growth"
+      },
+      {
+        "id": "4",
+        "name": "Technology can solve environmental problems"
+      }
+    ],
+    links: [
+      { source: "0", target: "1" },
+      { source: "1", target: "4" },
+      { source: "2", target: "3" },
+      { source: "3", target: "4" },
+      { source: "0", target: "2" }
+    ]
   };
-  console.log('Initialized empty graph data for production');
+  console.log('Initialized test graph for production');
 }
 
 // Placeholder - assigns random links to nodes
