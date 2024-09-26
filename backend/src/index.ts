@@ -42,7 +42,38 @@ if (environment === 'development') {
     io.emit('graph update', graphData);
   })();
 } else {
-  console.log('Initialized empty graph data for production');
+  graphData = {
+    nodes: [
+      {
+        "id": "0",
+        "name": "Climate change is a serious threat"
+      },
+      {
+        "id": "1",
+        "name": "Renewable energy can mitigate climate change"
+      },
+      {
+        "id": "2",
+        "name": "Economic growth is necessary for progress"
+      },
+      {
+        "id": "3",
+        "name": "Environmental regulations hinder economic growth"
+      },
+      {
+        "id": "4",
+        "name": "Technology can solve environmental problems"
+      }
+    ],
+    links: [
+      { source: "0", target: "1" },
+      { source: "1", target: "4" },
+      { source: "2", target: "3" },
+      { source: "3", target: "4" },
+      { source: "0", target: "2" }
+    ]
+  };
+  console.log('Initialized test graph for production');
 }
 
 // K-nearest neighbors algorithm
@@ -55,7 +86,7 @@ function recalculateLinks(k = 3) {
     const similarities = graphData.nodes.map((targetNode, index) => {
       if (index === i) { // Skip self
         return { index, similarity: -1 };
-      } 
+      }
       return {
         index,
         similarity: cosineSimilarity(sourceNode.embedding, targetNode.embedding)
