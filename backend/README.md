@@ -12,8 +12,8 @@ Run the container with `docker run -p 3001:3001 -v $(pwd):/app mindmeld-backend-
 
 ## Deployment
 
-Create new image in Google Cloud with `gcloud builds submit --tag gcr.io/mindmeld-backend/[IMAGE_NAME]`
+Create new image in Google Cloud with `./build.sh [IMAGE_NAME]`
 
-Deploy the image with `gcloud run deploy mindmeld --image gcr.io/mindmeld-backend/[IMAGE_NAME] --platform managed --region europe-west1 --allow-unauthenticated`
+Deploy the image with `./deploy.sh [IMAGE_NAME]`
 
 Show logs with `gcloud run services logs read mindmeld`
