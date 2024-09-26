@@ -71,8 +71,9 @@ const ArgumentMap: React.FC = () => {
     socket.emit('add argument', text);
   };
 
+  // TODO Would be better if the header and footer had heights defined as rem so we could use that when calculating the height here
   return (
-    <div className="w-full h-[600px] flex flex-row">
+    <div className="w-full h-[calc(100vh-112px)] flex flex-row">
       <div className="w-[400px] h-full bg-gray-100 p-4">
         <form onSubmit={(e) => {
           e.preventDefault();
@@ -84,13 +85,13 @@ const ArgumentMap: React.FC = () => {
           <input
             type="text"
             placeholder="Enter argument..."
-            className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-blue-500"
+            className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-stone-500 text-sm"
             onChange={(e) => setNewArgument(e.target.value)}
             value={newArgument}
           />
           <button
             type="submit"
-            className="mt-2 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="mt-2 w-full bg-stone-500 hover:bg-stone-700 text-white font-serif font-thin py-2 px-4 rounded"
           >
             Add Argument
           </button>
