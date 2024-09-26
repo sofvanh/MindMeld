@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import fs from 'fs';
 import path from 'path';
 
+import { embedText, cosineSimilarity } from './embeddingHandler';
 
 const backendUrl = process.env.BACKEND_URL || 'http://localhost';
 const port = process.env.PORT || 3001;
@@ -19,64 +20,59 @@ const io = new Server(server, {
   }
 });
 
-let graphData: { nodes: any[], links: any[] };
+let graphData: { nodes: any[], links: any[] } = {
+  nodes: [],
+  links: []
+};
 
 if (environment === 'development') {
   const testDataPath = path.join(__dirname, '../testdata.json');
   const testData = JSON.parse(fs.readFileSync(testDataPath, 'utf-8'));
-  graphData = testData;
-  recalculateLinks();
-  console.log('Loaded test data for development');
+
+  // Add embedding to each node in testData
+  (async () => {
+    const nodeNames = testData.nodes.map((node: { name: string }) => node.name);
+    const embeddings = await embedText(nodeNames);
+    testData.nodes.forEach((node: { embedding: number[] }, index: number) => {
+      node.embedding = embeddings[index];
+    });
+    graphData = testData;
+    recalculateLinks();
+    console.log('Loaded test data for development');
+    io.emit('graph update', graphData);
+  })();
 } else {
   graphData = {
-    nodes: [
-      {
-        "id": "0",
-        "name": "Climate change is a serious threat"
-      },
-      {
-        "id": "1",
-        "name": "Renewable energy can mitigate climate change"
-      },
-      {
-        "id": "2",
-        "name": "Economic growth is necessary for progress"
-      },
-      {
-        "id": "3",
-        "name": "Environmental regulations hinder economic growth"
-      },
-      {
-        "id": "4",
-        "name": "Technology can solve environmental problems"
-      }
-    ],
-    links: [
-      { source: "0", target: "1" },
-      { source: "1", target: "4" },
-      { source: "2", target: "3" },
-      { source: "3", target: "4" },
-      { source: "0", target: "2" }
-    ]
+    nodes: [],
+    links: []
   };
-  console.log('Initialized test graph for production');
+  console.log('Initialized empty graph for production');
 }
 
-// Placeholder - assigns random links to nodes
-function recalculateLinks() {
+// K-nearest neighbors algorithm
+function recalculateLinks(k = 3) {
   const nodeCount = graphData.nodes.length;
-  const newLinks = [];
+  const newLinks: { source: string, target: string }[] = [];
 
-  for (let i = 0; i < nodeCount + 1; i++) {
-    const source = Math.floor(Math.random() * nodeCount).toString();
-    let target = Math.floor(Math.random() * nodeCount).toString();
+  for (let i = 0; i < nodeCount; i++) {
+    const sourceNode = graphData.nodes[i];
+    const similarities = graphData.nodes.map((targetNode, index) => {
+      if (index === i) { // Skip self
+        return { index, similarity: -1 };
+      }
+      return {
+        index,
+        similarity: cosineSimilarity(sourceNode.embedding, targetNode.embedding)
+      };
+    });
 
-    // Ensure source and target are different
-    while (target === source) {
-      target = Math.floor(Math.random() * nodeCount).toString();
-    }
+    const nearestNeighbors = similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
 
-    newLinks.push({ source, target });
+    nearestNeighbors.forEach(neighbor => {
+      newLinks.push({ source: i.toString(), target: neighbor.index.toString() });
+    });
   }
 
   graphData.links = newLinks;
@@ -94,12 +90,13 @@ io.on('connection', (socket) => {
     socket.emit('initial graph data', graphData);
   });
 
-  socket.on('add argument', (text: string) => {
+  socket.on('add argument', async (text: string) => {
     console.log('Received new argument from socket', socket.id, ':', text);
     const newNode = {
       id: String(graphData.nodes.length),
       name: text,
       val: 1,
+      embedding: (await embedText([text]))[0]
     };
     graphData.nodes.push(newNode);
     recalculateLinks();
