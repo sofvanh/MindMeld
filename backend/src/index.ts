@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import { embedText } from './embeddingHandler';
 import { Graph, Argument } from './.shared/types';
 import { generateArgumentId } from './db/idGenerator';
+import { createGraph, getGraphs, getGraphData } from './db/dbOperations';
 
 const backendUrl = process.env.BACKEND_URL || 'http://localhost';
 const port = process.env.PORT || 3001;
@@ -20,7 +21,22 @@ const io = new Server(server, {
   }
 });
 
-const graphs: { [key: string]: Graph } = {};
+let graphsList: { id: string; name: string }[] = [];
+let graphs: { [key: string]: Graph } = {};
+
+async function initializeGraphs() {
+  graphsList = await getGraphs();
+  for (const { id } of graphsList) {
+    try {
+      const graphData = await getGraphData(id);
+      graphs[id] = graphData;
+    } catch (error) {
+      console.error(`Error loading graph ${id}:`, error);
+    }
+  }
+}
+
+initializeGraphs().catch(error => console.error('Error initializing graphs:', error));
 
 // K-nearest neighbors algorithm
 function recalculateLinks(graphId: string, k = 3) {
@@ -60,15 +76,22 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log('A user connected, socket ID:', socket.id);
 
-  // TODO Create graph
+  socket.on('create graph', async (name: string) => {
+    console.log('Creating graph');
+    try {
+      const graphId = await createGraph(name);
+      console.log(`New graph created with ID: ${graphId}`);
+      socket.emit('graph created', { id: graphId, name });
+    } catch (error) {
+      console.error('Error creating graph:', error);
+      socket.emit('graph creation error', { message: 'Failed to create graph' });
+    }
+  });
 
   socket.on('join graph', (graphId: string) => {
     console.log(`Socket ${socket.id} joining graph ${graphId}`);
     socket.join(graphId);
-    // if (!graphs[graphId]) {
-    //   graphs[graphId] = { id: graphId, name: `Graph ${graphId}`, arguments: [], edges: [] };
-    // }
-    socket.emit('initial graph data', graphs[graphId]);
+    socket.emit('graph data', graphs[graphId]);
   });
 
   socket.on('add argument', async ({ graphId, statement }: { graphId: string, statement: string }) => {
@@ -90,9 +113,8 @@ io.on('connection', (socket) => {
     // TODO Push to db
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected, socket ID:', socket.id);
-  });
+  socket.on('get graphs', () => socket.emit('graphs list', graphsList));
+  socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
 });
 
 server.listen(port, () => {

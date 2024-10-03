@@ -1,76 +1,31 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
-import io from 'socket.io-client';
-
-import { Argument, Graph } from '../shared/types';
+import { Graph } from '../shared/types';
 import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useWebSocket } from '../contexts/WebSocketContext';
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
-console.log('Attempting to connect to backend at:', backendUrl);
-const socket = io(backendUrl);
 
 const ArgumentMap: React.FC = () => {
+  const { socket } = useWebSocket();
   const { graphId } = useParams<{ graphId: string }>();
   const [newArgument, setNewArgument] = useState('');
   const [graph, setGraph] = useState<Graph | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('Initializing socket connection');
-    setError(null);
-
-    socket.on('connect', () => {
-      console.log('Socket connected successfully');
-      if (graphId) {
-        console.log(`Joining graph ${graphId}`);
-        socket.emit('join graph', graphId);
-      }
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-      setError('Unable to connect to the server. Please try again later.');
-    });
-
-    socket.on('initial graph data', (data: Graph) => {
-      if (data) {
-        setGraph(data);
-      } else {
-        setError(`Graph with ID ${graphId} not found.`);
-      }
-    });
-
-    socket.on('graph update', (data: Graph) => {
-      setGraph(data);
-    });
+    socket?.emit('join graph', graphId);
+    socket?.on('graph data', setGraph);
+    socket?.on('graph update', setGraph);
 
     return () => {
-      socket.off('initial graph data');
-      socket.off('graph update');
-      socket.off('connect');
-      socket.off('connect_error');
-    };
-  }, [graphId]);
+      socket?.off('graph update');
+    }
+  }, [socket, graphId])
 
-  const handleNodeClick = useCallback((node: Argument) => {
-    console.log('Clicked node:', node);
-  }, [graphId]);
-
-  const handleAddArgument = (text: string) => {
-    socket.emit('add argument', { graphId, text });
+  const handleAddArgument = (statement: string) => {
+    if (socket) {
+      socket.emit('add argument', { graphId, statement });
+    }
   };
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <p className="text-xl text-red-600 mb-4">{error}</p>
-        <Link to="/" className="bg-stone-500 hover:bg-stone-700 text-white font-serif font-thin py-2 px-4 rounded">
-          Return to Home
-        </Link>
-      </div>
-    );
-  }
 
   if (!graph) {
     return <div className="flex items-center justify-center h-full">Loading...</div>;
@@ -83,7 +38,7 @@ const ArgumentMap: React.FC = () => {
         <form onSubmit={(e) => {
           e.preventDefault();
           if (newArgument.trim()) {
-            handleAddArgument(newArgument);
+            handleAddArgument(newArgument.trim());
             setNewArgument('');
           }
         }}>
@@ -108,7 +63,7 @@ const ArgumentMap: React.FC = () => {
         graphData={{ nodes: graph?.arguments || [], links: graph?.edges || [] }}
         nodeLabel="name"
         nodeAutoColorBy="id"
-        onNodeClick={handleNodeClick}
+        // onNodeClick={handleNodeClick}
         enableNodeDrag={false}
       />
     </div>

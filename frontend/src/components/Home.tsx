@@ -1,13 +1,55 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useWebSocket } from '../contexts/WebSocketContext';
+
 
 const Home: React.FC = () => {
+  const { socket } = useWebSocket();
+  const [graphName, setGraphName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleCreateGraph = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (graphName.trim() && socket) {
+      console.log('Sending create graph event');
+      socket.emit('create graph', graphName);
+      setGraphName('');
+    }
+  };
+
+  React.useEffect(() => {
+    socket?.on('graph created', ({ id }) => navigate(`/graph/${id}`));
+    socket?.on('graph creation error', ({ message }) => setError(message));
+
+    return () => {
+      socket?.off('graph created');
+      socket?.off('graph creation error');
+    };
+  }, [socket, navigate]);
+
   return (
     <div className="text-center">
       <h1 className="text-2xl font-serif mb-4 mt-8">Welcome to MindMeld</h1>
-      <p className="mb-4">Select a graph or create a new one to get started.</p>
-      <Link to="/graph/new" className="bg-stone-500 hover:bg-stone-700 text-white font-serif font-thin py-2 px-4 rounded">
-        Create New Graph
+      <p className="mb-4">Create a new graph to get started.</p>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleCreateGraph} className="mb-4">
+        <input
+          type="text"
+          value={graphName}
+          onChange={(e) => setGraphName(e.target.value)}
+          placeholder="Enter graph name"
+          className="px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-stone-500 mr-2"
+        />
+        <button
+          type="submit"
+          className="bg-stone-500 hover:bg-stone-700 text-white font-serif font-thin py-2 px-4 rounded"
+        >
+          Create New Graph
+        </button>
+      </form>
+      <Link to="/graphs" className="text-stone-500 hover:text-stone-700">
+        View Existing Graphs
       </Link>
     </div>
   );

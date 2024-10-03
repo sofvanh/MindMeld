@@ -8,6 +8,11 @@ export async function createGraph(name: string): Promise<string> {
   return id;
 }
 
+export async function getGraphs(): Promise<{ id: string; name: string }[]> {
+  const result = await query('SELECT id, name FROM graphs ORDER BY name', []);
+  return result.rows;
+}
+
 export async function addArgument(graphId: string, statement: string, embedding: number[]): Promise<string> {
   const id = generateArgumentId();
   await query(
