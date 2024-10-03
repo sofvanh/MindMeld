@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "init_tables": "ts-node src/db/initDb.ts",
+    "copy_shared": "cp -r $(dirname $0)/../frontend/src/shared/ $(dirname $0)/src/.shared/"
   },
   "keywords": [],
   "author": "",
