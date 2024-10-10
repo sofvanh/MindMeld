@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { embedText, generateTopKSimilarEdges } from './embeddingHandler';
 import { Graph, Argument } from './.shared/types';
 import { generateArgumentId } from './db/idGenerator';
-import { createGraph, getGraphs, getGraphData } from './db/dbOperations';
+import { createGraph, getGraphs, getGraphData, addArgument, updateGraphEdges } from './db/dbOperations';
 
 const backendUrl = process.env.BACKEND_URL || 'http://localhost';
 const port = process.env.PORT || 3001;
@@ -48,8 +48,15 @@ io.on('connection', (socket) => {
     console.log('Creating graph');
     try {
       const graphId = await createGraph(name);
-      console.log(`New graph created with ID: ${graphId}`);
-      socket.emit('graph created', { id: graphId, name });
+      console.log(`New graph added to database with ID: ${graphId}`);
+
+      const newGraph = { id: graphId, name };
+      graphsList.push(newGraph);
+      graphs[graphId] = { id: graphId, name, arguments: [], edges: [] };
+      console.log(`New graph added to in-memory list: ${JSON.stringify(newGraph)}`);
+
+      socket.emit('graph created', newGraph);
+      io.emit('graphs list', graphsList);
     } catch (error) {
       console.error('Error creating graph:', error);
       socket.emit('graph creation error', { message: 'Failed to create graph' });
@@ -66,22 +73,24 @@ io.on('connection', (socket) => {
     console.log('Received new argument for graph', graphId, 'from socket', socket.id, ':', statement);
     if (!graphs[graphId]) return;
 
-    const id = generateArgumentId();
+    const graph = graphs[graphId];
     const embedding = (await embedText([statement]))[0];
+    const id = await addArgument(graphId, statement, embedding);
     const newArgument: Argument = {
       id,
       graphId,
       statement,
       embedding
     };
-    graphs[graphId].arguments.push(newArgument);
 
-    const newEdges = generateTopKSimilarEdges(graphs, graphId);
-    graphs[graphId].edges = newEdges;
-
-    console.log('Updated graph data, emitting to all clients in the graph');
+    graph.arguments.push(newArgument);
+    console.log('Added new argument', id)
+    const newEdges = generateTopKSimilarEdges(graph);
+    await updateGraphEdges(graphId, newEdges);
+    graph.edges = newEdges;
+    graphs[graphId] = graph;
+    console.log('Updated graph edges. Emitting to all clients in the graph');
     io.to(graphId).emit('graph update', graphs[graphId]);
-    // TODO Push new argument and edge changes to db
   });
 
   socket.on('get graphs', () => socket.emit('graphs list', graphsList));

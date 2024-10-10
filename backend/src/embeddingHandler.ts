@@ -2,13 +2,7 @@ import axios from 'axios';
 import { Edge, Graph } from './.shared/types';
 import { generateEdgeId } from './db/idGenerator';
 
-export function generateTopKSimilarEdges(graphs: { [key: string]: Graph }, graphId: string, k = 3): Edge[] {
-  const graph = graphs[graphId];
-  if (!graph) {
-    console.error(`Graph ${graphId} not found`);
-    return [];
-  }
-
+export function generateTopKSimilarEdges(graph: Graph, k = 3): Edge[] {
   const nodeCount = graph.arguments.length;
   const newLinks: Edge[] = [];
   const addedPairs = new Set<string>();
@@ -33,7 +27,7 @@ export function generateTopKSimilarEdges(graphs: { [key: string]: Graph }, graph
       const targetNode = graph.arguments[neighbor.index];
       const newLink = {
         id: generateEdgeId(),
-        graphId,
+        graphId: graph.id,
         sourceId: sourceNode.id,
         targetId: targetNode.id
       };
