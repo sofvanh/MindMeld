@@ -5,11 +5,24 @@ import { useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 
 
+interface ForceGraphData {
+  nodes: {
+    id: string;
+    name: string;
+  }[];
+  links: {
+    source: string;
+    target: string;
+  }[];
+}
+
+
 const ArgumentMap: React.FC = () => {
   const { socket } = useWebSocket();
   const { graphId } = useParams<{ graphId: string }>();
   const [newArgument, setNewArgument] = useState('');
   const [graph, setGraph] = useState<Graph | null>(null);
+  const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
 
   useEffect(() => {
     socket?.emit('join graph', graphId);
@@ -20,6 +33,14 @@ const ArgumentMap: React.FC = () => {
       socket?.off('graph update');
     }
   }, [socket, graphId])
+
+  useEffect(() => {
+    if (graph) {
+      const nodes = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement }));
+      const links = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
+      setGraphData({ nodes, links });
+    }
+  }, [graph]);
 
   const handleAddArgument = (statement: string) => {
     if (socket) {
@@ -60,7 +81,7 @@ const ArgumentMap: React.FC = () => {
       <ForceGraph2D
         width={window.innerWidth - 400}
         height={600}
-        graphData={{ nodes: graph?.arguments || [], links: graph?.edges || [] }}
+        graphData={graphData}
         nodeLabel="name"
         nodeAutoColorBy="id"
         // onNodeClick={handleNodeClick}

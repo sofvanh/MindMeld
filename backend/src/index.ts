@@ -1,8 +1,7 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
-
-import { embedText } from './embeddingHandler';
+import { embedText, generateTopKSimilarEdges } from './embeddingHandler';
 import { Graph, Argument } from './.shared/types';
 import { generateArgumentId } from './db/idGenerator';
 import { createGraph, getGraphs, getGraphData } from './db/dbOperations';
@@ -37,37 +36,6 @@ async function initializeGraphs() {
 }
 
 initializeGraphs().catch(error => console.error('Error initializing graphs:', error));
-
-// K-nearest neighbors algorithm
-function recalculateLinks(graphId: string, k = 3) {
-  // TODO
-  // const graph = graphs[graphId];
-  // if (!graph) return;
-
-  // const nodeCount = graph.arguments.length;
-  // const newLinks: Edge[] = [];
-
-  // for (let i = 0; i < nodeCount; i++) {
-  //   const sourceNode = graph.arguments[i];
-  //   const similarities = graph.arguments.map((targetNode, index) => {
-  //     if (index === i) return { index, similarity: -1 };
-  //     return {
-  //       index,
-  //       similarity: cosineSimilarity(sourceNode.embedding, targetNode.embedding)
-  //     };
-  //   });
-
-  //   const nearestNeighbors = similarities
-  //     .sort((a, b) => b.similarity - a.similarity)
-  //     .slice(0, k);
-
-  //   nearestNeighbors.forEach(neighbor => {
-  //     newLinks.push({ sourceId: sourceNode.id, target: graph.arguments[neighbor.index].id });
-  //   });
-  // }
-
-  // graph.edges = newLinks;
-}
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the MindMeld backend!' });
@@ -107,10 +75,13 @@ io.on('connection', (socket) => {
       embedding
     };
     graphs[graphId].arguments.push(newArgument);
-    recalculateLinks(graphId);
+
+    const newEdges = generateTopKSimilarEdges(graphs, graphId);
+    graphs[graphId].edges = newEdges;
+
     console.log('Updated graph data, emitting to all clients in the graph');
     io.to(graphId).emit('graph update', graphs[graphId]);
-    // TODO Push to db
+    // TODO Push new argument and edge changes to db
   });
 
   socket.on('get graphs', () => socket.emit('graphs list', graphsList));
