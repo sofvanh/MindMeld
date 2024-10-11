@@ -1,3 +1,15 @@
+# Build stage
+FROM node:20.11.0-slim AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Production stage
 FROM node:20.11.0-slim
 
 WORKDIR /app
@@ -8,11 +20,9 @@ ENV PORT=3000
 ENV FRONTEND_URL="https://mindmeldtool.netlify.app"
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production
 
-COPY . .
-
-RUN npm run build
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]

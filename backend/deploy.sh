@@ -10,29 +10,31 @@ IMAGE_NAME=$1
 PROJECT_ID="mindmeld-backend"
 REGION="europe-west1"
 SERVICE_NAME="mindmeld"
-SECRET_NAME="OPENAI_API_KEY"
 
-# Check if the secret exists, if not, create it
-if ! gcloud secrets describe $SECRET_NAME &>/dev/null; then
-    echo "Secret $SECRET_NAME does not exist. Creating it now..."
-    gcloud secrets create $SECRET_NAME --replication-policy="automatic"
-    
-    # Prompt for the secret value
-    read -sp "Enter the value for $SECRET_NAME: " secret_value
-    echo
-    
-    # Add the secret value
-    echo -n "$secret_value" | gcloud secrets versions add $SECRET_NAME --data-file=-
-    echo "Secret $SECRET_NAME created and value set."
-else
-    echo "Secret $SECRET_NAME already exists."
+# Check for required secrets
+required_secrets=("OPENAI_API_KEY" "DB_USER" "DB_HOST" "DB_NAME" "DB_PASSWORD")
+missing_secrets=()
+
+for secret in "${required_secrets[@]}"; do
+  if ! gcloud secrets versions access latest --secret="$secret" >/dev/null 2>&1; then
+    missing_secrets+=("$secret")
+  fi
+done
+
+if [ ${#missing_secrets[@]} -ne 0 ]; then
+  echo "Error: The following required secrets are missing:"
+  for secret in "${missing_secrets[@]}"; do
+    echo "- $secret"
+  done
+  echo "Please create these secrets before running the deployment script."
+  exit 1
 fi
 
+echo "All required secrets are present. Proceeding with deployment..."
 # Deploy the image to Cloud Run
-echo "Deploying image $IMAGE_NAME to Cloud Run..."
 gcloud run deploy $SERVICE_NAME \
     --image gcr.io/$PROJECT_ID/$IMAGE_NAME \
-    --set-secrets=$SECRET_NAME=$SECRET_NAME:latest \
+    --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest,DB_USER=DB_USER:latest,DB_HOST=DB_HOST:latest,DB_NAME=DB_NAME:latest,DB_PASSWORD=DB_PASSWORD:latest \
     --platform managed \
     --region $REGION \
     --allow-unauthenticated
