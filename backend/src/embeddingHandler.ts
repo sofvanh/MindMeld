@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Edge, Graph } from './.shared/types';
 import { generateEdgeId } from './db/idGenerator';
+import config from './config';
 
 export function generateTopKSimilarEdges(graph: Graph, k = 3): Edge[] {
   const nodeCount = graph.arguments.length;
@@ -54,7 +55,7 @@ function cosineSimilarity(embedding1: number[], embedding2: number[]) {
 }
 
 export async function embedText(texts: string[]) {
-  const openAI_api_key = process.env.OPENAI_API_KEY;
+  const openAI_api_key = config.openAIKey;
   if (!openAI_api_key) {
     throw new Error('OpenAI API key not found');
   }
