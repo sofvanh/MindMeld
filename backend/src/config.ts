@@ -22,7 +22,7 @@ interface Config {
 }
 
 const config: Config = {
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv: environment,
   port: parseInt(process.env.PORT || '3001', 10),
   backendUrl: process.env.BACKEND_URL || 'http://localhost',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',

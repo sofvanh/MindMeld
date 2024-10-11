@@ -36,7 +36,7 @@ export async function addArgument(graphId: string, statement: string, embedding:
 export async function updateGraphEdges(graphId: string, newEdges: Edge[]): Promise<void> {
   // Get current edges from the database
   const currentEdgesResult = await query('SELECT id, source_id, target_id FROM edges WHERE graph_id = $1', [graphId]);
-  const currentEdges = new Set(currentEdgesResult.rows.map(row => `${row.source_id}-${row.target_id}`));
+  const currentEdges = new Set(currentEdgesResult.rows.map((row: { source_id: string; target_id: string }) => `${row.source_id}-${row.target_id}`));
 
   // Identify edges to be added and removed
   const edgesToAdd: Edge[] = [];
@@ -50,13 +50,13 @@ export async function updateGraphEdges(graphId: string, newEdges: Edge[]): Promi
     newEdgesSet.add(edgeKey);
   }
 
-  const edgesToRemove = currentEdgesResult.rows.filter(row =>
+  const edgesToRemove = currentEdgesResult.rows.filter((row: { source_id: string; target_id: string }) =>
     !newEdgesSet.has(`${row.source_id}-${row.target_id}`)
   );
 
   // Remove redundant edges
   if (edgesToRemove.length > 0) {
-    const edgeIdsToRemove = edgesToRemove.map(row => row.id);
+    const edgeIdsToRemove = edgesToRemove.map((row: { id: string }) => row.id);
     await query('DELETE FROM edges WHERE id = ANY($1)', [edgeIdsToRemove]);
   }
 
@@ -82,14 +82,15 @@ export async function getGraphData(graphId: string): Promise<Graph> {
   const argumentsResult = await query('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
   const edgesResult = await query('SELECT * FROM edges WHERE graph_id = $1', [graphId]);
 
-  const args: Argument[] = argumentsResult.rows.map(row => ({
+  // TODO Create types for rows
+  const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[] }) => ({
     id: row.id,
     graphId: row.graph_id,
     statement: row.statement,
     embedding: row.embedding
   }));
 
-  const links: Edge[] = edgesResult.rows.map(row => ({
+  const links: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({
     id: row.id,
     graphId: row.graph_id,
     sourceId: row.source_id,
