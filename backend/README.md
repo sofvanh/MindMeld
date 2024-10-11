@@ -17,3 +17,5 @@ Create new image in Google Cloud with `./build.sh [IMAGE_NAME]`
 Deploy the image with `./deploy.sh [IMAGE_NAME]`
 
 Show logs with `gcloud run services logs read mindmeld`
+
+See all images with `gcloud container images list`
