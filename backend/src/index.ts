@@ -3,19 +3,15 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { embedText, generateTopKSimilarEdges } from './embeddingHandler';
 import { Graph, Argument } from './.shared/types';
-import { generateArgumentId } from './db/idGenerator';
 import { createGraph, getGraphs, getGraphData, addArgument, updateGraphEdges } from './db/dbOperations';
+import config from './config';
 
-const backendUrl = process.env.BACKEND_URL || 'http://localhost';
-const port = process.env.PORT || 3001;
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-const environment = process.env.NODE_ENV || 'development';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: frontendUrl,
+    origin: config.frontendUrl,
     methods: ["GET", "POST"]
   }
 });
@@ -97,8 +93,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
 });
 
-server.listen(port, () => {
-  console.log(`Server running at ${backendUrl}:${port}`);
-  console.log(`Environment: ${environment}`);
-  console.log(`Allowing CORS for origin: ${frontendUrl}`);
+server.listen(config.port, () => {
+  console.log(`Server running at ${config.backendUrl}:${config.port}`);
+  console.log(`Environment: ${config.nodeEnv}`);
+  console.log(`Allowing CORS for origin: ${config.frontendUrl}`);
 });

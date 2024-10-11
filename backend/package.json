@@ -30,6 +30,7 @@
     "@flydotio/dockerfile": "^0.5.8",
     "@types/node": "^22.5.5",
     "@types/pg": "^8.11.10",
-    "@types/socket.io": "^3.0.2"
+    "@types/socket.io": "^3.0.2",
+    "dotenv": "^16.4.5"
   }
 }
