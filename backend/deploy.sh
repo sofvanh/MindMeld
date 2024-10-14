@@ -10,6 +10,7 @@ IMAGE_NAME=$1
 PROJECT_ID="mindmeld-backend"
 REGION="europe-west1"
 SERVICE_NAME="mindmeld"
+CLOUD_SQL_CONNECTION_NAME="mindmeld-backend:europe-west1:mindmeld-db"
 
 # Check for required secrets
 required_secrets=("OPENAI_API_KEY" "DB_USER" "DB_HOST" "DB_NAME" "DB_PASSWORD")
@@ -34,6 +35,7 @@ echo "All required secrets are present. Proceeding with deployment..."
 # Deploy the image to Cloud Run
 gcloud run deploy $SERVICE_NAME \
     --image gcr.io/$PROJECT_ID/$IMAGE_NAME \
+    --add-cloudsql-instances $CLOUD_SQL_CONNECTION_NAME \
     --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest,DB_USER=DB_USER:latest,DB_HOST=DB_HOST:latest,DB_NAME=DB_NAME:latest,DB_PASSWORD=DB_PASSWORD:latest \
     --platform managed \
     --region $REGION \

@@ -1,11 +1,3 @@
-const environment = process.env.NODE_ENV || 'development';
-
-// .env files are only used in development environments
-if (environment === 'development') {
-  require('dotenv').config();
-  // TODO: Check if essential database credentials are set
-}
-
 interface Config {
   nodeEnv: string;
   port: number;
@@ -21,6 +13,21 @@ interface Config {
   };
 }
 
+const environment = process.env.NODE_ENV || 'development';
+let host: string;
+
+// TODO: Check if essential database credentials are set
+if (environment === 'development') {
+  // .env files are only used in development environments
+  require('dotenv').config();
+  console.log("Using development config");
+  host = process.env.DB_HOST || '';
+} else {
+  console.log("Using production config");
+  const cloudSqlConnectionName = process.env.CLOUD_SQL_CONNECTION_NAME || '';
+  host = `/cloudsql/${cloudSqlConnectionName}`;
+}
+
 const config: Config = {
   nodeEnv: environment,
   port: parseInt(process.env.PORT || '3001', 10),
@@ -29,7 +36,7 @@ const config: Config = {
   openAIKey: process.env.OPENAI_API_KEY || '',
   db: {
     user: process.env.DB_USER || '',
-    host: process.env.DB_HOST || '',
+    host,
     name: process.env.DB_NAME || '',
     password: process.env.DB_PASSWORD || '',
     port: parseInt(process.env.DB_PORT || '5432', 10),

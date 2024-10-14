@@ -31,7 +31,10 @@ async function initializeGraphs() {
   }
 }
 
-initializeGraphs().catch(error => console.error('Error initializing graphs:', error));
+initializeGraphs().catch(error => {
+  console.error('Error initializing graphs:', error);
+  console.log('Config:', config);
+});
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the MindMeld backend!' });
