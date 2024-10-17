@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SignInOutButton from './SignInOutButton';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // TODO Needs a visual update
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-stone-600 text-white p-4">
+      <header className="bg-stone-600 text-white p-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-serif hover:text-stone-300">MindMeld</Link>
+        <SignInOutButton />
       </header>
       <main className="flex-grow">
         {children}
