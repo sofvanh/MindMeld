@@ -6,6 +6,6 @@
 
 `npm start` to create builds and run both projects in prod mode
 
-## Setting an OpenAI API Key
+## Environment variables
 
-`export OPENAI_API_KEY=your-secret-api-key`
+Before running the app locally, you have to create `.env` files in both `backend` and `frontend` (or otherwise set the required env variables). See their respective READMEs for more info.
