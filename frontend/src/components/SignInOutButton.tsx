@@ -1,6 +1,7 @@
 import React from 'react';
 import { CredentialResponse, GoogleLogin, googleLogout } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
+import { defaultButtonClasses } from '../styles/defaultStyles';
 
 const SignInOutButton: React.FC = () => {
   const { user, setUser } = useAuth();
@@ -22,14 +23,23 @@ const SignInOutButton: React.FC = () => {
   };
 
   // TODO Visual update
-  return user ? (
-    <button onClick={handleSignOut}>Sign out</button>
-  ) : (
-    <GoogleLogin
-      onSuccess={handleSignInSuccess}
-      onError={handleSignInError}
-      useOneTap
-    />
+  return (
+    <div className="h-10 flex items-center">
+      {user ? (
+        <button
+          onClick={handleSignOut}
+          className={defaultButtonClasses}
+        >
+          Sign out
+        </button>
+      ) : (
+        <GoogleLogin
+          onSuccess={handleSignInSuccess}
+          onError={handleSignInError}
+          useOneTap
+        />
+      )}
+    </div>
   );
 };
 

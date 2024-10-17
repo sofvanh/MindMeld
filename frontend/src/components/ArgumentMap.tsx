@@ -4,6 +4,7 @@ import { Graph } from '../shared/types';
 import { useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
+import { defaultButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
 
 
 interface ForceGraphData {
@@ -57,7 +58,7 @@ const ArgumentMap: React.FC = () => {
   // TODO Would be better if the header and footer had heights defined as rem so we could use that when calculating the height here
   return (
     <div className="w-full h-[calc(100vh-124px)] flex flex-row">
-      <div className="w-[400px] h-full bg-gray-100 p-4">
+      <div className="w-[400px] h-full bg-stone-50 p-4">
         {user ? (
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -69,28 +70,23 @@ const ArgumentMap: React.FC = () => {
             <input
               type="text"
               placeholder="Enter argument..."
-              className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-stone-500 text-sm"
+              className={`${defaultTextFieldClasses} w-full`}
               onChange={(e) => setNewArgument(e.target.value)}
               value={newArgument}
             />
             <button
               type="submit"
-              className="mt-2 w-full bg-stone-500 hover:bg-stone-700 text-white font-serif font-thin py-2 px-4 rounded"
+              className={defaultButtonClasses}
             >
               Add Argument
             </button>
           </form>
         ) : (
-          <button
-            // onClick={() => signIn()}
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-serif font-thin py-2 px-4 rounded"
-          >
-            Sign in to add arguments
-          </button>
+          <p className="text-sm text-stone-400">Sign in to add arguments</p>
         )}</div>
       <ForceGraph2D
         width={window.innerWidth - 400}
-        height={600}
+        height={window.innerHeight - 124}
         graphData={graphData}
         nodeLabel="name"
         nodeAutoColorBy="id"

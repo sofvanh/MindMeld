@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { defaultButtonClasses, defaultTextButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
 
 
 const Home: React.FC = () => {
@@ -39,16 +40,16 @@ const Home: React.FC = () => {
           value={graphName}
           onChange={(e) => setGraphName(e.target.value)}
           placeholder="Enter graph name"
-          className="px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-stone-500 mr-2"
+          className={`${defaultTextFieldClasses} mr-2`}
         />
         <button
           type="submit"
-          className="bg-stone-500 hover:bg-stone-700 text-white font-serif font-thin py-2 px-4 rounded"
+          className={defaultButtonClasses}
         >
           Create New Graph
         </button>
       </form>
-      <Link to="/graphs" className="text-stone-500 hover:text-stone-700">
+      <Link to="/graphs" className={defaultTextButtonClasses}>
         View Existing Graphs
       </Link>
     </div>
