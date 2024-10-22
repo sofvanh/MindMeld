@@ -5,6 +5,7 @@ export const defaultButtonClasses =
 
 export const defaultTextButtonClasses =
   "text-stone-500 hover:text-stone-700 " +
+  "hover:bg-black hover:bg-opacity-5 " +
   "font-serif font-thin py-2 px-4 rounded " +
   "transition-colors duration-200 ease-in-out";
 

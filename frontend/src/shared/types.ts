@@ -1,3 +1,9 @@
+export interface User {
+  id: string;
+  googleId: string;
+  email: string;
+}
+
 // Arguments are the nodes in the graph
 export interface Argument {
   id: string;

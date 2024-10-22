@@ -4,6 +4,7 @@ interface Config {
   backendUrl: string;
   frontendUrl: string;
   openAIKey: string;
+  googleClientId: string;
   db: {
     user: string;
     host: string;
@@ -34,6 +35,7 @@ const config: Config = {
   backendUrl: process.env.BACKEND_URL || 'http://localhost',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   openAIKey: process.env.OPENAI_API_KEY || '',
+  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   db: {
     user: process.env.DB_USER || '',
     host,

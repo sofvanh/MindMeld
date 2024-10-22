@@ -1,41 +1,44 @@
 import React from 'react';
 import { CredentialResponse, GoogleLogin, googleLogout } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
-import { defaultButtonClasses } from '../styles/defaultStyles';
+import { defaultTextButtonClasses } from '../styles/defaultStyles';
+import { useWebSocket } from '../contexts/WebSocketContext';
 
 const SignInOutButton: React.FC = () => {
   const { user, setUser } = useAuth();
+  const { socket } = useWebSocket();
 
   const handleSignInSuccess = (response: CredentialResponse) => {
-    console.log('Sign in success:', response);
-    // TODO Send response to backend to verify and get user info, or create new user
-    setUser({ id: 'usr_1', name: 'User 1' });
-  };
-
-  const handleSignInError = () => {
-    console.log('Sign in failed');
+    socket?.emit('authenticate', response.credential, (socketRes: any) => {
+      if (socketRes.success) {
+        setUser(socketRes.user);
+      } else {
+        console.error('Failed to authenticate with backend');
+      }
+    })
   };
 
   const handleSignOut = () => {
     googleLogout();
-    setUser(null);
-    console.log('Signed out successfully');
+    socket?.emit('logout', () => {
+      setUser(null);
+      console.log('Signed out successfully');
+    });
   };
 
-  // TODO Visual update
   return (
     <div className="h-10 flex items-center">
       {user ? (
         <button
           onClick={handleSignOut}
-          className={defaultButtonClasses}
+          className={defaultTextButtonClasses}
         >
           Sign out
         </button>
       ) : (
         <GoogleLogin
           onSuccess={handleSignInSuccess}
-          onError={handleSignInError}
+          onError={() => console.error('Sign in with Google failed')}
           useOneTap
         />
       )}
