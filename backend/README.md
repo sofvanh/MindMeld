@@ -11,6 +11,7 @@ The following env vars are required when running the app (esp locally, maybe out
 - `DB_NAME`
 - `DB_PASSWORD`
 - `OPENAI_API_KEY`
+- `GOOGLE_CLIENT_ID`
 
 ## Using docker
 
