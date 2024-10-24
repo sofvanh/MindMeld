@@ -2,6 +2,17 @@
 
 `npm install`, followed by `npm run dev` for dev mode, `npm run build` and `npm start` for production. Open [http://localhost:3001](http://localhost:3001) to see the server running in dev mode.
 
+## Environment variables
+
+The following env vars are required when running the app (esp locally, maybe outdated for production):
+
+- `DB_USER`
+- `DB_HOST`
+- `DB_NAME`
+- `DB_PASSWORD`
+- `OPENAI_API_KEY`
+- `GOOGLE_CLIENT_ID`
+
 ## Using docker
 
 ### Development

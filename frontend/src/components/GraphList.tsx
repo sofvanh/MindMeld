@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { defaultTextButtonClasses } from '../styles/defaultStyles';
 
 interface Graph {
   id: string;
@@ -32,7 +33,7 @@ const GraphList: React.FC = () => {
         <ul>
           {graphs.map((graph) => (
             <li key={graph.id} className="mb-2">
-              <Link to={`/graph/${graph.id}`} className="text-sky-800 hover:text-sky-950">
+              <Link to={`/graph/${graph.id}`} className={defaultTextButtonClasses}>
                 {graph.name}
               </Link>
             </li>

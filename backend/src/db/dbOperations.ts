@@ -1,6 +1,15 @@
 import { query } from './db';
-import { generateGraphId, generateArgumentId, generateEdgeId } from './idGenerator';
-import { Argument, Edge, Graph } from '../.shared/types';
+import { generateUserId, generateGraphId, generateArgumentId, generateEdgeId } from './idGenerator';
+import { User, Argument, Edge, Graph } from '../.shared/types';
+
+export async function findOrCreateUser(googleId: string, email: string): Promise<User> {
+  let user = await query('SELECT * FROM users WHERE google_id = $1', [googleId]);
+  if (user.rows[0]) return user.rows[0];
+
+  const id = generateUserId();
+  const result = await query('INSERT INTO users (id, google_id, email) VALUES ($1, $2, $3) RETURNING *', [id, googleId, email]);
+  return result.rows[0];
+}
 
 export async function createGraph(name: string): Promise<string> {
   const id = generateGraphId();
@@ -104,10 +113,3 @@ export async function getGraphData(graphId: string): Promise<Graph> {
     edges: links
   } as Graph;
 }
-
-// export async function updateArgument(argumentId: string, newStatement: string, newEmbedding: number[]): Promise<void> {
-//   await query(
-//     'UPDATE arguments SET statement = $1, embedding = $2 WHERE id = $3',
-//     [newStatement, newEmbedding, argumentId]
-//   );
-// }

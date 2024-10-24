@@ -7,6 +7,7 @@ const generateCustomId = (prefix: string): string => {
   return `${prefix}_${timestamp}${randomPart}`;
 };
 
+export const generateUserId = (): string => generateCustomId('usr');
 export const generateGraphId = (): string => generateCustomId('gra');
 export const generateArgumentId = (): string => generateCustomId('arg');
 export const generateEdgeId = (): string => generateCustomId('edg');
