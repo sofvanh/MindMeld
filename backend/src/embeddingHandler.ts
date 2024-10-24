@@ -33,6 +33,10 @@ export function generateTopKSimilarEdges(graph: Graph, k = 2): Edge[] {
 
   // Select top n*k connections
   const topConnections = allPossibleLinks.slice(0, nodeCount * k);
+  // TODO Optimize this
+  // We shouldn't generate IDs here as we will not add all of these
+  // This function should only return a deterministic list of source-target pairs where the source is always smaller than the target
+  // This way the actual adding of edges can be optimized
   return topConnections.map(link => ({
     id: generateEdgeId(),
     graphId: graph.id,
