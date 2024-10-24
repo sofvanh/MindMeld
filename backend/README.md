@@ -21,7 +21,7 @@ Build the development image with `docker build -f Dockerfile.dev -t mindmeld-bac
 
 Run the container with `docker run -p 3001:3001 -v $(pwd):/app mindmeld-backend-dev`
 
-## Deployment
+### Deployment
 
 Create new image in Google Cloud with `./build.sh [IMAGE_NAME]`
 
