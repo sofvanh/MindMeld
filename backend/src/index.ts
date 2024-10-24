@@ -21,26 +21,6 @@ const googleAuthClient = new OAuth2Client(config.googleClientId);
 
 app.use(express.json());
 
-let graphsList: { id: string; name: string }[] = [];
-let graphs: { [key: string]: Graph } = {};
-
-async function initializeGraphs() {
-  graphsList = await getGraphs();
-  for (const { id } of graphsList) {
-    try {
-      const graphData = await getGraphData(id);
-      graphs[id] = graphData;
-    } catch (error) {
-      console.error(`Error loading graph ${id}:`, error);
-    }
-  }
-}
-
-initializeGraphs().catch(error => {
-  console.error('Error initializing graphs:', error);
-  console.log('Config:', config);
-});
-
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the MindMeld backend!' });
 });
@@ -87,21 +67,18 @@ io.on('connection', (socket) => {
     try {
       const graphId = await createGraph(name);
       const newGraph = { id: graphId, name };
-      graphsList.push(newGraph);
-      graphs[graphId] = { id: graphId, name, arguments: [], edges: [] };
-
       callback?.({ success: true, graph: newGraph });
-      io.emit('graphs list', graphsList);
     } catch (error) {
       console.error('Error creating graph:', error);
       callback?.({ success: false, error: 'Failed to create graph' });
     }
   });
 
-  socket.on('join graph', (graphId: string) => {
+  socket.on('join graph', async (graphId: string) => {
     console.log(`Socket ${socket.id} joining graph ${graphId}`);
     socket.join(graphId);
-    socket.emit('graph data', graphs[graphId]);
+    const graphData = await getGraphData(graphId);
+    socket.emit('graph data', graphData);
   });
 
   socket.on('add argument', async ({ graphId, statement }: { graphId: string, statement: string }, callback?: Function) => {
@@ -110,13 +87,13 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (!graphs[graphId]) {
-      callback?.({ success: false, error: 'Graph not found' });
-      return;
-    }
-
     try {
-      const graph = graphs[graphId];
+      const graph = await getGraphData(graphId);
+      if (!graph) {
+        callback?.({ success: false, error: 'Graph not found' });
+        return;
+      }
+
       const embedding = (await embedText([statement]))[0];
       const id = await addArgument(graphId, statement, embedding);
       const newArgument: Argument = {
@@ -129,10 +106,9 @@ io.on('connection', (socket) => {
       graph.arguments.push(newArgument);
       const newEdges = generateTopKSimilarEdges(graph);
       await updateGraphEdges(graphId, newEdges);
-      graph.edges = newEdges;
-      graphs[graphId] = graph;
 
-      io.to(graphId).emit('graph update', graphs[graphId]);
+      const updatedGraph = await getGraphData(graphId);
+      io.to(graphId).emit('graph update', updatedGraph);
       callback?.({ success: true, argument: newArgument });
     } catch (error) {
       console.error('Error adding argument:', error);
@@ -145,7 +121,7 @@ io.on('connection', (socket) => {
     callback?.();
   });
 
-  socket.on('get graphs', () => socket.emit('graphs list', graphsList));
+  socket.on('get graphs', async () => socket.emit('graphs list', await getGraphs()));
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
 });
 
