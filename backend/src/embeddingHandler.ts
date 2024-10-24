@@ -3,43 +3,46 @@ import { Edge, Graph } from './.shared/types';
 import { generateEdgeId } from './db/idGenerator';
 import config from './config';
 
-export function generateTopKSimilarEdges(graph: Graph, k = 3): Edge[] {
+export function generateTopKSimilarEdges(graph: Graph, k = 2): Edge[] {
   const nodeCount = graph.arguments.length;
-  const newLinks: Edge[] = [];
-  const addedPairs = new Set<string>();
+  const allPossibleLinks: { source: string, target: string, priority: number }[] = [];
 
-  for (let i = 0; i < nodeCount; i++) {
-    const sourceNode = graph.arguments[i];
-    const similarities = graph.arguments
-      .map((targetNode, index) => ({
-        index,
+  // Generate rankings for each node
+  const rankings = graph.arguments.map((sourceNode, i) => {
+    return graph.arguments.map((targetNode, j) => {
+      if (i === j) return { index: j, similarity: -1 }; // Exclude self
+      return {
+        index: j,
         similarity: cosineSimilarity(sourceNode.embedding, targetNode.embedding)
-      }))
-      .filter(({ index, similarity }) => {
-        if (index === i) return false;
-        const pairId = [sourceNode.id, graph.arguments[index].id].sort().join('-');
-        if (addedPairs.has(pairId)) return false;
-        return true;
-      })
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
-
-    similarities.forEach(neighbor => {
-      const targetNode = graph.arguments[neighbor.index];
-      const newLink = {
-        id: generateEdgeId(),
-        graphId: graph.id,
-        sourceId: sourceNode.id,
-        targetId: targetNode.id
       };
-      newLinks.push(newLink);
+    }).sort((a, b) => b.similarity - a.similarity);
+  });
 
-      const pairId = [sourceNode.id, targetNode.id].sort().join('-');
-      addedPairs.add(pairId);
-    });
+  // Calculate priority for each possible connection
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = i + 1; j < nodeCount; j++) { // Ensure no duplicate connections
+      const rankAtoB = rankings[i].findIndex(r => r.index === j) + 1;
+      const rankBtoA = rankings[j].findIndex(r => r.index === i) + 1;
+      const priority = rankAtoB * rankBtoA;
+      allPossibleLinks.push({ source: graph.arguments[i].id, target: graph.arguments[j].id, priority });
+    }
   }
 
-  return newLinks;
+  // Order connections by priority
+  allPossibleLinks.sort((a, b) => a.priority - b.priority);
+
+  // Select top n*k connections
+  const topConnections = allPossibleLinks.slice(0, nodeCount * k);
+  // TODO Optimize this
+  // We shouldn't generate IDs here as we will not add all of these
+  // This function should only return a deterministic list of source-target pairs where the source is always smaller than the target
+  // This way the actual adding of edges can be optimized
+  return topConnections.map(link => ({
+    id: generateEdgeId(),
+    graphId: graph.id,
+    sourceId: link.source,
+    targetId: link.target
+  }));
 }
 
 function cosineSimilarity(embedding1: number[], embedding2: number[]) {
