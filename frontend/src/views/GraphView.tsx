@@ -6,6 +6,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { defaultButtonClasses, defaultTextButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
 import LoadingSpinner from '../components/LoadingSpinner';
+import NodeInfoBox from '../components/NodeInfoBox';
 
 
 interface ForceGraphData {
@@ -27,6 +28,7 @@ const GraphView: React.FC = () => {
   const [newArgument, setNewArgument] = useState('');
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
+  const [selectedNode, setSelectedNode] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     socket?.emit('join graph', graphId);
@@ -64,6 +66,10 @@ const GraphView: React.FC = () => {
     }
   };
 
+  const handleNodeClick = (node: { id: string; name: string }) => {
+    setSelectedNode(node);
+  };
+
   if (!graph) {
     return <div className="flex items-center justify-center h-full mt-8">
       <LoadingSpinner size="large" />
@@ -87,13 +93,18 @@ const GraphView: React.FC = () => {
         graphData={graphData}
         nodeLabel="name"
         nodeAutoColorBy="id"
-        // onNodeClick={handleNodeClick}
+        onNodeClick={handleNodeClick}
         enableNodeDrag={false}
       />
-
+      {selectedNode && (
+        <NodeInfoBox
+          statement={selectedNode.name}
+          onClose={() => setSelectedNode(null)}
+        />
+      )}
       {user ? (
         <form
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 w-full max-w-[600px] px-4"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 w-full max-w-[600px] px-4"
           onSubmit={(e) => {
             e.preventDefault();
             if (newArgument.trim()) {
