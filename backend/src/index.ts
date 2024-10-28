@@ -65,8 +65,8 @@ io.on('connection', (socket) => {
     }
 
     try {
-      const graphId = await createGraph(name);
-      const newGraph = { id: graphId, name };
+      const graphId = await createGraph(name, socket.data.user.id);
+      const newGraph = { id: graphId, name, authorId: socket.data.user.id };
       callback?.({ success: true, graph: newGraph });
     } catch (error) {
       console.error('Error creating graph:', error);
@@ -95,12 +95,13 @@ io.on('connection', (socket) => {
       }
 
       const embedding = (await embedText([statement]))[0];
-      const id = await addArgument(graphId, statement, embedding);
+      const id = await addArgument(graphId, statement, embedding, socket.data.user.id);
       const newArgument: Argument = {
         id,
         graphId,
         statement,
-        embedding
+        embedding,
+        authorId: socket.data.user.id
       };
 
       graph.arguments.push(newArgument);

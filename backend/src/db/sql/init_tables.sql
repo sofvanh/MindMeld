@@ -6,7 +6,9 @@ CREATE TABLE users (
 
 CREATE TABLE graphs (
     id VARCHAR(20) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    author_id VARCHAR(20),
+    FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
 CREATE TABLE arguments (
@@ -14,7 +16,9 @@ CREATE TABLE arguments (
     graph_id VARCHAR(20) NOT NULL,
     statement TEXT NOT NULL,
     embedding DOUBLE PRECISION[] NOT NULL,
-    FOREIGN KEY (graph_id) REFERENCES graphs(id)
+    author_id VARCHAR(20),
+    FOREIGN KEY (graph_id) REFERENCES graphs(id),
+    FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
 CREATE INDEX idx_arguments_graph_id ON arguments(graph_id);

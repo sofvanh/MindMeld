@@ -10,6 +10,7 @@ export interface Argument {
   graphId: string;
   statement: string;
   embedding: number[];
+  authorId?: string;
 }
 
 // Edges are the connections between arguments
@@ -24,6 +25,7 @@ export interface Edge {
 export interface Graph {
   id: string;
   name: string;
+  authorId?: string;
   arguments: Argument[];
   edges: Edge[];
 }

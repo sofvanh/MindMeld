@@ -11,9 +11,12 @@ export async function findOrCreateUser(googleId: string, email: string): Promise
   return result.rows[0];
 }
 
-export async function createGraph(name: string): Promise<string> {
+export async function createGraph(name: string, authorId: string): Promise<string> {
   const id = generateGraphId();
-  await query('INSERT INTO graphs (id, name) VALUES ($1, $2)', [id, name]);
+  await query(
+    'INSERT INTO graphs (id, name, author_id) VALUES ($1, $2, $3)',
+    [id, name, authorId]
+  );
   return id;
 }
 
@@ -22,11 +25,16 @@ export async function getGraphs(): Promise<{ id: string; name: string }[]> {
   return result.rows;
 }
 
-export async function addArgument(graphId: string, statement: string, embedding: number[]): Promise<string> {
+export async function addArgument(
+  graphId: string,
+  statement: string,
+  embedding: number[],
+  authorId: string
+): Promise<string> {
   const id = generateArgumentId();
   await query(
-    'INSERT INTO arguments (id, graph_id, statement, embedding) VALUES ($1, $2, $3, $4)',
-    [id, graphId, statement, embedding]
+    'INSERT INTO arguments (id, graph_id, statement, embedding, author_id) VALUES ($1, $2, $3, $4, $5)',
+    [id, graphId, statement, embedding, authorId]
   );
   return id;
 }
