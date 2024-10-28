@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import { Graph } from '../shared/types';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
-import { defaultButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
+import { defaultButtonClasses, defaultTextButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 
@@ -46,6 +46,18 @@ const GraphView: React.FC = () => {
     }
   }, [graph]);
 
+  useEffect(() => {
+    if (graph) {
+      document.title = `${graph.name} - MindMeld`;
+    } else {
+      document.title = 'MindMeld';
+    }
+
+    return () => {
+      document.title = 'MindMeld';
+    };
+  }, [graph]);
+
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
       socket.emit('add argument', { graphId, statement });
@@ -60,6 +72,15 @@ const GraphView: React.FC = () => {
 
   return (
     <div className="w-full h-[calc(100vh-8rem)] relative">
+      <div className="absolute top-4 left-4 z-10 bg-white/80 px-2 py-1 rounded-lg shadow-sm flex items-center gap-2">
+        <Link to="/graphs" className={`${defaultTextButtonClasses} !p-1 min-w-8 flex items-center justify-center`}>
+          ←
+        </Link>
+        <p className="text-base m-0">
+          {graph.name}
+          {graph.arguments.length === 0 && <p className="inline text-sm text-stone-400"> (empty)</p>}
+        </p>
+      </div>
       <ForceGraph2D
         width={window.innerWidth}
         height={window.innerHeight - 124}
