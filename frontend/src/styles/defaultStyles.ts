@@ -1,5 +1,5 @@
 export const defaultButtonClasses =
-  "mt-2 bg-stone-500 hover:bg-stone-700 text-white " +
+  "bg-stone-500 hover:bg-stone-700 text-white " +
   "font-serif font-thin py-2 px-4 rounded " +
   "transition-colors duration-200 ease-in-out";
 

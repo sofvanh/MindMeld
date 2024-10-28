@@ -55,37 +55,10 @@ const GraphView: React.FC = () => {
     return <div className="flex items-center justify-center h-full">Loading...</div>;
   }
 
-  // TODO Would be better if the header and footer had heights defined as rem so we could use that when calculating the height here
   return (
-    <div className="w-full h-[calc(100vh-124px)] flex flex-row">
-      <div className="w-[400px] h-full bg-stone-50 p-4">
-        {user ? (
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if (newArgument.trim()) {
-              handleAddArgument(newArgument.trim());
-              setNewArgument('');
-            }
-          }}>
-            <input
-              type="text"
-              placeholder="Enter argument..."
-              className={`${defaultTextFieldClasses} w-full`}
-              onChange={(e) => setNewArgument(e.target.value)}
-              value={newArgument}
-            />
-            <button
-              type="submit"
-              className={defaultButtonClasses}
-            >
-              Add Argument
-            </button>
-          </form>
-        ) : (
-          <p className="text-sm text-stone-400">Sign in to add arguments</p>
-        )}</div>
+    <div className="w-full h-[calc(100vh-8rem)] relative">
       <ForceGraph2D
-        width={window.innerWidth - 400}
+        width={window.innerWidth}
         height={window.innerHeight - 124}
         graphData={graphData}
         nodeLabel="name"
@@ -93,6 +66,37 @@ const GraphView: React.FC = () => {
         // onNodeClick={handleNodeClick}
         enableNodeDrag={false}
       />
+
+      {user ? (
+        <form
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 w-full max-w-[600px] px-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (newArgument.trim()) {
+              handleAddArgument(newArgument.trim());
+              setNewArgument('');
+            }
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Enter new argument"
+            className={`${defaultTextFieldClasses} flex-1 shadow-md`}
+            onChange={(e) => setNewArgument(e.target.value)}
+            value={newArgument}
+          />
+          <button
+            type="submit"
+            className={`${defaultButtonClasses} shadow-md`}
+          >
+            Add
+          </button>
+        </form>
+      ) : (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white p-4 rounded-lg shadow-lg">
+          <p className="text-sm text-stone-400">Sign in to add arguments</p>
+        </div>
+      )}
     </div>
   );
 };
