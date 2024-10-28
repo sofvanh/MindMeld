@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { defaultButtonClasses, defaultTextButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
 import { useAuth } from '../contexts/AuthContext';
-import SignInOutButton from './SignInOutButton';
+import SignInOutButton from '../components/SignInOutButton';
 
 
-const Home: React.FC = () => {
+const HomeView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const [graphName, setGraphName] = useState('');
@@ -68,4 +68,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default HomeView;

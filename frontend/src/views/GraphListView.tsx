@@ -8,7 +8,7 @@ interface Graph {
   name: string;
 }
 
-const GraphList: React.FC = () => {
+const GraphListView: React.FC = () => {
   const { socket } = useWebSocket();
   const [graphs, setGraphs] = useState<Graph[]>([]);
 
@@ -44,4 +44,4 @@ const GraphList: React.FC = () => {
   );
 };
 
-export default GraphList;
+export default GraphListView;

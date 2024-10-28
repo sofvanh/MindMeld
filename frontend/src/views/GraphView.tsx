@@ -19,7 +19,7 @@ interface ForceGraphData {
 }
 
 
-const ArgumentMap: React.FC = () => {
+const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
@@ -97,4 +97,4 @@ const ArgumentMap: React.FC = () => {
   );
 };
 
-export default ArgumentMap;
+export default GraphView;
