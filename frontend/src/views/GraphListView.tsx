@@ -25,8 +25,8 @@ const GraphListView: React.FC = () => {
   }, [socket]);
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl mb-4">Existing Graphs</h2>
+    <div className="max-w-md mx-auto mt-10 px-4">
+      <h2>Existing Graphs</h2>
       {graphs.length === 0 ? (
         <p>Loading...</p>
       ) : (

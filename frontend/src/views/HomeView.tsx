@@ -33,8 +33,8 @@ const HomeView: React.FC = () => {
   }, [socket, navigate]);
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl font-serif mb-4 mt-8">Welcome to MindMeld</h1>
+    <div className="text-center px-4">
+      <h1 className="mb-4 mt-8">Welcome to MindMeld</h1>
       {user ? (
         <div>
           <p className="mb-4">Create a new graph to get started.</p>
@@ -51,7 +51,7 @@ const HomeView: React.FC = () => {
               type="submit"
               className={defaultButtonClasses}
             >
-              Create New Graph
+              Create
             </button>
           </form>
         </div>
