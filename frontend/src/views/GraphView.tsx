@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { defaultButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 
 interface ForceGraphData {
@@ -52,7 +53,9 @@ const GraphView: React.FC = () => {
   };
 
   if (!graph) {
-    return <div className="flex items-center justify-center h-full">Loading...</div>;
+    return <div className="flex items-center justify-center h-full mt-8">
+      <LoadingSpinner size="large" />
+    </div>;
   }
 
   return (

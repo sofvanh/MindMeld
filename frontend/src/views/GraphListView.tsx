@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { defaultTextButtonClasses } from '../styles/defaultStyles';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 interface Graph {
   id: string;
@@ -28,7 +29,9 @@ const GraphListView: React.FC = () => {
     <div className="max-w-md mx-auto mt-10 px-4">
       <h2>Existing Graphs</h2>
       {graphs.length === 0 ? (
-        <p>Loading...</p>
+        <div className="flex flex-col items-center mt-8 h-full">
+          <LoadingSpinner size="large" />
+        </div>
       ) : (
         <ul>
           {graphs.map((graph) => (
