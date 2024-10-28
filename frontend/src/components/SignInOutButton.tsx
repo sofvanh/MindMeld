@@ -5,13 +5,14 @@ import { defaultTextButtonClasses } from '../styles/defaultStyles';
 import { useWebSocket } from '../contexts/WebSocketContext';
 
 const SignInOutButton: React.FC = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, setAuthToken } = useAuth();
   const { socket } = useWebSocket();
 
   const handleSignInSuccess = (response: CredentialResponse) => {
     socket?.emit('authenticate', response.credential, (socketRes: any) => {
       if (socketRes.success) {
         setUser(socketRes.user);
+        setAuthToken(response.credential!);
       } else {
         console.error('Failed to authenticate with backend');
       }
@@ -22,6 +23,7 @@ const SignInOutButton: React.FC = () => {
     googleLogout();
     socket?.emit('logout', () => {
       setUser(null);
+      setAuthToken(null);
       console.log('Signed out successfully');
     });
   };

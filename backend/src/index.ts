@@ -74,6 +74,7 @@ io.on('connection', (socket) => {
     }
   });
 
+  // TODO Should probably have 'leave graph' as well
   socket.on('join graph', async (graphId: string) => {
     console.log(`Socket ${socket.id} joining graph ${graphId}`);
     socket.join(graphId);
