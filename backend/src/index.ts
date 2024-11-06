@@ -2,10 +2,13 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import { embedText, generateTopKSimilarEdges } from './embeddingHandler';
-import { Graph, Argument, User } from './.shared/types';
-import { findOrCreateUser, createGraph, getGraphs, getGraphData, addArgument, updateGraphEdges } from './db/dbOperations';
+import { Argument, User } from './.shared/types';
 import config from './config';
 import { OAuth2Client } from 'google-auth-library';
+import { findOrCreateUser } from './db/operations/userOperations';
+import { createGraph, getGraphs, getGraphData } from './db/operations/graphOperations';
+import { addArgument } from './db/operations/argumentOperations';
+import { updateGraphEdges } from './db/operations/edgeOperations';
 
 
 const app = express();
