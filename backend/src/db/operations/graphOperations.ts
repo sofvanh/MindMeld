@@ -25,12 +25,31 @@ export async function getGraphData(graphId: string): Promise<Graph> {
   const argumentsResult = await query('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
   const edgesResult = await query('SELECT * FROM edges WHERE graph_id = $1', [graphId]);
 
-  // TODO Create types for rows
-  const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[] }) => ({
+  // Get reaction counts for all arguments in the graph
+  const reactionCountsResult = await query(
+    `SELECT argument_id, type, COUNT(*) as count
+     FROM reactions 
+     WHERE argument_id IN (SELECT id FROM arguments WHERE graph_id = $1)
+     GROUP BY argument_id, type`,
+    [graphId]
+  );
+
+  // Create a map of reaction counts by argument
+  const reactionCountsMap = new Map();
+  reactionCountsResult.rows.forEach((row: any) => {
+    if (!reactionCountsMap.has(row.argument_id)) {
+      reactionCountsMap.set(row.argument_id, { agree: 0, disagree: 0 });
+    }
+    reactionCountsMap.get(row.argument_id)[row.type] = parseInt(row.count);
+  });
+
+  const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
     id: row.id,
     graphId: row.graph_id,
     statement: row.statement,
-    embedding: row.embedding
+    embedding: row.embedding,
+    authorId: row.author_id,
+    reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0 }
   }));
 
   const links: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({

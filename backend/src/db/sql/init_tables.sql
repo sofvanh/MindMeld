@@ -36,3 +36,16 @@ CREATE TABLE edges (
 CREATE INDEX idx_edges_graph_id ON edges(graph_id);
 CREATE INDEX idx_edges_source_id ON edges(source_id);
 CREATE INDEX idx_edges_target_id ON edges(target_id);
+
+CREATE TABLE reactions (
+    id VARCHAR(20) PRIMARY KEY,
+    user_id VARCHAR(20) NOT NULL,
+    argument_id VARCHAR(20) NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (argument_id) REFERENCES arguments(id),
+    UNIQUE (user_id, argument_id, type)
+);
+
+CREATE INDEX idx_reactions_user_id ON reactions(user_id);
+CREATE INDEX idx_reactions_argument_id ON reactions(argument_id);

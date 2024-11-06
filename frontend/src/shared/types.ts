@@ -11,6 +11,11 @@ export interface Argument {
   statement: string;
   embedding: number[];
   authorId?: string;
+  reactionCounts?: {
+    agree: number;
+    disagree: number;
+  };
+  userReaction?: 'agree' | 'disagree' | null;
 }
 
 // Edges are the connections between arguments
@@ -28,4 +33,11 @@ export interface Graph {
   authorId?: string;
   arguments: Argument[];
   edges: Edge[];
+}
+
+export interface Reaction {
+  id: string;
+  userId: string;
+  argumentId: string;
+  type: 'agree' | 'disagree';
 }
