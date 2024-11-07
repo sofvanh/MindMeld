@@ -5,6 +5,7 @@ import config from './config';
 import { handleAuthenticate, handleLogout } from './websocket/authHandler';
 import { handleCreateGraph, handleGetGraphs, handleJoinGraph, handleLeaveGraph } from './websocket/graphHandler';
 import { handleAddArgument } from './websocket/argumentHandler';
+import { handleAddReaction, handleRemoveReaction } from './websocket/reactionHandler';
 
 
 const app = express();
@@ -31,6 +32,8 @@ io.on('connection', (socket) => {
   socket.on('leave graph', (graphId: string) => handleLeaveGraph(socket, graphId)); // TODO Invoke this from client
   socket.on('get graphs', () => handleGetGraphs(socket));
   socket.on('add argument', (args, callback) => handleAddArgument(socket, io, args, callback));
+  socket.on('add reaction', (args, callback) => handleAddReaction(socket, io, args, callback));
+  socket.on('remove reaction', (args, callback) => handleRemoveReaction(socket, io, args, callback));
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
 });
 
