@@ -17,9 +17,9 @@ export const handleCreateGraph = async (socket: Socket, name: string, callback?:
 };
 
 export const handleJoinGraph = async (socket: Socket, graphId: string) => {
-  console.log(`Socket ${socket.id} joining graph ${graphId}`);
+  console.log(`Socket ${socket.id} joining graph ${graphId}, user: ${socket.data.user?.id}`);
   socket.join(graphId);
-  const graph = await getGraphData(graphId);
+  const graph = await getGraphData(graphId, socket.data.user?.id);
   socket.emit('graph data', graph);
 };
 

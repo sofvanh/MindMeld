@@ -16,7 +16,7 @@ export async function getGraphs(): Promise<{ id: string; name: string }[]> {
   return result.rows;
 }
 
-export async function getGraphData(graphId: string): Promise<Graph> {
+export async function getGraphData(graphId: string, userId: string): Promise<Graph> {
   const graphResult = await query('SELECT * FROM graphs WHERE id = $1', [graphId]);
   if (graphResult.rows.length === 0) {
     throw new Error('Graph not found');
@@ -43,13 +43,28 @@ export async function getGraphData(graphId: string): Promise<Graph> {
     reactionCountsMap.get(row.argument_id)[row.type] = parseInt(row.count);
   });
 
+  // Get user reactions if userId is provided
+  let userReactionsMap = new Map();
+  if (userId) {
+    const userReactionsResult = await query(
+      `SELECT argument_id, type
+       FROM reactions 
+       WHERE user_id = $1 AND argument_id IN (SELECT id FROM arguments WHERE graph_id = $2)`,
+      [userId, graphId]
+    );
+    userReactionsResult.rows.forEach((row: any) => {
+      userReactionsMap.set(row.argument_id, row.type);
+    });
+  }
+
   const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
     id: row.id,
     graphId: row.graph_id,
     statement: row.statement,
     embedding: row.embedding,
     authorId: row.author_id,
-    reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0 }
+    reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0 },
+    userReaction: userReactionsMap.get(row.id)
   }));
 
   const links: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({

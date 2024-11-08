@@ -1,73 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
-import { Graph } from '../shared/types';
+import { Argument, Graph } from '../shared/types';
 import { Link, useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
-import { defaultButtonClasses, defaultTextButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
+import { primaryButtonClasses, secondaryButtonClasses, textFieldClasses } from '../styles/defaultStyles';
 import LoadingSpinner from '../components/LoadingSpinner';
 import NodeInfoBox from '../components/NodeInfoBox';
 
 
 interface ForceGraphData {
-  nodes: {
-    id: string;
-    name: string;
-  }[];
-  links: {
-    source: string;
-    target: string;
-  }[];
+  nodes: NodeData[];
+  links: LinkData[];
 }
 
+interface NodeData {
+  id: string;
+  name: string;
+  argument: Argument;
+}
+
+interface LinkData {
+  source: string;
+  target: string;
+}
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
-  const { user } = useAuth();
+  const { loading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
   const [newArgument, setNewArgument] = useState('');
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
-  const [selectedNode, setSelectedNode] = useState<{ id: string; name: string } | null>(null);
+  const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
 
   useEffect(() => {
+    if (loading) return;
     socket?.emit('join graph', graphId);
     socket?.on('graph data', setGraph);
     socket?.on('graph update', setGraph);
-
     return () => {
+      socket?.emit('leave graph', graphId);
+      socket?.off('graph data');
       socket?.off('graph update');
     }
-  }, [socket, graphId])
-
-  useEffect(() => {
-    if (graph) {
-      const nodes = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement }));
-      const links = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
-      setGraphData({ nodes, links });
-    }
-  }, [graph]);
+  }, [socket, graphId, loading])
 
   useEffect(() => {
     if (graph) {
       document.title = `${graph.name} - MindMeld`;
-    } else {
-      document.title = 'MindMeld';
+      const nodes: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement, argument: arg }));
+      const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
+      setGraphData({ nodes, links });
+      if (selectedNode) {
+        const updatedNode = nodes.find(node => node.id === selectedNode.id);
+        if (updatedNode) {
+          setSelectedNode(updatedNode);
+        }
+      }
     }
-
-    return () => {
-      document.title = 'MindMeld';
-    };
   }, [graph]);
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
       socket.emit('add argument', { graphId, statement });
     }
-  };
-
-  const handleNodeClick = (node: { id: string; name: string }) => {
-    setSelectedNode(node);
   };
 
   if (!graph) {
@@ -79,7 +76,7 @@ const GraphView: React.FC = () => {
   return (
     <div className="w-full h-[calc(100vh-8rem)] relative">
       <div className="absolute top-4 left-4 z-10 bg-white/80 px-2 py-1 rounded-lg shadow-sm flex items-center gap-2">
-        <Link to="/graphs" className={`${defaultTextButtonClasses} !p-1 min-w-8 flex items-center justify-center`}>
+        <Link to="/graphs" className={`${secondaryButtonClasses} !p-1 min-w-8 flex items-center justify-center`}>
           ←
         </Link>
         <p className="text-base m-0">
@@ -93,45 +90,47 @@ const GraphView: React.FC = () => {
         graphData={graphData}
         nodeLabel="name"
         nodeAutoColorBy="id"
-        onNodeClick={handleNodeClick}
+        onNodeClick={node => setSelectedNode(node)}
         enableNodeDrag={false}
       />
-      {selectedNode && (
-        <NodeInfoBox
-          statement={selectedNode.name}
-          onClose={() => setSelectedNode(null)}
-        />
-      )}
-      {user ? (
-        <form
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 w-full max-w-[600px] px-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (newArgument.trim()) {
-              handleAddArgument(newArgument.trim());
-              setNewArgument('');
-            }
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Enter new argument"
-            className={`${defaultTextFieldClasses} flex-1 shadow-md`}
-            onChange={(e) => setNewArgument(e.target.value)}
-            value={newArgument}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
+        {selectedNode && (
+          <NodeInfoBox
+            argument={selectedNode.argument}
+            onClose={() => setSelectedNode(null)}
           />
-          <button
-            type="submit"
-            className={`${defaultButtonClasses} shadow-md`}
+        )}
+        {user ? (
+          <form
+            className=" flex gap-2 w-full"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (newArgument.trim()) {
+                handleAddArgument(newArgument.trim());
+                setNewArgument('');
+              }
+            }}
           >
-            Add
-          </button>
-        </form>
-      ) : (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white p-4 rounded-lg shadow-lg">
-          <p className="text-sm text-stone-400">Sign in to add arguments</p>
-        </div>
-      )}
+            <input
+              type="text"
+              placeholder="Enter new argument"
+              className={`${textFieldClasses} flex-1 shadow-md`}
+              onChange={(e) => setNewArgument(e.target.value)}
+              value={newArgument}
+            />
+            <button
+              type="submit"
+              className={`${primaryButtonClasses} shadow-md`}
+            >
+              Add
+            </button>
+          </form>
+        ) : (
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <p className="text-sm text-stone-400">Sign in to add arguments</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

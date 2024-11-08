@@ -16,7 +16,7 @@ export const handleAddArgument = async (
   }
 
   try {
-    const graph = await getGraphData(graphId);
+    const graph = await getGraphData(graphId, socket.data.user.id);
     if (!graph) {
       callback?.({ success: false, error: 'Graph not found' });
       return;
@@ -30,7 +30,7 @@ export const handleAddArgument = async (
     const newEdges = generateTopKSimilarEdges(graph);
     await updateGraphEdges(graphId, newEdges);
 
-    const updatedGraph = await getGraphData(graphId);
+    const updatedGraph = await getGraphData(graphId, socket.data.user.id);
     io.to(graphId).emit('graph update', updatedGraph);
     callback?.({ success: true, argument: newArgument });
   } catch (error) {

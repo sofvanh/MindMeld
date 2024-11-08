@@ -1,4 +1,4 @@
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CredentialResponse, googleLogout, GoogleOAuthProvider } from '@react-oauth/google';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useWebSocket } from './WebSocketContext';
 
@@ -11,45 +11,64 @@ interface User {
 }
 
 interface AuthContextType {
+  loading: boolean;
   user: User | null;
-  setUser: (user: User | null) => void;
-  setAuthToken: (token: string | null) => void;
+  signIn: (response: CredentialResponse) => void;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
+  loading: false,
   user: null,
-  setUser: () => { },
-  setAuthToken: () => { },
+  signIn: () => { },
+  signOut: () => { },
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { socket } = useWebSocket();
 
-  const setAuthToken = (token: string | null) => {
-    if (token) {
-      localStorage.setItem(TOKEN_STORAGE_KEY, token);
-    } else {
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    }
-  };
-
   useEffect(() => {
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (storedToken && socket) {
+
+    if (!storedToken) {
+      setLoading(false);
+      return;
+    }
+
+    if (storedToken && socket && !user && !loading) {
+      setLoading(true);
       socket.emit('authenticate', storedToken, (response: any) => {
         if (response.success) {
           setUser(response.user);
         } else {
+          console.error('Authentication failed');
           localStorage.removeItem(TOKEN_STORAGE_KEY);
         }
+        setLoading(false);
       });
     }
-  }, [socket]);
+  }, [socket, loading, user]);
+
+  const signIn = (response: CredentialResponse) => {
+    localStorage.setItem(TOKEN_STORAGE_KEY, response.credential!);
+    window.location.reload();
+  }
+
+  const signOut = () => {
+    socket?.emit('logout', () => {
+      setLoading(true);
+      googleLogout();
+      setUser(null);
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+      window.location.reload();
+    });
+  }
 
   return (
     <GoogleOAuthProvider clientId={OAUTH_CLIENT_ID}>
-      <AuthContext.Provider value={{ user, setUser, setAuthToken }}>
+      <AuthContext.Provider value={{ loading, user, signIn, signOut }}>
         {children}
       </AuthContext.Provider>
     </GoogleOAuthProvider>

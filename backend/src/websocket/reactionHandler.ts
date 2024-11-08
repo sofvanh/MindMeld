@@ -17,7 +17,7 @@ export const handleAddReaction = async (
   try {
     const id = await addReaction(socket.data.user.id, argumentId, type);
     const graphId = (await query('SELECT graph_id FROM arguments WHERE id = $1', [argumentId])).rows[0].graph_id;
-    const updatedGraph = await getGraphData(graphId);
+    const updatedGraph = await getGraphData(graphId, socket.data.user.id);
     io.to(graphId).emit('graph update', updatedGraph);
     callback?.({ success: true, id });
   } catch (error) {
@@ -40,7 +40,7 @@ export const handleRemoveReaction = async (
   try {
     await removeReaction(socket.data.user.id, argumentId, type);
     const graphId = (await query('SELECT graph_id FROM arguments WHERE id = $1', [argumentId])).rows[0].graph_id;
-    const updatedGraph = await getGraphData(graphId);
+    const updatedGraph = await getGraphData(graphId, socket.data.user.id);
     io.to(graphId).emit('graph update', updatedGraph);
     callback?.({ success: true });
   } catch (error) {

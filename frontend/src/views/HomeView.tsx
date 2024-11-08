@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
-import { defaultButtonClasses, defaultTextButtonClasses, defaultTextFieldClasses } from '../styles/defaultStyles';
+import { primaryButtonClasses, secondaryButtonClasses, textFieldClasses } from '../styles/defaultStyles';
 import { useAuth } from '../contexts/AuthContext';
 import SignInOutButton from '../components/SignInOutButton';
 
@@ -45,11 +45,11 @@ const HomeView: React.FC = () => {
               value={graphName}
               onChange={(e) => setGraphName(e.target.value)}
               placeholder="Enter graph name"
-              className={`${defaultTextFieldClasses} mr-2`}
+              className={`${textFieldClasses} mr-2`}
             />
             <button
               type="submit"
-              className={defaultButtonClasses}
+              className={primaryButtonClasses}
             >
               Create
             </button>
@@ -61,7 +61,7 @@ const HomeView: React.FC = () => {
         </div>
       )}
       <p className="mb-2 text-stone-400">or</p>
-      <Link to="/graphs" className={defaultTextButtonClasses}>
+      <Link to="/graphs" className={secondaryButtonClasses}>
         View Existing Graphs
       </Link>
     </div>
