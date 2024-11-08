@@ -13,7 +13,7 @@ SERVICE_NAME="mindmeld"
 CLOUD_SQL_CONNECTION_NAME="mindmeld-backend:europe-west1:mindmeld-db"
 
 # Check for required secrets
-required_secrets=("OPENAI_API_KEY" "DB_USER" "DB_HOST" "DB_NAME" "DB_PASSWORD")
+required_secrets=("OPENAI_API_KEY" "DB_USER" "DB_HOST" "DB_NAME" "DB_PASSWORD" "GOOGLE_CLIENT_ID")
 missing_secrets=()
 
 for secret in "${required_secrets[@]}"; do
