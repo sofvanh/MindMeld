@@ -33,6 +33,7 @@ const GraphView: React.FC = () => {
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -52,14 +53,19 @@ const GraphView: React.FC = () => {
       const nodes: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement, argument: arg }));
       const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
       setGraphData({ nodes, links });
-      if (selectedNode) {
-        const updatedNode = nodes.find(node => node.id === selectedNode.id);
-        if (updatedNode) {
-          setSelectedNode(updatedNode);
-        }
-      }
     }
   }, [graph]);
+
+  useEffect(() => {
+    if (graph && selectedNodeId) {
+      const updatedNode = graph.arguments.find(arg => arg.id === selectedNodeId);
+      if (updatedNode) {
+        setSelectedNode({ id: updatedNode.id, name: updatedNode.statement, argument: updatedNode });
+      }
+    } else {
+      setSelectedNode(null);
+    }
+  }, [graph, selectedNodeId]);
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
@@ -90,14 +96,14 @@ const GraphView: React.FC = () => {
         graphData={graphData}
         nodeLabel="name"
         nodeAutoColorBy="id"
-        onNodeClick={node => setSelectedNode(node)}
+        onNodeClick={node => setSelectedNodeId(node.id)}
         enableNodeDrag={false}
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedNode && (
           <NodeInfoBox
             argument={selectedNode.argument}
-            onClose={() => setSelectedNode(null)}
+            onClose={() => setSelectedNodeId(null)}
           />
         )}
         {user ? (
