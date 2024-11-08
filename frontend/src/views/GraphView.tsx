@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import { Argument, Graph } from '../shared/types';
 import { Link, useParams } from 'react-router-dom';
@@ -33,6 +33,7 @@ const GraphView: React.FC = () => {
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
+  const selectedNodeRef = useRef(selectedNode);
 
   useEffect(() => {
     if (loading) return;
@@ -52,14 +53,19 @@ const GraphView: React.FC = () => {
       const nodes: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement, argument: arg }));
       const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
       setGraphData({ nodes, links });
-      if (selectedNode) {
-        const updatedNode = nodes.find(node => node.id === selectedNode.id);
-        if (updatedNode) {
+
+      if (selectedNodeRef.current) {
+        const updatedNode = nodes.find(node => node.id === selectedNodeRef.current!.id);
+        if (updatedNode && updatedNode !== selectedNode) {
           setSelectedNode(updatedNode);
         }
       }
     }
   }, [graph]);
+
+  useEffect(() => {
+    selectedNodeRef.current = selectedNode;
+  }, [selectedNode]);
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
