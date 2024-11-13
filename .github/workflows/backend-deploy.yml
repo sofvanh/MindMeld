@@ -42,5 +42,19 @@ jobs:
       - name: Build and Push Image
         run: |
           cd backend
-          gcloud builds submit \
-            --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }}
+          BUILD_ID=$(gcloud builds submit \
+            --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} \
+            --format='get(id)' 2>/dev/null)
+          echo "Build submitted with ID: $BUILD_ID"
+          
+          # Wait for build to complete by polling status
+          while true; do
+            STATUS=$(gcloud builds describe $BUILD_ID --format='get(status)' 2>/dev/null)
+            echo "Build status: $STATUS"
+            if [ "$STATUS" = "SUCCESS" ]; then
+              exit 0
+            elif [ "$STATUS" = "FAILURE" ] || [ "$STATUS" = "CANCELLED" ]; then
+              exit 1
+            fi
+            sleep 10
+          done
