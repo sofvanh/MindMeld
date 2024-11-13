@@ -17,7 +17,7 @@ interface Config {
 const environment = process.env.NODE_ENV || 'development';
 let host: string;
 
-// TODO: Check if essential database credentials are set
+// TODO: Check if essential database credentials are set!
 if (environment === 'development') {
   // .env files are only used in development environments
   require('dotenv').config();
