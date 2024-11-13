@@ -7,7 +7,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="bg-stone-100 px-4 flex justify-between items-center h-16">
-        <Link to="/" className="text-2xl font-serif text-stone-900 hover:text-stone-600">MindMeld</Link>
+        <Link to="/" className="text-2xl font-serif text-stone-900 hover:text-stone-600">
+          MindMeld
+          <p className="text-sm font-sans text-stone-400 text-center">Work in progress</p>
+        </Link>
         <SignInOutButton />
       </header>
       <main className="flex-grow">

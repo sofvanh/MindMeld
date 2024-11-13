@@ -1,14 +1,10 @@
 import { CredentialResponse, googleLogout, GoogleOAuthProvider } from '@react-oauth/google';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useWebSocket } from './WebSocketContext';
+import { User } from '../shared/types';
 
 const OAUTH_CLIENT_ID = process.env.REACT_APP_OAUTH_CLIENT_ID || '';
 const TOKEN_STORAGE_KEY = 'mindmeld_auth_token';
-
-interface User {
-  id: string;
-  name: string;
-}
 
 interface AuthContextType {
   loading: boolean;
