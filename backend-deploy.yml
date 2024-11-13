@@ -1,0 +1,46 @@
+name: Build Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/src/shared/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate version
+        id: version
+        run: |
+          echo "version=dev-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Copy shared code
+        run: |
+          mkdir -p backend/src/.shared
+          cp -r frontend/src/shared/* backend/src/.shared/
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Build and Push Image
+        run: |
+          cd backend
+          gcloud builds submit \
+            --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }}
