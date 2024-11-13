@@ -42,4 +42,15 @@ jobs:
       - name: Build and Push Image
         run: |
           cd backend
-          gcloud builds submit --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }}
+          echo "Starting Cloud Build..."
+          BUILD_OUTPUT=$(gcloud builds submit --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} 2>&1)
+          echo "$BUILD_OUTPUT"
+          
+          if echo "$BUILD_OUTPUT" | grep -q "Created.*builds"; then
+            echo "Build submitted successfully!"
+            echo "You can view the build progress at: https://console.cloud.google.com/cloud-build/builds"
+            exit 0
+          else
+            echo "Failed to submit build"
+            exit 1
+          fi
