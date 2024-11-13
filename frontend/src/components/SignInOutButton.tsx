@@ -21,10 +21,7 @@ const SignInOutButton: React.FC = () => {
       {loading ? (
         <LoadingSpinner size="small" />
       ) : user ? (
-        <button
-          onClick={signOut}
-          className={secondaryButtonClasses}
-        >
+        <button onClick={signOut} className={`${secondaryButtonClasses} !p-1`}>
           Sign out
           <p className="text-sm font-sans text-stone-400 text-center">{nickname}</p>
         </button>
