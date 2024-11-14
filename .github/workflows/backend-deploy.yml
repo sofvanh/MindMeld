@@ -39,23 +39,23 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      - name: Check for required secrets
+      - name: Check for required Google Cloud secrets
         run: |
           required_secrets=("OPENAI_API_KEY" "DB_USER" "DB_HOST" "DB_NAME" "DB_PASSWORD" "GOOGLE_CLIENT_ID")
           missing_secrets=()
           for secret in "${required_secrets[@]}"; do
-            if [ -z "${{ secrets[secret] }}" ]; then
+            if ! gcloud secrets versions access latest --secret="$secret" >/dev/null 2>&1; then
               missing_secrets+=("$secret")
             fi
           done
           if [ ${#missing_secrets[@]} -ne 0 ]; then
-            echo "Error: The following required secrets are missing:"
+            echo "Error: The following required Google Cloud secrets are missing:"
             for secret in "${missing_secrets[@]}"; do
               echo "- $secret"
             done
             exit 1
           fi
-          echo "All required secrets are present. Proceeding with deployment..."
+          echo "All required Google Cloud secrets are present. Proceeding with deployment..."
 
       - name: Build and Push Image
         run: |
