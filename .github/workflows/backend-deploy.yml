@@ -1,4 +1,4 @@
-name: Build Backend
+name: Build and Deploy Backend
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - 'frontend/src/shared/**'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,6 +39,24 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
+      - name: Check for required secrets
+        run: |
+          required_secrets=("OPENAI_API_KEY" "DB_USER" "DB_HOST" "DB_NAME" "DB_PASSWORD" "GOOGLE_CLIENT_ID")
+          missing_secrets=()
+          for secret in "${required_secrets[@]}"; do
+            if [ -z "${{ secrets[secret] }}" ]; then
+              missing_secrets+=("$secret")
+            fi
+          done
+          if [ ${#missing_secrets[@]} -ne 0 ]; then
+            echo "Error: The following required secrets are missing:"
+            for secret in "${missing_secrets[@]}"; do
+              echo "- $secret"
+            done
+            exit 1
+          fi
+          echo "All required secrets are present. Proceeding with deployment..."
+
       - name: Build and Push Image
         run: |
           cd backend
@@ -46,3 +64,13 @@ jobs:
           gcloud builds submit --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} --async
           echo "Build submitted successfully!"
           echo "You can view the build progress at: https://console.cloud.google.com/cloud-build/builds"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy mindmeld \
+            --image gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} \
+            --add-cloudsql-instances ${{ secrets.CLOUD_SQL_CONNECTION_NAME }} \
+            --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest,DB_USER=DB_USER:latest,DB_HOST=DB_HOST:latest,DB_NAME=DB_NAME:latest,DB_PASSWORD=DB_PASSWORD:latest,GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID:latest \
+            --platform managed \
+            --region europe-west1 \
+            --allow-unauthenticated
