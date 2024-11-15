@@ -58,14 +58,28 @@ jobs:
           echo "All required Google Cloud secrets are present. Proceeding with deployment..."
 
       - name: Build and Push Image
+        id: build
         run: |
           cd backend
-          echo "Starting Cloud Build..."
-          gcloud builds submit --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} --async
-          echo "Build submitted successfully!"
-          echo "You can view the build progress at: https://console.cloud.google.com/cloud-build/builds"
+          BUILD_ID=$(gcloud builds submit --tag gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} --format='get(id)' --async)
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          
+          echo "Waiting for build to complete..."
+          while true; do
+            STATUS=$(gcloud builds describe $BUILD_ID --format='get(status)')
+            if [ "$STATUS" = "SUCCESS" ]; then
+              echo "Build completed successfully!"
+              break
+            elif [ "$STATUS" = "FAILURE" ] || [ "$STATUS" = "TIMEOUT" ] || [ "$STATUS" = "CANCELLED" ]; then
+              echo "Build failed with status: $STATUS"
+              exit 1
+            fi
+            echo "Build status: $STATUS"
+            sleep 30
+          done
 
       - name: Deploy to Cloud Run
+        if: success()
         run: |
           gcloud run deploy mindmeld \
             --image gcr.io/mindmeld-backend/mindmeld:${{ steps.version.outputs.version }} \
