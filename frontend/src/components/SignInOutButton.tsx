@@ -27,13 +27,10 @@ const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => 
   }
 
   return (
-    <div className="h-10 flex items-center">
-      <GoogleLogin
-        onSuccess={response => signIn(response)}
-        onError={() => console.error('Sign in with Google failed')}
-        useOneTap
-      />
-    </div>
+    <GoogleLogin
+      onSuccess={response => signIn(response)}
+      onError={() => console.error('Sign in with Google failed')}
+    />
   );
 };
 
