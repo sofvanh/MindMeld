@@ -1,23 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import SignInOutButton from './SignInOutButton';
+import Header from './Header';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // TODO Needs a visual update
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-stone-100 px-4 flex justify-between items-center h-16">
-        <Link to="/" className="text-2xl font-serif text-stone-900 hover:text-stone-600">
-          MindMeld
-          <p className="text-sm font-sans text-stone-400 text-center">Work in progress</p>
-        </Link>
-        <SignInOutButton />
-      </header>
+      <Header />
       <main className="flex-grow">
         {children}
       </main>
-      <footer className="bg-stone-100 px-4 text-center h-16 flex items-center justify-center">
-        <p className="text-sm">© 2024 Nicholas Kees Dupuis and Sofia Vanhanen. Licensed under the GNU GPLv3.</p>
+      <footer className="bg-white border-t border-slate-200 px-4 text-center h-16 flex items-center justify-center">
+        <p className="text-sm text-slate-600">© 2024 Nicholas Kees Dupuis and Sofia Vanhanen. Licensed under the GNU GPLv3.</p>
       </footer>
     </div>
   );

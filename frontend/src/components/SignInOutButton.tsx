@@ -1,37 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
-import { secondaryButtonClasses } from '../styles/defaultStyles';
 import LoadingSpinner from './LoadingSpinner';
+import { secondaryButtonClasses } from '../styles/defaultStyles';
 
-const SignInOutButton: React.FC = () => {
+interface SignInOutButtonProps {
+  className?: string;
+}
+
+const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => {
   const { loading, user, signIn, signOut } = useAuth();
-  const [nickname, setNickname] = useState('');
 
-  useEffect(() => {
-    if (user) {
-      setNickname(user.email.split('@')[0]);
-    } else {
-      setNickname('');
-    }
-  }, [user]);
+  if (loading) {
+    return <LoadingSpinner size="small" />;
+  }
+
+  if (user) {
+    return (
+      <button
+        onClick={signOut}
+        className={`${secondaryButtonClasses} ${className}`}
+      >
+        Sign out
+      </button>
+    );
+  }
 
   return (
     <div className="h-10 flex items-center">
-      {loading ? (
-        <LoadingSpinner size="small" />
-      ) : user ? (
-        <button onClick={signOut} className={`${secondaryButtonClasses} !p-1`}>
-          Sign out
-          <p className="text-sm font-sans text-stone-400 text-center">{nickname}</p>
-        </button>
-      ) : (
-        <GoogleLogin
-          onSuccess={response => signIn(response)}
-          onError={() => console.error('Sign in with Google failed')}
-          useOneTap
-        />
-      )}
+      <GoogleLogin
+        onSuccess={response => signIn(response)}
+        onError={() => console.error('Sign in with Google failed')}
+        useOneTap
+      />
     </div>
   );
 };

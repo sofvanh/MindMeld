@@ -72,7 +72,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({ argument, onClose }) => {
         </div>
         <CloseButton onClick={onClose} />
       </div>
-      <p className="text-sm text-stone-700 flex-1">{argument.statement}</p>
+      <p className="text-sm text-slate-700 flex-1">{argument.statement}</p>
     </div>
   );
 };

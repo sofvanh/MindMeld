@@ -3,15 +3,19 @@
 @tailwind utilities;
 
 @layer base {
+    body {
+        @apply font-system text-slate-900;
+    }
+
     h1 {
-        @apply font-serif text-stone-900 mb-4 text-4xl;
+        @apply font-bricolage text-slate-900 mb-4 text-4xl font-semibold;
     }
 
     h2 {
-        @apply font-serif text-stone-900 mb-4 text-2xl;
+        @apply font-bricolage text-slate-900 mb-4 text-2xl;
     }
 
     h3 {
-        @apply font-serif text-stone-900 mb-4 text-xl;
+        @apply font-bricolage text-slate-900 mb-4 text-xl;
     }
 }

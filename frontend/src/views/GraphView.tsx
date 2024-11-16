@@ -87,7 +87,7 @@ const GraphView: React.FC = () => {
         </Link>
         <p className="text-base m-0">
           {graph.name}
-          {graph.arguments.length === 0 && <p className="inline text-sm text-stone-400"> (empty)</p>}
+          {graph.arguments.length === 0 && <p className="inline text-sm text-slate-400"> (empty)</p>}
         </p>
       </div>
       <ForceGraph2D
@@ -133,7 +133,7 @@ const GraphView: React.FC = () => {
           </form>
         ) : (
           <div className="bg-white p-4 rounded-lg shadow-lg">
-            <p className="text-sm text-stone-400">Sign in to add arguments</p>
+            <p className="text-sm text-slate-400">Sign in to add arguments</p>
           </div>
         )}
       </div>
