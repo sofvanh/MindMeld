@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CloseButton from './CloseButton';
-import { greenIconButtonClasses, iconClasses, redIconButtonClasses, iconButtonClasses, amberIconButtonClasses } from '../styles/defaultStyles';
+import { greenIconButtonClasses, iconClasses, redIconButtonClasses, iconButtonClasses, amberIconButtonClasses, tooltipClasses } from '../styles/defaultStyles';
 import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
 import { MdOutlineQuestionMark } from "react-icons/md";
 import { Argument } from '../shared/types';
@@ -43,25 +43,28 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({ argument, onClose }) => {
       <div className="flex justify-between items-start gap-4">
         <div className="flex gap-2">
           <button
+            data-tooltip={user ? "Agree" : "Agree (sign in to contribute)"}
             onClick={() => user && handleReactionClick('agree')}
             disabled={!user}
-            className={`!p-1 w-auto gap-0.5 ${userReactions.agree ? greenIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
+            className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.agree ? greenIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50'}`}
           >
             <IoIosThumbsUp className={iconClasses} />
             <span className="text-xs">{reactionCounts?.agree || 0}</span>
           </button>
           <button
+            data-tooltip={user ? "Disagree" : "Disagree (sign in to contribute)"}
             onClick={() => user && handleReactionClick('disagree')}
             disabled={!user}
-            className={`!p-1 w-auto gap-0.5 ${userReactions.disagree ? redIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
+            className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.disagree ? redIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50'}`}
           >
             <IoIosThumbsDown className={iconClasses} />
             <span className="text-xs">{reactionCounts?.disagree || 0}</span>
           </button>
           <button
+            data-tooltip={user ? "Unclear" : "Unclear (sign in to contribute)"}
             onClick={() => user && handleReactionClick('unclear')}
             disabled={!user}
-            className={`!p-1 w-auto gap-0.5 ${userReactions.unclear ? amberIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
+            className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.unclear ? amberIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50'}`}
           >
             <MdOutlineQuestionMark className={iconClasses} />
             <span className="text-xs">{reactionCounts?.unclear || 0}</span>
