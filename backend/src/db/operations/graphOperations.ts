@@ -38,7 +38,7 @@ export async function getGraphData(graphId: string, userId: string): Promise<Gra
   const reactionCountsMap = new Map();
   reactionCountsResult.rows.forEach((row: any) => {
     if (!reactionCountsMap.has(row.argument_id)) {
-      reactionCountsMap.set(row.argument_id, { agree: 0, disagree: 0 });
+      reactionCountsMap.set(row.argument_id, { agree: 0, disagree: 0, unclear: 0 });
     }
     reactionCountsMap.get(row.argument_id)[row.type] = parseInt(row.count);
   });
@@ -53,7 +53,10 @@ export async function getGraphData(graphId: string, userId: string): Promise<Gra
       [userId, graphId]
     );
     userReactionsResult.rows.forEach((row: any) => {
-      userReactionsMap.set(row.argument_id, row.type);
+      if (!userReactionsMap.has(row.argument_id)) {
+        userReactionsMap.set(row.argument_id, {});
+      }
+      userReactionsMap.get(row.argument_id)[row.type] = true;
     });
   }
 
@@ -63,7 +66,7 @@ export async function getGraphData(graphId: string, userId: string): Promise<Gra
     statement: row.statement,
     embedding: row.embedding,
     authorId: row.author_id,
-    reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0 },
+    reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0, unclear: 0 },
     userReaction: userReactionsMap.get(row.id)
   }));
 

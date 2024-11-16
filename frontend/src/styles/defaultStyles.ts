@@ -9,9 +9,9 @@ export const primaryButtonClasses = `
 `;
 
 const secondaryButtonColors = "text-stone-500 hover:text-stone-700 hover:bg-black hover:bg-opacity-5";
-export const greenButtonColors = "text-green-500 hover:text-green-700 hover:bg-green-500 hover:bg-opacity-5";
-export const redButtonColors = "text-red-500 hover:text-red-700 hover:bg-red-500 hover:bg-opacity-5";
-
+export const greenButtonColors = "text-green-500 hover:text-green-700 hover:bg-green-500 hover:bg-opacity-15";
+export const redButtonColors = "text-red-500 hover:text-red-700 hover:bg-red-500 hover:bg-opacity-15";
+export const amberButtonColors = "text-amber-500 hover:text-amber-700 hover:bg-amber-500 hover:bg-opacity-15";
 export const secondaryButtonClasses = `
   ${defaultButtonClasses} ${secondaryButtonColors} py-2 px-4
 `;
@@ -21,6 +21,7 @@ export const baseIconButtonClasses = `${defaultButtonClasses} p-0 w-6 h-6 flex i
 export const iconButtonClasses = `${baseIconButtonClasses} ${secondaryButtonColors}`;
 export const greenIconButtonClasses = `${baseIconButtonClasses} ${greenButtonColors}`;
 export const redIconButtonClasses = `${baseIconButtonClasses} ${redButtonColors}`;
+export const amberIconButtonClasses = `${baseIconButtonClasses} ${amberButtonColors}`;
 
 export const iconClasses = "w-full h-full";
 

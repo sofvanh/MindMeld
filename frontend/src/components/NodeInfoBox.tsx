@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import CloseButton from './CloseButton';
-import { greenIconButtonClasses, iconClasses, redIconButtonClasses } from '../styles/defaultStyles';
-import { iconButtonClasses } from '../styles/defaultStyles';
+import { greenIconButtonClasses, iconClasses, redIconButtonClasses, iconButtonClasses, amberIconButtonClasses } from '../styles/defaultStyles';
 import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
+import { MdOutlineQuestionMark } from "react-icons/md";
 import { Argument } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,24 +15,25 @@ interface NodeInfoBoxProps {
 const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({ argument, onClose }) => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
-  const [userReaction, setUserReaction] = useState(argument.userReaction);
+  const [userReactions, setUserReactions] = useState(argument.userReaction || {});
   const [reactionCounts, setReactionCounts] = useState(argument.reactionCounts);
 
   useEffect(() => {
-    setUserReaction(argument.userReaction);
+    setUserReactions(argument.userReaction || {});
     setReactionCounts(argument.reactionCounts);
   }, [argument]);
 
-  const handleReactionClick = (reaction: 'agree' | 'disagree') => {
-    if (userReaction === reaction) {
-      socket?.emit('remove reaction', {
-        argumentId: argument.id,
-        type: reaction
-      });
-    } else {
+  const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
+    const newValue = !userReactions[type];
+    if (newValue) {
       socket?.emit('add reaction', {
         argumentId: argument.id,
-        type: reaction
+        type
+      });
+    } else {
+      socket?.emit('remove reaction', {
+        argumentId: argument.id,
+        type
       });
     }
   };
@@ -44,7 +45,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({ argument, onClose }) => {
           <button
             onClick={() => user && handleReactionClick('agree')}
             disabled={!user}
-            className={`!p-1 w-auto gap-0.5 ${userReaction === 'agree' ? greenIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
+            className={`!p-1 w-auto gap-0.5 ${userReactions.agree ? greenIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
           >
             <IoIosThumbsUp className={iconClasses} />
             <span className="text-xs">{reactionCounts?.agree || 0}</span>
@@ -52,10 +53,18 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({ argument, onClose }) => {
           <button
             onClick={() => user && handleReactionClick('disagree')}
             disabled={!user}
-            className={`!p-1 w-auto gap-0.5 ${userReaction === 'disagree' ? redIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
+            className={`!p-1 w-auto gap-0.5 ${userReactions.disagree ? redIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
           >
             <IoIosThumbsDown className={iconClasses} />
             <span className="text-xs">{reactionCounts?.disagree || 0}</span>
+          </button>
+          <button
+            onClick={() => user && handleReactionClick('unclear')}
+            disabled={!user}
+            className={`!p-1 w-auto gap-0.5 ${userReactions.unclear ? amberIconButtonClasses : iconButtonClasses} ${!user && 'opacity-50 pointer-events-none'}`}
+          >
+            <MdOutlineQuestionMark className={iconClasses} />
+            <span className="text-xs">{reactionCounts?.unclear || 0}</span>
           </button>
         </div>
         <CloseButton onClick={onClose} />

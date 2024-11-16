@@ -14,8 +14,13 @@ export interface Argument {
   reactionCounts?: {
     agree: number;
     disagree: number;
+    unclear: number;
   };
-  userReaction?: 'agree' | 'disagree' | null;
+  userReaction?: {
+    agree?: boolean;
+    disagree?: boolean;
+    unclear?: boolean;
+  };
 }
 
 // Edges are the connections between arguments
@@ -39,5 +44,5 @@ export interface Reaction {
   id: string;
   userId: string;
   argumentId: string;
-  type: 'agree' | 'disagree';
+  type: 'agree' | 'disagree' | 'unclear';
 }

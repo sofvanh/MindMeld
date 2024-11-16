@@ -6,7 +6,7 @@ import { query } from '../db/db';
 export const handleAddReaction = async (
   socket: Socket,
   io: any,
-  { argumentId, type }: { argumentId: string; type: 'agree' | 'disagree' },
+  { argumentId, type }: { argumentId: string; type: 'agree' | 'disagree' | 'unclear' },
   callback?: Function
 ) => {
   if (!socket.data.user) {
@@ -29,7 +29,7 @@ export const handleAddReaction = async (
 export const handleRemoveReaction = async (
   socket: Socket,
   io: any,
-  { argumentId, type }: { argumentId: string; type: 'agree' | 'disagree' },
+  { argumentId, type }: { argumentId: string; type: 'agree' | 'disagree' | 'unclear' },
   callback?: Function
 ) => {
   if (!socket.data.user) {

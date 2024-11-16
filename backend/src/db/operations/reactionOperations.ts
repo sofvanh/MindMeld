@@ -1,22 +1,23 @@
 import { query } from '../db';
 import { generateReactionId } from '../idGenerator';
-import { Reaction } from '../../.shared/types';
 
 export async function addReaction(
   userId: string,
   argumentId: string,
-  type: 'agree' | 'disagree'
+  type: 'agree' | 'disagree' | 'unclear'
 ): Promise<string> {
   const id = generateReactionId();
 
-  // Remove any existing agree/disagree reactions from this user on this argument
-  await query(
-    `DELETE FROM reactions 
-     WHERE user_id = $1 
-     AND argument_id = $2 
-     AND type IN ('agree', 'disagree')`,
-    [userId, argumentId]
-  );
+  // If adding agree/disagree, remove any existing agree/disagree reactions
+  if (type === 'agree' || type === 'disagree') {
+    await query(
+      `DELETE FROM reactions 
+       WHERE user_id = $1 
+       AND argument_id = $2 
+       AND type IN ('agree', 'disagree')`,
+      [userId, argumentId]
+    );
+  }
 
   // Add the new reaction
   await query(
