@@ -38,3 +38,23 @@ export async function removeReaction(
     [userId, argumentId, type]
   );
 }
+
+interface ReactionForGraph {
+  userId: string;
+  argumentId: string;
+  type: string;
+}
+
+export async function getReactionsForGraph(
+  graphId: string
+): Promise<ReactionForGraph[]> {
+  const result = await query(
+    `SELECT user_id, argument_id, type
+     FROM reactions
+     JOIN arguments ON reactions.argument_id = arguments.id
+     WHERE arguments.graph_id = $1`,
+    [graphId]
+  );
+
+  return result.rows;
+}
