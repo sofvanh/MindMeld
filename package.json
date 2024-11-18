@@ -12,6 +12,7 @@
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
   "dependencies": {
+    "@tensorflow/tfjs-node": "^4.22.0",
     "concurrently": "^6.2.0"
   }
 }

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Edge, Graph } from './.shared/types';
 import { generateEdgeId } from './db/idGenerator';
+import { cosineSimilarity } from './utils/math';
 import config from './config';
 
 export function generateTopKSimilarEdges(graph: Graph, k = 2): Edge[] {
@@ -43,18 +44,6 @@ export function generateTopKSimilarEdges(graph: Graph, k = 2): Edge[] {
     sourceId: link.source,
     targetId: link.target
   }));
-}
-
-function cosineSimilarity(embedding1: number[], embedding2: number[]) {
-  if (embedding1.length !== embedding2.length) {
-    throw new Error('Embeddings must have the same length');
-  }
-
-  const dotProduct = embedding1.reduce((acc, cur, i) => acc + cur * embedding2[i], 0);
-  const magnitude1 = Math.sqrt(embedding1.reduce((acc, cur) => acc + cur * cur, 0));
-  const magnitude2 = Math.sqrt(embedding2.reduce((acc, cur) => acc + cur * cur, 0));
-
-  return dotProduct / (magnitude1 * magnitude2);
 }
 
 export async function embedText(texts: string[]) {
