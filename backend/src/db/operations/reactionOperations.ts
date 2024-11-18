@@ -39,7 +39,7 @@ export async function removeReaction(
   );
 }
 
-interface ReactionForGraph {
+export interface ReactionForGraph {
   userId: string;
   argumentId: string;
   type: string;
