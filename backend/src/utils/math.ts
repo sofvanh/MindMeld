@@ -20,3 +20,12 @@ export function cosineSimilarity(vector1: number[], vector2: number[]) {
   
     return dotProduct / (magnitude1 * magnitude2);
   }
+
+export function cosineSimilarityMatrix(matrix: number[][]) {
+    const matrixTensor = tf.tensor2d(matrix);
+    const dotProduct = tf.matMul(matrixTensor, matrixTensor, false, true);
+    const magnitude = tf.sqrt(tf.sum(tf.square(matrixTensor), 1));
+    const magnitudeProduct = tf.matMul(magnitude, magnitude, false, true);
+    const similarity = dotProduct.div(magnitudeProduct);
+    return similarity.arraySync() as number[][];
+  }
