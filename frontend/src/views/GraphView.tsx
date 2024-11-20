@@ -4,9 +4,10 @@ import { Argument, Graph } from '../shared/types';
 import { Link, useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
-import { primaryButtonClasses, secondaryButtonClasses, textFieldClasses } from '../styles/defaultStyles';
+
 import LoadingSpinner from '../components/LoadingSpinner';
 import NodeInfoBox from '../components/NodeInfoBox';
+import { buttonStyles } from '../styles/defaultStyles';
 
 
 interface ForceGraphData {
@@ -82,7 +83,7 @@ const GraphView: React.FC = () => {
   return (
     <div className="w-full h-[calc(100vh-8rem)] relative">
       <div className="absolute top-4 left-4 z-10 bg-white/80 px-2 py-1 rounded-lg shadow-sm flex items-center gap-2">
-        <Link to="/graphs" className={`${secondaryButtonClasses} !p-1 min-w-8 flex items-center justify-center`}>
+        <Link to="/graphs" className={`${buttonStyles.secondary} !p-1 min-w-8 flex items-center justify-center`}>
           ←
         </Link>
         <p className="text-base m-0">
@@ -120,13 +121,13 @@ const GraphView: React.FC = () => {
             <input
               type="text"
               placeholder="Enter new argument"
-              className={`${textFieldClasses} flex-1 shadow-md`}
+              className="flex-1 shadow-md"
               onChange={(e) => setNewArgument(e.target.value)}
               value={newArgument}
             />
             <button
               type="submit"
-              className={`${primaryButtonClasses} shadow-md`}
+              className={`${buttonStyles.primary} shadow-md`}
             >
               Add
             </button>

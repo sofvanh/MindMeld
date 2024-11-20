@@ -20,10 +20,23 @@
     }
 
     a {
-        @apply text-blue-500 hover:text-blue-700 transition-colors duration-200;
+        @apply text-blue-500 rounded hover:text-blue-700 transition-colors duration-200;
     }
 
     p {
         @apply text-slate-700;
+    }
+
+    .card {
+        @apply bg-white border border-slate-200 rounded-lg p-6;
+    }
+
+    input,
+    textarea {
+        @apply px-3 py-2 border border-slate-200 rounded text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm;
+    }
+
+    button {
+        @apply font-sans font-semibold rounded transition-colors duration-200 ease-in-out whitespace-normal break-words;
     }
 }

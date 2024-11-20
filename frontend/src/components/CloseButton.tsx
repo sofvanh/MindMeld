@@ -1,6 +1,6 @@
 import React from 'react';
 import { IoIosClose } from "react-icons/io";
-import { iconClasses, iconButtonClasses } from '../styles/defaultStyles';
+import { buttonStyles, iconClasses } from '../styles/defaultStyles';
 
 interface CloseButtonProps {
   onClick: () => void;
@@ -8,7 +8,7 @@ interface CloseButtonProps {
 
 const CloseButton: React.FC<CloseButtonProps> = ({ onClick }) => {
   return (
-    <button onClick={onClick} className={iconButtonClasses}>
+    <button onClick={onClick} className={buttonStyles.icon.default}>
       <IoIosClose className={iconClasses} />
     </button>
   );
