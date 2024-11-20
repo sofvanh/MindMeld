@@ -36,3 +36,15 @@ before:rounded before:text-xs before:whitespace-nowrap
 before:opacity-0 hover:before:opacity-100 before:transition-opacity
 before:pointer-events-none
 `;
+
+export const cardClasses = `
+  bg-white border border-slate-200 rounded-lg p-6
+`;
+
+export const interactiveCardClasses = `
+  ${cardClasses} hover:shadow-md transition-shadow cursor-pointer
+`;
+
+export const subtleCardClasses = `
+  bg-slate-50 border border-slate-200 rounded-lg p-4
+`;

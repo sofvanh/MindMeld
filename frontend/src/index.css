@@ -12,10 +12,14 @@
     }
 
     h2 {
-        @apply font-bricolage text-slate-900 mb-4 text-2xl;
+        @apply font-system text-slate-900 mb-4 text-2xl;
     }
 
     h3 {
         @apply font-bricolage text-slate-900 mb-4 text-xl;
+    }
+
+    a {
+        @apply text-blue-500 hover:text-blue-600 transition-colors duration-200;
     }
 }
