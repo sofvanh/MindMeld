@@ -1,6 +1,6 @@
 # MindMeld
 
-A full-stack application for AI-facilitated group deliberation, drawing inspiration from [Polis](https://pol.is/home) and [Community Notes by X](https://www.lesswrong.com/posts/sx9wTyCp5kgy8xGac/community-notes-by-x).
+MindMeld is a full-stack application designed to facilitate group deliberation using AI. It draws inspiration from platforms like [Polis](https://pol.is/home) and [Community Notes by X](https://www.lesswrong.com/posts/sx9wTyCp5kgy8xGac/community-notes-by-x). You can access the work-in-progress deployment [here](https://mindmeldtool.netlify.app/).
 
 ## Development Setup
 
@@ -28,6 +28,10 @@ A full-stack application for AI-facilitated group deliberation, drawing inspirat
    ```
 
 For detailed commands related to individual frontend or backend tasks, refer to the `package.json` files in their respective directories.
+
+## Design
+
+The branding and design system documentation can be found at `/design`. You can view it live [here](https://mindmeldtool.netlify.app/design).
 
 ## Deployment
 

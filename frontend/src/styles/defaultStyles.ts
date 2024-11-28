@@ -1,32 +1,25 @@
-const defaultButtonClasses = `
-  font-sans font-medium rounded
-  transition-colors duration-200 ease-in-out
-  whitespace-normal break-words
-`;
-
-export const primaryButtonClasses = `
-  ${defaultButtonClasses} bg-blue-500 hover:bg-blue-600 text-white py-2 px-4
-`;
-
 const secondaryButtonColors = "text-slate-700 hover:text-slate-900 hover:bg-slate-100";
-export const greenButtonColors = "text-green-600 hover:text-green-700 hover:bg-green-50";
-export const redButtonColors = "text-red-500 hover:text-red-600 hover:bg-red-50";
-export const amberButtonColors = "text-amber-500 hover:text-amber-600 hover:bg-amber-50";
-export const secondaryButtonClasses = `
-  ${defaultButtonClasses} ${secondaryButtonColors} py-2 px-4
-`;
+const greenButtonColors = "text-green-600 hover:text-green-700 hover:bg-green-50";
+const redButtonColors = "text-red-500 hover:text-red-600 hover:bg-red-50";
+const amberButtonColors = "text-amber-500 hover:text-amber-600 hover:bg-amber-50";
+const baseIconButtonClasses = `p-0 w-6 h-6 flex items-center justify-center`;
 
-export const baseIconButtonClasses = `${defaultButtonClasses} p-0 w-6 h-6 flex items-center justify-center`;
-
-export const iconButtonClasses = `${baseIconButtonClasses} ${secondaryButtonColors}`;
-export const greenIconButtonClasses = `${baseIconButtonClasses} ${greenButtonColors}`;
-export const redIconButtonClasses = `${baseIconButtonClasses} ${redButtonColors}`;
-export const amberIconButtonClasses = `${baseIconButtonClasses} ${amberButtonColors}`;
+export const buttonStyles = {
+  primary: `bg-blue-500 hover:bg-blue-600 text-white py-2 px-4`,
+  secondary: `${secondaryButtonColors} py-2 px-4`,
+  green: `${greenButtonColors} py-2 px-4`,
+  red: `${redButtonColors} py-2 px-4`,
+  amber: `${amberButtonColors} py-2 px-4`,
+  icon: {
+    base: `${baseIconButtonClasses}`,
+    default: `${baseIconButtonClasses} ${secondaryButtonColors}`,
+    green: `${baseIconButtonClasses} ${greenButtonColors}`,
+    red: `${baseIconButtonClasses} ${redButtonColors}`,
+    amber: `${baseIconButtonClasses} ${amberButtonColors}`,
+  }
+};
 
 export const iconClasses = "w-full h-full";
-
-export const textFieldClasses =
-  "px-3 py-2 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm";
 
 export const tooltipClasses = `
 relative before:content-[attr(data-tooltip)] before:absolute 
@@ -36,3 +29,17 @@ before:rounded before:text-xs before:whitespace-nowrap
 before:opacity-0 hover:before:opacity-100 before:transition-opacity
 before:pointer-events-none
 `;
+
+const interactiveCardClasses = `
+  card hover:shadow-md transition-shadow cursor-pointer
+`;
+
+const subtleCardClasses = `
+  bg-slate-50 border border-slate-200 rounded-lg p-4
+`;
+
+export const cardStyles = {
+  default: `card`,
+  interactive: interactiveCardClasses,
+  subtle: subtleCardClasses
+};

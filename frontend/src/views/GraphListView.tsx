@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
-import { secondaryButtonClasses } from '../styles/defaultStyles';
+
 import LoadingSpinner from '../components/LoadingSpinner';
+import { buttonStyles } from '../styles/defaultStyles';
 
 interface Graph {
   id: string;
@@ -36,7 +37,7 @@ const GraphListView: React.FC = () => {
         <ul>
           {graphs.map((graph) => (
             <li key={graph.id} className="mb-2">
-              <Link to={`/graph/${graph.id}`} className={secondaryButtonClasses}>
+              <Link to={`/graph/${graph.id}`} className={buttonStyles.secondary}>
                 {graph.name}
               </Link>
             </li>

@@ -2,7 +2,7 @@ import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
-import { secondaryButtonClasses } from '../styles/defaultStyles';
+import { buttonStyles } from '../styles/defaultStyles';
 
 interface SignInOutButtonProps {
   className?: string;
@@ -19,7 +19,7 @@ const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => 
     return (
       <button
         onClick={signOut}
-        className={`${secondaryButtonClasses} ${className}`}
+        className={`${buttonStyles.secondary} ${className}`}
       >
         Sign out
       </button>

@@ -8,14 +8,35 @@
     }
 
     h1 {
-        @apply font-bricolage text-slate-900 mb-4 text-4xl font-semibold;
+        @apply font-bricolage mb-4 text-4xl font-semibold;
     }
 
     h2 {
-        @apply font-bricolage text-slate-900 mb-4 text-2xl;
+        @apply font-system mb-4 text-2xl font-semibold;
     }
 
     h3 {
-        @apply font-bricolage text-slate-900 mb-4 text-xl;
+        @apply font-system mb-4 text-xl font-semibold;
+    }
+
+    a {
+        @apply text-blue-500 rounded hover:text-blue-700 transition-colors duration-200;
+    }
+
+    p {
+        @apply text-slate-700;
+    }
+
+    .card {
+        @apply bg-white border border-slate-200 rounded-lg p-6;
+    }
+
+    input,
+    textarea {
+        @apply px-3 py-2 border border-slate-200 rounded text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm;
+    }
+
+    button {
+        @apply font-sans font-semibold rounded transition-colors duration-200 ease-in-out whitespace-normal break-words;
     }
 }
