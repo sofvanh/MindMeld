@@ -22,10 +22,22 @@ export function cosineSimilarity(vector1: number[], vector2: number[]) {
   }
 
 export function cosineSimilarityMatrix(matrix: number[][]) {
+    if (matrix.length === 0 || matrix[0].length === 0) {
+      return [[]];
+    }
     const matrixTensor = tf.tensor2d(matrix);
-    const dotProduct = tf.matMul(matrixTensor, matrixTensor, false, true);
-    const magnitude = tf.sqrt(tf.sum(tf.square(matrixTensor), 1));
-    const magnitudeProduct = tf.matMul(magnitude, magnitude, false, true);
+    const dotProduct = tf.matMul(matrixTensor, matrixTensor.transpose());
+
+    const magnitude = tf.sqrt(tf.sum(tf.square(matrixTensor), 1, true));
+    const magnitudeProduct = tf.matMul(magnitude, magnitude.transpose());
+    
     const similarity = dotProduct.div(magnitudeProduct);
+
+    // Dispose tensors to free memory
+    matrixTensor.dispose();
+    dotProduct.dispose();
+    magnitude.dispose();
+    magnitudeProduct.dispose();
+
     return similarity.arraySync() as number[][];
   }
