@@ -4,7 +4,6 @@ import { Argument, Graph } from '../shared/types';
 import { Link, useParams } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
-
 import LoadingSpinner from '../components/LoadingSpinner';
 import NodeInfoBox from '../components/NodeInfoBox';
 import { buttonStyles } from '../styles/defaultStyles';
@@ -51,7 +50,21 @@ const GraphView: React.FC = () => {
   useEffect(() => {
     if (graph) {
       document.title = `${graph.name} - MindMeld`;
-      const nodes: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement, argument: arg }));
+      const nodes: NodeData[] = graph.arguments.map(arg => {
+        // TODO Make colors nicer
+        const r = Math.round((arg.score?.consensus ?? 0) * 255);
+        const g = Math.round((arg.score?.fragmentation ?? 0) * 255);
+        const b = Math.round((1 - (arg.score?.clarity ?? 0)) * 255);
+
+        return {
+          id: arg.id,
+          name: arg.statement,
+          color: arg.score
+            ? `rgb(${r}, ${g}, ${b})`
+            : '#94a3b8',
+          argument: arg
+        };
+      });
       const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
       setGraphData({ nodes, links });
     }

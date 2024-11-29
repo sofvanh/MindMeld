@@ -7,6 +7,16 @@ import { Argument } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 
+
+const getScoreLabel = (score: number | undefined): string => {
+  if (score === undefined) return 'unknown';
+  if (score < 0.2) return 'very low';
+  if (score < 0.4) return 'low';
+  if (score < 0.6) return 'medium';
+  if (score < 0.8) return 'high';
+  return 'very high';
+};
+
 interface NodeInfoBoxProps {
   argument: Argument;
   onClose: () => void;
@@ -72,7 +82,25 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({ argument, onClose }) => {
         </div>
         <CloseButton onClick={onClose} />
       </div>
-      <p className="text-sm text-slate-700 flex-1">{argument.statement}</p>
+
+      <p className="mt-2 text-sm text-slate-700 flex-1">{argument.statement}</p>
+
+      <details className="mt-2">
+        <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-700">
+          View scores
+        </summary>
+        <div className="flex flex-col gap-1 mt-1">
+          {argument.score ? (
+            <>
+              <span className="text-xs text-slate-500">Consensus: {getScoreLabel(argument.score.consensus)}</span>
+              <span className="text-xs text-slate-500">Fragmentation: {getScoreLabel(argument.score.fragmentation)}</span>
+              <span className="text-xs text-slate-500">Clarity: {getScoreLabel(argument.score.clarity)}</span>
+            </>
+          ) : (
+            <span className="text-xs text-slate-500">More user feedback is required to generate scores.</span>
+          )}
+        </div>
+      </details>
     </div>
   );
 };
