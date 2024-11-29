@@ -1,6 +1,7 @@
 import { query } from '../db';
 import { generateGraphId } from '../idGenerator';
 import { Argument, Edge, Graph } from '../../.shared/types';
+import { getArgumentScores } from '../../analysis/argumentScoreHandler';
 
 export async function createGraph(name: string, authorId: string): Promise<string> {
   const id = generateGraphId();
@@ -60,6 +61,20 @@ export async function getGraphData(graphId: string, userId: string): Promise<Gra
     });
   }
 
+  // Get argument scores
+  // TODO: Make sure this is efficient
+  const argumentScores = await getArgumentScores(graphId);
+  const scoresMap = new Map(
+    argumentScores.map(score => [
+      score.argumentId,
+      {
+        consensus: score.consensusScore,
+        fragmentation: score.fragmentationScore,
+        clarity: score.clarityScore
+      }
+    ])
+  );
+
   const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
     id: row.id,
     graphId: row.graph_id,
@@ -67,7 +82,8 @@ export async function getGraphData(graphId: string, userId: string): Promise<Gra
     embedding: row.embedding,
     authorId: row.author_id,
     reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0, unclear: 0 },
-    userReaction: userReactionsMap.get(row.id)
+    userReaction: userReactionsMap.get(row.id),
+    score: scoresMap.get(row.id)
   }));
 
   const links: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({

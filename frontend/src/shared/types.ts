@@ -21,6 +21,11 @@ export interface Argument {
     disagree?: boolean;
     unclear?: boolean;
   };
+  score?: {
+    consensus: number;
+    fragmentation: number;
+    clarity: number;
+  };
 }
 
 // Edges are the connections between arguments
