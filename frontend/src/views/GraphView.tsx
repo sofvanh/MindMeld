@@ -51,15 +51,17 @@ const GraphView: React.FC = () => {
     if (graph) {
       document.title = `${graph.name} - MindMeld`;
       const nodes: NodeData[] = graph.arguments.map(arg => {
+        // TODO Make colors nicer
         const r = Math.round((arg.score?.consensus ?? 0) * 255);
         const g = Math.round((arg.score?.fragmentation ?? 0) * 255);
+        const b = Math.round((1 - (arg.score?.clarity ?? 0)) * 255);
 
         return {
           id: arg.id,
           name: arg.statement,
           color: arg.score
-            ? `rgb(${r}, ${g}, 0)`
-            : '#cccccc',
+            ? `rgb(${r}, ${g}, ${b})`
+            : '#94a3b8',
           argument: arg
         };
       });
