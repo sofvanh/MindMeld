@@ -1,15 +1,15 @@
 import { ReactionForGraph, getReactionsForGraph} from "../db/operations/reactionOperations";
 import { cosineSimilarityMatrix } from "../utils/math";
 
-export async function getArgumentScores(graphId: string) {
-    /**
-     * @returns {Array} An array of objects, each containing:
-     *   - argumentId
-     *   - consensusScore
-     *   - fragmentationScore
-     *   - clarityScore
-     */
 
+interface ArgumentScore {
+    argumentId: string;
+    consensusScore: number;
+    fragmentationScore: number;
+    clarityScore: number;
+}
+
+export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
     const reactionArray: ReactionForGraph[] = await getReactionsForGraph(graphId);
     const minimumVotesUser = 3;
     const minimumVotesArgument = 2;
