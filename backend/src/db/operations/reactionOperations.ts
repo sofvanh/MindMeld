@@ -56,5 +56,9 @@ export async function getReactionsForGraph(
     [graphId]
   );
 
-  return result.rows;
+  return result.rows.map((row: any) => ({
+    userId: row.user_id,
+    argumentId: row.argument_id,
+    type: row.type
+  }));
 }
