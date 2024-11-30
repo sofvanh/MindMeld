@@ -1,4 +1,3 @@
-import { sum } from "@tensorflow/tfjs-node";
 import { ReactionForGraph, getReactionsForGraph} from "../db/operations/reactionOperations";
 import { cosineSimilarityMatrix, computeAllSums} from "../utils/math";
 
@@ -109,11 +108,6 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
     const votes = usersWhoVoted.map(i => votingMatrix[i][argumentIndex]);
 
     if (usersWhoVoted.length >= 2) {
-
-      // Get smaller matrices for just the users who voted
-      const userSimilarities = usersWhoVoted.map(i =>
-        usersWhoVoted.map(j => userSimilarityMatrix[i][j])
-      );
 
       // Compute individual user scores (to be aggregated as the final argument score later)
       const userConsensusScores = new Array(usersWhoVoted.length).fill(0);
