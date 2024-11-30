@@ -10,28 +10,40 @@ interface ArgumentScore {
   clarityScore: number;
 }
 
-export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
-  const reactionArray: ReactionForGraph[] = await getReactionsForGraph(graphId);
+function filterReactions(reactions: ReactionForGraph[]): ReactionForGraph[] {
   const minimumVotesUser = 3;
   const minimumVotesArgument = 2;
 
-  // Count votes for each user and each argument
-  const userVoteCounts = new Map<string, number>();
-  const argumentVoteCounts = new Map<string, number>();
+  let filteredReactions = reactions
+  let hasChanges = true;
 
-  for (const reaction of reactionArray) {
-    if (reaction.type === 'agree' || reaction.type === 'disagree') {
-      userVoteCounts.set(reaction.userId, (userVoteCounts.get(reaction.userId) || 0) + 1);
-      argumentVoteCounts.set(reaction.argumentId, (argumentVoteCounts.get(reaction.argumentId) || 0) + 1);
+    while (hasChanges) {
+      const userCounts = new Map<string, number>();
+      const argumentCounts = new Map<string, number>();
+    
+      for (const reaction of filteredReactions) {
+        if (reaction.type === 'agree' || reaction.type === 'disagree') {
+          userCounts.set(reaction.userId, (userCounts.get(reaction.userId) || 0) + 1);
+          argumentCounts.set(reaction.argumentId, (argumentCounts.get(reaction.argumentId) || 0) + 1);
+        }
+      }
+    
+      const newFilteredReactions: ReactionForGraph[] = filteredReactions.filter(reaction => {
+        const userCount = userCounts.get(reaction.userId) || 0;
+        const argumentCount = argumentCounts.get(reaction.argumentId) || 0;
+    
+        return userCount >= minimumVotesUser && argumentCount >= minimumVotesArgument;
+      });
+
+      hasChanges = newFilteredReactions.length !== filteredReactions.length;
+      filteredReactions = newFilteredReactions;
     }
+    return filteredReactions;
   }
 
-  // Filter reactions
-  const filteredReactions = reactionArray.filter(reaction => {
-    const userVoteCount = userVoteCounts.get(reaction.userId) || 0;
-    const argumentVoteCount = argumentVoteCounts.get(reaction.argumentId) || 0;
-    return userVoteCount >= minimumVotesUser && argumentVoteCount >= minimumVotesArgument;
-  });
+export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
+  const reactionArray: ReactionForGraph[] = await getReactionsForGraph(graphId);
+  const filteredReactions = filterReactions(reactionArray);
 
   // Create maps for user and argument indices
   const userIndexMap = new Map<string, number>();
