@@ -1,5 +1,6 @@
-import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
-import { cosineSimilarityMatrix } from "../utils/math";
+import { sum } from "@tensorflow/tfjs-node";
+import { ReactionForGraph, getReactionsForGraph} from "../db/operations/reactionOperations";
+import { cosineSimilarityMatrix, computeAllSums} from "../utils/math";
 
 
 interface ArgumentScore {
@@ -79,13 +80,11 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
   // Calculate the user similarity matrix
   const userSimilarityMatrix: number[][] = cosineSimilarityMatrix(votingMatrix);
 
+  // Calculate the sum matrices
+  const { sum_pos_pos, sum_pos_neg, sum_neg_pos, sum_neg_neg} = computeAllSums(userSimilarityMatrix, votingMatrix);
+
   // Calculate the argument scores for each argument
-  const argumentScores: {
-    argumentId: string,
-    consensusScore: number,
-    fragmentationScore: number
-    clarityScore: number
-  }[] = [];
+  const argumentScores: ArgumentScore[] = [];
 
   argumentIndexMap.forEach((argumentIndex, argumentId) => {
     //Identify users who voted on this argument
@@ -103,12 +102,6 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       const userSimilarities = usersWhoVoted.map(i =>
         usersWhoVoted.map(j => userSimilarityMatrix[i][j])
       );
-      const userAgreementMatrix = votes.map(voteI =>
-        votes.map(voteJ => (voteI === voteJ ? 1 : 0))
-      );
-      const userDisagreementMatrix = votes.map(voteI =>
-        votes.map(voteJ => (voteI === -voteJ ? 1 : 0))
-      );
 
       // Compute individual user scores (to be aggregated as the final argument score later)
       const userConsensusScores = new Array(usersWhoVoted.length).fill(0);
@@ -117,44 +110,30 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       const userUnclearScores = new Array(usersWhoVoted.length).fill(0);
 
       for (let i = 0; i < usersWhoVoted.length; i++) {
-        // Partition users into in-group and out-group
-        const inGroup: number[] = [];
-        const outGroup: number[] = [];
-        for (let j = 0; j < usersWhoVoted.length; j++) {
-          const similarity = userSimilarities[i][j];
-          if (similarity > 0) {
-            inGroup.push(j);
-          } else if (similarity < 0) {
-            outGroup.push(j);
-          }
-        }
+
+        // Get in-group and out-group users
+        const sumIngroupAgree = sum_pos_pos[usersWhoVoted[i]][argumentIndex];
+        const sumIngroupDisagree = sum_pos_neg[usersWhoVoted[i]][argumentIndex];
+        const sumOutgroupAgree = sum_neg_pos[usersWhoVoted[i]][argumentIndex];
+        const sumOutgroupDisagree = sum_neg_neg[usersWhoVoted[i]][argumentIndex];
 
         // Calculate user consensus score
-        if (outGroup.length > 0) {
-          let consensusSum = 0
-          let outgroupWeightedSize = 0;
-          for (const j of outGroup) {
-            consensusSum += userAgreementMatrix[i][j] * userSimilarities[i][j];
-            outgroupWeightedSize += userSimilarities[i][j];
-          }
-          userConsensusScores[i] = consensusSum / outgroupWeightedSize;
+        const sumAlignedOutgroup = votes[i] === 1 ? sumOutgroupAgree : sumOutgroupDisagree;
+        const sumOutgroup = sumOutgroupAgree + sumOutgroupDisagree;
+        if (sumOutgroup > 0) {
+            userConsensusScores[i] = sumAlignedOutgroup / sumOutgroup;
         }
         else {
           userConsensusScores[i] = 0;
         }
 
         // Calculate user fragmentation score
-        let fragmentationSum = 0;
-        let ingroupWeightedSize = 0;
-        for (const j of inGroup) { // inGroup.length is always > 0 (includes self)
-          fragmentationSum += userDisagreementMatrix[i][j] * userSimilarities[i][j];
-          ingroupWeightedSize += userSimilarities[i][j];
-        }
-        userFragmentationScores[i] = fragmentationSum / ingroupWeightedSize;
-
+        const sumDisalignedIngroup = votes[i] === -1 ? sumIngroupAgree : sumIngroupDisagree;
+        const sumIngroup = sumIngroupAgree + sumIngroupDisagree;
+        userFragmentationScores[i] = sumDisalignedIngroup / sumIngroup;
 
         // Calculate user uniqueness score
-        userUniquenessScores[i] = 1 / ingroupWeightedSize
+        userUniquenessScores[i] = 1 / (sumIngroup);
 
         // Get user unclear score
         userUnclearScores[i] = unclearMatrix[usersWhoVoted[i]][argumentIndex];
