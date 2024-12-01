@@ -6,6 +6,7 @@ export interface VoteAnalysis {
     argumentIndexMap: Map<string, number>;
     votingMatrix: number[][];
     unclearMatrix: number[][];
+    uniquenessMatrix: number[][];
     sum_pos_pos: number[][];
     sum_pos_neg: number[][];
     sum_neg_pos: number[][];
@@ -97,11 +98,22 @@ export async function analyzeVotes(graphId: string): Promise<VoteAnalysis> {
     // Calculate the sum matrices
     const { sum_pos_pos, sum_pos_neg, sum_neg_pos, sum_neg_neg} = computeAllSums(userSimilarityMatrix, votingMatrix);
 
+    // Calculate the uniqueness matrix
+    const uniquenessMatrix = votingMatrix.map((row, i) => row.map((value, j) => {
+        const sumIngroupAgree = sum_pos_pos[i][j];
+        const sumIngroupDisagree = sum_pos_neg[i][j];
+        const sumIngroupNoVote = votingMatrix[i][j] === 0 ? 1 : 0;
+
+        const sumIngroup = sumIngroupAgree + sumIngroupDisagree + sumIngroupNoVote;
+        return 1 / sumIngroup;
+    }));
+
     return {
         userIndexMap,
         argumentIndexMap,
         votingMatrix,
         unclearMatrix,
+        uniquenessMatrix,
         sum_pos_pos,
         sum_pos_neg,
         sum_neg_pos,

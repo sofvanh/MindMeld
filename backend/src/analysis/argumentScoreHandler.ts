@@ -1,6 +1,6 @@
 import { analyzeVotes } from "./voteAnalyzer";
 
-interface ArgumentScore {
+export interface ArgumentScore {
   argumentId: string;
   consensusScore: number;
   fragmentationScore: number;
@@ -10,8 +10,7 @@ interface ArgumentScore {
 function getArgumentClarityScore(argumentIndex: number, 
                                  votingMatrix: number[][],
                                  unclearMatrix: number[][], 
-                                 sum_pos_pos: number[][],
-                                 sum_pos_neg: number[][]) {
+                                 uniquenessMatrix: number[][]) {
 
   //Identify all users who reacted on this argument 
   let usersWhoReacted: number[] = [];
@@ -24,30 +23,27 @@ function getArgumentClarityScore(argumentIndex: number,
   let unclearSum = 0;
   let uniquenessSum = 0;
   for (let i = 0; i < usersWhoReacted.length; i++) {
-    const sumIngroupAgree = sum_pos_pos[usersWhoReacted[i]][argumentIndex];
-    const sumIngroupDisagree = sum_pos_neg[usersWhoReacted[i]][argumentIndex];
-    const sumIngroupNoVote = votingMatrix[usersWhoReacted[i]][argumentIndex] === 0 ? 1 : 0;
+    let uniqueness = uniquenessMatrix[usersWhoReacted[i]][argumentIndex];
 
-    let sumIngroup = sumIngroupAgree + sumIngroupDisagree + sumIngroupNoVote;
-
-    unclearSum += unclearMatrix[usersWhoReacted[i]][argumentIndex] / sumIngroup;
-    uniquenessSum += 1 / sumIngroup;
+    unclearSum += unclearMatrix[usersWhoReacted[i]][argumentIndex] * uniqueness;
+    uniquenessSum += uniqueness;
   }
 
   return 1 - (unclearSum / uniquenessSum);
 }
 
 export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
-    const {
-        userIndexMap,
-        argumentIndexMap,
-        votingMatrix,
-        unclearMatrix,
-        sum_pos_pos,
-        sum_pos_neg,
-        sum_neg_pos,
-        sum_neg_neg,
-    } = await analyzeVotes(graphId);
+  const {
+      userIndexMap,
+      argumentIndexMap,
+      votingMatrix,
+      unclearMatrix,
+      uniquenessMatrix,
+      sum_pos_pos,
+      sum_pos_neg,
+      sum_neg_pos,
+      sum_neg_neg,
+  } = await analyzeVotes(graphId);
 
   // Calculate the argument scores for each argument
   const argumentScores: ArgumentScore[] = [];
@@ -121,8 +117,7 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       const argumentClarityScore = getArgumentClarityScore(argumentIndex, 
                                                            votingMatrix, 
                                                            unclearMatrix, 
-                                                           sum_pos_pos, 
-                                                           sum_pos_neg);
+                                                           uniquenessMatrix);
 
       argumentScores.push({
         argumentId,
@@ -130,6 +125,9 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
         fragmentationScore: argumentFragmentationScore,
         clarityScore: argumentClarityScore
       });
+    }
+    else {
+      throw new Error('Argument has less than 2 votes');
     }
   });
 
