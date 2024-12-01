@@ -49,22 +49,22 @@ const GraphView: React.FC = () => {
     }
   }, [socket, graphId, loading])
 
+  const getColor = (arg: Argument) => {
+    if (!arg.score) return '#94a3b8';
+    const r = Math.round((arg.score.consensus ?? 0) * 255);
+    const g = Math.round((arg.score.fragmentation ?? 0) * 255);
+    const b = Math.round((1 - (arg.score.clarity ?? 0)) * 255);
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  }
+
   useEffect(() => {
     if (graph) {
       document.title = `${graph.name} - MindMeld`;
       const nodes: NodeData[] = graph.arguments.map(arg => {
-        // TODO Make colors nicer
-        const r = Math.round((arg.score?.consensus ?? 0) * 255);
-        const g = Math.round((arg.score?.fragmentation ?? 0) * 255);
-        const b = Math.round((1 - (arg.score?.clarity ?? 0)) * 255);
-
         return {
           id: arg.id,
           name: arg.statement,
-          color: arg.score
-            // Convert RGB values to a hexadecimal color string
-            ? `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
-            : '#94a3b8',
+          color: getColor(arg),
           argument: arg
         } as NodeData;
       });
@@ -75,9 +75,15 @@ const GraphView: React.FC = () => {
 
   useEffect(() => {
     if (graph && selectedNodeId) {
-      const selectedNode = graphData.nodes.find(node => node.id === selectedNodeId);
+      console.log('selectedNodeId', selectedNodeId);
+      const selectedNode = graph.arguments.find(arg => arg.id === selectedNodeId);
       if (selectedNode) {
-        setSelectedNode(selectedNode);
+        setSelectedNode({
+          id: selectedNode.id,
+          name: selectedNode.statement,
+          color: getColor(selectedNode),
+          argument: selectedNode
+        });
       }
     } else {
       setSelectedNode(null);
