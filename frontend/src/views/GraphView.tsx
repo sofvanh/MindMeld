@@ -174,7 +174,7 @@ const GraphView: React.FC = () => {
         graphData={layoutData}
         nodeLabel="name"
         onNodeClick={handleNodeClick}
-        enableNodeDrag={true}
+        enableNodeDrag={false}
         nodeCanvasObject={nodeCanvasObject}
         nodeCanvasObjectMode={() => 'replace'}
         autoPauseRedraw={true}
