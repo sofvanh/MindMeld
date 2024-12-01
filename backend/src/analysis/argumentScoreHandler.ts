@@ -63,8 +63,6 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       // Compute individual user scores (to be aggregated as the final argument score later)
       const userConsensusScores = new Array(usersWhoVoted.length).fill(0);
       const userFragmentationScores = new Array(usersWhoVoted.length).fill(0);
-      const userUniquenessScores = new Array(usersWhoVoted.length).fill(0);
-      const userUnclearScores = new Array(usersWhoVoted.length).fill(0);
 
       for (let i = 0; i < usersWhoVoted.length; i++) {
 
@@ -88,9 +86,6 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
         const sumDisalignedIngroup = votes[i] === -1 ? sumIngroupAgree : sumIngroupDisagree;
         const sumIngroup = sumIngroupAgree + sumIngroupDisagree;
         userFragmentationScores[i] = sumDisalignedIngroup / sumIngroup;
-
-        // Calculate user uniqueness score
-        userUniquenessScores[i] = 1 / (sumIngroup);
       }
 
       // Aggregate user scores to get argument scores
@@ -100,15 +95,15 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       let weightedConsensusSum = 0;
       let uniquenessSum = 0;
       for (let i = 0; i < usersWhoVoted.length; i++) {
-        weightedConsensusSum += userConsensusScores[i] * userUniquenessScores[i];
-        uniquenessSum += userUniquenessScores[i];
+        weightedConsensusSum += userConsensusScores[i] * uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
+        uniquenessSum += uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
       }
       const argumentConsensusScore = weightedConsensusSum / uniquenessSum;
 
       // Calculate argument fragmentation score
       let weightedFragmentationSum = 0;
       for (let i = 0; i < usersWhoVoted.length; i++) {
-        weightedFragmentationSum += userFragmentationScores[i] * userUniquenessScores[i];
+        weightedFragmentationSum += userFragmentationScores[i] * uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
       }
       // Score is multiplied by 2 to scale it to the range [0, 1]
       const argumentFragmentationScore = (weightedFragmentationSum / uniquenessSum) * 2;

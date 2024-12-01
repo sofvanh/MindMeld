@@ -1,5 +1,5 @@
-import { ReactionForGraph, getReactionsForGraph} from "../db/operations/reactionOperations";
-import { cosineSimilarityMatrix, computeAllSums} from "../utils/math";
+import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
+import { cosineSimilarityMatrix, computeAllSums } from "../utils/math";
 
 export interface VoteAnalysis {
     userIndexMap: Map<string, number>;
@@ -14,8 +14,8 @@ export interface VoteAnalysis {
 }
 
 function filterReactions(reactions: ReactionForGraph[]): ReactionForGraph[] {
-    const minimumVotesUser = 3;
-    const minimumVotesArgument = 2;
+    const MINIMUM_VOTES_USER = 3;
+    const MINIMUM_VOTES_ARGUMENT = 2;
   
     let filteredReactions = reactions
     let hasChanges = true;
@@ -35,7 +35,7 @@ function filterReactions(reactions: ReactionForGraph[]): ReactionForGraph[] {
             const userCount = userCounts.get(reaction.userId) || 0;
             const argumentCount = argumentCounts.get(reaction.argumentId) || 0;
         
-            return userCount >= minimumVotesUser && argumentCount >= minimumVotesArgument;
+            return userCount >= MINIMUM_VOTES_USER && argumentCount >= MINIMUM_VOTES_ARGUMENT;
         });
 
         hasChanges = newFilteredReactions.length !== filteredReactions.length;
@@ -53,19 +53,17 @@ export async function analyzeVotes(graphId: string): Promise<VoteAnalysis> {
     const argumentIndexMap = new Map<string, number>();
 
     // Fill the maps
-    let userIndex = 0;
-    let argumentIndex = 0;
+    let userIndexCounter = 0;
+    let argumentIndexCounter = 0;
 
-    for (const reaction of filteredReactions) {
+    filteredReactions.forEach(reaction => {
         if (!userIndexMap.has(reaction.userId)) {
-            userIndexMap.set(reaction.userId, userIndex);
-            userIndex++;
+            userIndexMap.set(reaction.userId, userIndexCounter++);
         }
         if (!argumentIndexMap.has(reaction.argumentId)) {
-            argumentIndexMap.set(reaction.argumentId, argumentIndex);
-            argumentIndex++;
+            argumentIndexMap.set(reaction.argumentId, argumentIndexCounter++);
         }
-    }
+    });
 
     // Initialize the voting matrix and unclear matrix
     const userCount = userIndexMap.size;

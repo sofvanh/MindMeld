@@ -12,7 +12,6 @@ async function getUniquenessScores(userId: string, graphId: string): Promise<Map
     const {
         userIndexMap,
         argumentIndexMap,
-        votingMatrix,
         uniquenessMatrix
     } = await analyzeVotes(graphId);
 
@@ -36,35 +35,26 @@ export async function getArgumentPriority(graphId: string, userId: string): Prom
 
     // Record which arguments the user has reacted to
     const reactions: ReactionForGraph[] = await getReactionsForGraph(graphId);
-    const userReactions = reactions.filter(reaction => reaction.userId === userId);
-    const userReactedMap = new Map<string, boolean>();
-    userReactions.forEach(reaction => userReactedMap.set(reaction.argumentId, true));
+    const userReactedMap = new Map<string, boolean>(
+        reactions.filter(reaction => reaction.userId === userId).map(reaction => [reaction.argumentId, true])
+    );
     
     // Get priority for arguments with scores (consensus, fragmentation, clarity)
     const argumentScores: ArgumentScore[] = await getArgumentScores(graphId);
     const uniquenessScores: Map<string, number> = await getUniquenessScores(userId, graphId);
 
-    for (const argumentScore of argumentScores) {
-        const argumentId = argumentScore.argumentId;
-        const consensusScore = argumentScore.consensusScore;
-        const fragmentationScore = argumentScore.fragmentationScore;
-        const clarityScore = argumentScore.clarityScore;
-        const uniquenessScore = uniquenessScores.get(argumentId) || 1;
-
-        console.log('User: ' + userId);
-        console.log(`Argument: ${argumentId}, Consensus: ${consensusScore}, Fragmentation: ${fragmentationScore}, Clarity: ${clarityScore}, Uniqueness: ${uniquenessScore}`);
-
-        let priority = (1 + 50*consensusScore + 50*fragmentationScore ) * (clarityScore ** 2) * (uniquenessScore ** 2);
-
+    for (const { argumentId, consensusScore, fragmentationScore, clarityScore } of argumentScores) {
+        const uniquenessScore = uniquenessScores.get(argumentId) ?? 1;
+        const priority = (1 + 50 * consensusScore + 50 * fragmentationScore) * (clarityScore ** 2) * (uniquenessScore ** 2);
         argumentPriorityMap.set(argumentId, priority);
     }
 
-    // Add priority for arguments without scores
-    for (const argumentId of argumentIds) {
+    // Add default priority for arguments without scores
+    argumentIds.forEach(argumentId => {
         if (!argumentPriorityMap.has(argumentId)) {
             argumentPriorityMap.set(argumentId, 1);
         }
-    }
+    });
 
     // Set priority to 0 for arguments the user has already reacted to
     userReactedMap.forEach((_, argumentId) => {
@@ -72,11 +62,6 @@ export async function getArgumentPriority(graphId: string, userId: string): Prom
     });
 
     // Sort arguments by priority and return
-    const argumentPriorityArray: ArgumentPriority[] = [];
-    argumentPriorityMap.forEach((priority, argumentId) => {
-        argumentPriorityArray.push({ argumentId, priority });
-    });
-
-    argumentPriorityArray.sort((a, b) => b.priority - a.priority);
-    return argumentPriorityArray;
+    return Array.from(argumentPriorityMap, ([argumentId, priority]) => ({ argumentId, priority }))
+                .sort((a, b) => b.priority - a.priority);
 }
