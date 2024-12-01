@@ -7,6 +7,36 @@ interface ArgumentScore {
   clarityScore: number;
 }
 
+function getArgumentClarityScore(argumentIndex: number, 
+                                 votingMatrix: number[][],
+                                 unclearMatrix: number[][], 
+                                 sum_pos_pos: number[][],
+                                 sum_pos_neg: number[][]) {
+
+  //Identify all users who reacted on this argument 
+  let usersWhoReacted: number[] = [];
+  for (let i = 0; i < votingMatrix.length; i++) {
+    if (votingMatrix[i][argumentIndex] !== 0 || unclearMatrix[i][argumentIndex] !== 0) {
+      usersWhoReacted.push(i);
+    }
+  }
+
+  let unclearSum = 0;
+  let uniquenessSum = 0;
+  for (let i = 0; i < usersWhoReacted.length; i++) {
+    const sumIngroupAgree = sum_pos_pos[usersWhoReacted[i]][argumentIndex];
+    const sumIngroupDisagree = sum_pos_neg[usersWhoReacted[i]][argumentIndex];
+    const sumIngroupNoVote = votingMatrix[usersWhoReacted[i]][argumentIndex] === 0 ? 1 : 0;
+
+    let sumIngroup = sumIngroupAgree + sumIngroupDisagree + sumIngroupNoVote;
+
+    unclearSum += unclearMatrix[usersWhoReacted[i]][argumentIndex] / sumIngroup;
+    uniquenessSum += 1 / sumIngroup;
+  }
+
+  return 1 - (unclearSum / uniquenessSum);
+}
+
 export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
     const {
         userIndexMap,
@@ -65,9 +95,6 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
 
         // Calculate user uniqueness score
         userUniquenessScores[i] = 1 / (sumIngroup);
-
-        // Get user unclear score
-        userUnclearScores[i] = unclearMatrix[usersWhoVoted[i]][argumentIndex];
       }
 
       // Aggregate user scores to get argument scores
@@ -91,11 +118,11 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       const argumentFragmentationScore = (weightedFragmentationSum / uniquenessSum) * 2;
 
       // Calculate argument clarity score
-      let unclearSum = 0;
-      for (let i = 0; i < usersWhoVoted.length; i++) {
-        unclearSum += userUnclearScores[i] * userUniquenessScores[i];
-      }
-      const argumentClarityScore = 1 - (unclearSum / uniquenessSum);
+      const argumentClarityScore = getArgumentClarityScore(argumentIndex, 
+                                                           votingMatrix, 
+                                                           unclearMatrix, 
+                                                           sum_pos_pos, 
+                                                           sum_pos_neg);
 
       argumentScores.push({
         argumentId,
