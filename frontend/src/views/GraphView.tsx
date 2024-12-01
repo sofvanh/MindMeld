@@ -17,6 +17,7 @@ interface ForceGraphData {
 interface NodeData {
   id: string;
   name: string;
+  color: string;
   argument: Argument;
 }
 
@@ -60,10 +61,11 @@ const GraphView: React.FC = () => {
           id: arg.id,
           name: arg.statement,
           color: arg.score
-            ? `rgb(${r}, ${g}, ${b})`
+            // Convert RGB values to a hexadecimal color string
+            ? `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
             : '#94a3b8',
           argument: arg
-        };
+        } as NodeData;
       });
       const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
       setGraphData({ nodes, links });
@@ -72,9 +74,9 @@ const GraphView: React.FC = () => {
 
   useEffect(() => {
     if (graph && selectedNodeId) {
-      const updatedNode = graph.arguments.find(arg => arg.id === selectedNodeId);
-      if (updatedNode) {
-        setSelectedNode({ id: updatedNode.id, name: updatedNode.statement, argument: updatedNode });
+      const selectedNode = graphData.nodes.find(node => node.id === selectedNodeId);
+      if (selectedNode) {
+        setSelectedNode(selectedNode);
       }
     } else {
       setSelectedNode(null);
@@ -86,6 +88,24 @@ const GraphView: React.FC = () => {
       socket.emit('add argument', { graphId, statement });
     }
   };
+
+  const nodeCanvasObject = React.useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const radius = 5;  // Base radius size in pixels
+    const color = node.color || '#94a3b8';
+
+    // Draw the circle
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // If this is the selected node, draw a border
+    if (node.id === selectedNodeId) {
+      ctx.strokeStyle = color + '60'; // Lower opacity for border
+      ctx.lineWidth = 8 / globalScale;
+      ctx.stroke();
+    }
+  }, [selectedNodeId]);
 
   if (!graph) {
     return <div className="flex items-center justify-center h-full mt-8">
@@ -109,9 +129,10 @@ const GraphView: React.FC = () => {
         height={window.innerHeight - 124}
         graphData={graphData}
         nodeLabel="name"
-        nodeAutoColorBy="id"
         onNodeClick={node => setSelectedNodeId(node.id)}
-        enableNodeDrag={false}
+        enableNodeDrag={true}
+        nodeCanvasObject={nodeCanvasObject}
+        nodeCanvasObjectMode={() => 'replace'}
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedNode && (
