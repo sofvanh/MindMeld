@@ -35,6 +35,7 @@ const GraphView: React.FC = () => {
   const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedNodeIndex, setSelectedNodeIndex] = useState<number>(0);
 
   useEffect(() => {
     if (loading) return;
@@ -89,6 +90,28 @@ const GraphView: React.FC = () => {
     }
   };
 
+  const handlePrevNode = () => {
+    if (!graphData.nodes.length) return;
+    const newIndex = selectedNodeIndex > 0
+      ? selectedNodeIndex - 1
+      : graphData.nodes.length - 1;
+    setSelectedNodeIndex(newIndex);
+    setSelectedNodeId(graphData.nodes[newIndex].id);
+  };
+
+  const handleNextNode = () => {
+    if (!graphData.nodes.length) return;
+    const newIndex = (selectedNodeIndex + 1) % graphData.nodes.length;
+    setSelectedNodeIndex(newIndex);
+    setSelectedNodeId(graphData.nodes[newIndex].id);
+  };
+
+  const handleNodeClick = (node: any) => {
+    const index = graphData.nodes.findIndex(n => n.id === node.id);
+    setSelectedNodeIndex(index);
+    setSelectedNodeId(node.id);
+  };
+
   const nodeCanvasObject = React.useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const radius = 5;  // Base radius size in pixels
     const color = node.color || '#94a3b8';
@@ -129,7 +152,7 @@ const GraphView: React.FC = () => {
         height={window.innerHeight - 124}
         graphData={graphData}
         nodeLabel="name"
-        onNodeClick={node => setSelectedNodeId(node.id)}
+        onNodeClick={handleNodeClick}
         enableNodeDrag={true}
         nodeCanvasObject={nodeCanvasObject}
         nodeCanvasObjectMode={() => 'replace'}
@@ -138,7 +161,14 @@ const GraphView: React.FC = () => {
         {selectedNode && (
           <NodeInfoBox
             argument={selectedNode.argument}
-            onClose={() => setSelectedNodeId(null)}
+            onClose={() => {
+              setSelectedNodeId(null);
+              setSelectedNodeIndex(0);
+            }}
+            onPrevNode={handlePrevNode}
+            onNextNode={handleNextNode}
+            totalNodes={graphData.nodes.length}
+            currentIndex={selectedNodeIndex + 1}
           />
         )}
         {user ? (
