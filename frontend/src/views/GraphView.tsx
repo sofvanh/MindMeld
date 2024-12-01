@@ -32,7 +32,6 @@ const GraphView: React.FC = () => {
   const { graphId } = useParams<{ graphId: string }>();
   const [newArgument, setNewArgument] = useState('');
   const [graph, setGraph] = useState<Graph | null>(null);
-  const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedNodeIndex, setSelectedNodeIndex] = useState<number>(0);
@@ -49,6 +48,17 @@ const GraphView: React.FC = () => {
     }
   }, [socket, graphId, loading])
 
+  useEffect(() => {
+    if (graph) {
+      document.title = `${graph.name} - MindMeld`;
+    } else {
+      document.title = 'Loading... - MindMeld';
+    }
+    return () => {
+      document.title = 'MindMeld';
+    };
+  }, [graph?.name]);
+
   const getColor = (arg: Argument) => {
     if (!arg.score) return '#94a3b8';
     const r = Math.round((arg.score.consensus ?? 0) * 255);
@@ -57,21 +67,44 @@ const GraphView: React.FC = () => {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   }
 
-  useEffect(() => {
-    if (graph) {
-      document.title = `${graph.name} - MindMeld`;
-      const nodes: NodeData[] = graph.arguments.map(arg => {
-        return {
-          id: arg.id,
-          name: arg.statement,
-          color: getColor(arg),
-          argument: arg
-        } as NodeData;
-      });
-      const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
-      setGraphData({ nodes, links });
+  const layoutData = React.useMemo(() => {
+    if (!graph) return { nodes: [], links: [] };
+
+    return {
+      nodes: graph.arguments.map(arg => ({
+        id: arg.id,
+        name: arg.statement,
+      })),
+      links: graph.edges.map(edge => ({
+        source: edge.sourceId,
+        target: edge.targetId
+      }))
+    };
+  }, [graph?.arguments.length, graph?.edges.length]);
+
+  const nodeColors = React.useMemo(() => {
+    if (!graph) return new Map();
+
+    return new Map(
+      graph.arguments.map(arg => [arg.id, getColor(arg)])
+    );
+  }, [graph?.arguments]);
+
+  const nodeCanvasObject = React.useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const radius = 5;
+    const color = nodeColors.get(node.id) || '#94a3b8';
+
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    if (node.id === selectedNodeId) {
+      ctx.strokeStyle = color + '60';
+      ctx.lineWidth = 8 / globalScale;
+      ctx.stroke();
     }
-  }, [graph]);
+  }, [nodeColors, selectedNodeId]);
 
   useEffect(() => {
     if (graph && selectedNodeId) {
@@ -97,44 +130,26 @@ const GraphView: React.FC = () => {
   };
 
   const handlePrevNode = () => {
-    if (!graphData.nodes.length) return;
+    if (!layoutData.nodes.length) return;
     const newIndex = selectedNodeIndex > 0
       ? selectedNodeIndex - 1
-      : graphData.nodes.length - 1;
+      : layoutData.nodes.length - 1;
     setSelectedNodeIndex(newIndex);
-    setSelectedNodeId(graphData.nodes[newIndex].id);
+    setSelectedNodeId(layoutData.nodes[newIndex].id);
   };
 
   const handleNextNode = () => {
-    if (!graphData.nodes.length) return;
-    const newIndex = (selectedNodeIndex + 1) % graphData.nodes.length;
+    if (!layoutData.nodes.length) return;
+    const newIndex = (selectedNodeIndex + 1) % layoutData.nodes.length;
     setSelectedNodeIndex(newIndex);
-    setSelectedNodeId(graphData.nodes[newIndex].id);
+    setSelectedNodeId(layoutData.nodes[newIndex].id);
   };
 
   const handleNodeClick = (node: any) => {
-    const index = graphData.nodes.findIndex(n => n.id === node.id);
+    const index = layoutData.nodes.findIndex(n => n.id === node.id);
     setSelectedNodeIndex(index);
     setSelectedNodeId(node.id);
   };
-
-  const nodeCanvasObject = React.useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const radius = 5;  // Base radius size in pixels
-    const color = node.color || '#94a3b8';
-
-    // Draw the circle
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill();
-
-    // If this is the selected node, draw a border
-    if (node.id === selectedNodeId) {
-      ctx.strokeStyle = color + '60'; // Lower opacity for border
-      ctx.lineWidth = 8 / globalScale;
-      ctx.stroke();
-    }
-  }, [selectedNodeId]);
 
   if (!graph) {
     return <div className="flex items-center justify-center h-full mt-8">
@@ -156,12 +171,13 @@ const GraphView: React.FC = () => {
       <ForceGraph2D
         width={window.innerWidth}
         height={window.innerHeight - 124}
-        graphData={graphData}
+        graphData={layoutData}
         nodeLabel="name"
         onNodeClick={handleNodeClick}
         enableNodeDrag={true}
         nodeCanvasObject={nodeCanvasObject}
         nodeCanvasObjectMode={() => 'replace'}
+        autoPauseRedraw={true}
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedNode && (
@@ -173,7 +189,7 @@ const GraphView: React.FC = () => {
             }}
             onPrevNode={handlePrevNode}
             onNextNode={handleNextNode}
-            totalNodes={graphData.nodes.length}
+            totalNodes={layoutData.nodes.length}
             currentIndex={selectedNodeIndex + 1}
           />
         )}
