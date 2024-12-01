@@ -29,7 +29,7 @@ async function getUniquenessScores(userId: string, graphId: string): Promise<Map
     }
 }
 
-export async function getArgumentPriority(graphId: string, userId: string): Promise<ArgumentPriority[]> {
+export async function getArgumentPriorities(graphId: string, userId: string): Promise<ArgumentPriority[]> {
     const argumentIds = await getArgumentIdsByGraphId(graphId);
     const argumentPriorityMap = new Map<string, number>();
 
