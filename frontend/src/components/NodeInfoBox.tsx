@@ -8,15 +8,6 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 
 
-const getScoreLabel = (score: number | undefined): string => {
-  if (score === undefined) return 'unknown';
-  if (score < 0.2) return 'very low';
-  if (score < 0.4) return 'low';
-  if (score < 0.6) return 'medium';
-  if (score < 0.8) return 'high';
-  return 'very high';
-};
-
 interface NodeInfoBoxProps {
   argument: Argument;
   onClose: () => void;
@@ -124,9 +115,9 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
         <div className="flex flex-col gap-1 mt-1">
           {argument.score ? (
             <>
-              <span className="text-xs text-slate-500">Consensus: {getScoreLabel(argument.score.consensus)}</span>
-              <span className="text-xs text-slate-500">Fragmentation: {getScoreLabel(argument.score.fragmentation)}</span>
-              <span className="text-xs text-slate-500">Clarity: {getScoreLabel(argument.score.clarity)}</span>
+              <span className="text-xs text-slate-500">Consensus: {Math.round(argument.score.consensus * 100)}%</span>
+              <span className="text-xs text-slate-500">Fragmentation: {Math.round(argument.score.fragmentation * 100)}%</span>
+              <span className="text-xs text-slate-500">Clarity: {Math.round(argument.score.clarity * 100)}%</span>
             </>
           ) : (
             <span className="text-xs text-slate-500">More user feedback is required to generate scores.</span>
