@@ -17,13 +17,16 @@ interface ForceGraphData {
 interface NodeData {
   id: string;
   name: string;
+}
+
+interface ExtendedNodeData extends NodeData {
   color: string;
   argument: Argument;
 }
 
 interface LinkData {
-  source: string;
-  target: string;
+  source: NodeData;
+  target: NodeData;
 }
 
 const GraphView: React.FC = () => {
@@ -32,7 +35,8 @@ const GraphView: React.FC = () => {
   const { graphId } = useParams<{ graphId: string }>();
   const [newArgument, setNewArgument] = useState('');
   const [graph, setGraph] = useState<Graph | null>(null);
-  const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
+  const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
+  const [selectedNode, setSelectedNode] = useState<ExtendedNodeData | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedNodeIndex, setSelectedNodeIndex] = useState<number>(0);
 
@@ -49,11 +53,7 @@ const GraphView: React.FC = () => {
   }, [socket, graphId, loading])
 
   useEffect(() => {
-    if (graph) {
-      document.title = `${graph.name} - MindMeld`;
-    } else {
-      document.title = 'Loading... - MindMeld';
-    }
+    document.title = graph?.name ? `${graph.name} - MindMeld` : 'Loading... - MindMeld';
     return () => {
       document.title = 'MindMeld';
     };
@@ -67,27 +67,23 @@ const GraphView: React.FC = () => {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   }
 
-  const layoutData = React.useMemo(() => {
-    if (!graph) return { nodes: [], links: [] };
+  useEffect(() => {
+    if (!graph) return;
+    const newArguments: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement }));
+    const newLinks: LinkData[] = graph.edges.map(edge => ({
+      source: newArguments.find(arg => arg.id === edge.sourceId) as NodeData,
+      target: newArguments.find(arg => arg.id === edge.targetId) as NodeData
+    }));
+    const hasNodesChanged = newArguments.map(node => node.id).sort().join(',') !== layoutData.nodes.map(node => node.id).sort().join(',');
+    const hasLinksChanged = newLinks.map(link => `${link.source}-${link.target}`).sort().join(',') !== layoutData.links.map(link => `${link.source}-${link.target}`).sort().join(',');
 
-    return {
-      nodes: graph.arguments.map(arg => ({
-        id: arg.id,
-        name: arg.statement,
-      })),
-      links: graph.edges.map(edge => ({
-        source: edge.sourceId,
-        target: edge.targetId
-      }))
-    };
-  }, [graph?.arguments.length, graph?.edges.length]);
+    if (hasNodesChanged || hasLinksChanged) {
+      setLayoutData({ nodes: newArguments, links: newLinks });
+    }
+  }, [graph, layoutData.nodes, layoutData.links]);
 
   const nodeColors = React.useMemo(() => {
-    if (!graph) return new Map();
-
-    return new Map(
-      graph.arguments.map(arg => [arg.id, getColor(arg)])
-    );
+    return new Map(graph?.arguments?.map(arg => [arg.id, getColor(arg)]) || []);
   }, [graph?.arguments]);
 
   const nodeCanvasObject = React.useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {

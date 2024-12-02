@@ -3,6 +3,9 @@ import { addReaction, removeReaction } from '../db/operations/reactionOperations
 import { getGraphData } from '../db/operations/graphOperations';
 import { query } from '../db/db';
 
+
+// TODO When scores are updated, send only the changed scores
+
 export const handleAddReaction = async (
   socket: Socket,
   io: any,
