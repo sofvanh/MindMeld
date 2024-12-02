@@ -60,11 +60,11 @@ const GraphView: React.FC = () => {
   }, [graph?.name]);
 
   const getColor = (arg: Argument) => {
-    if (!arg.score) return '#94a3b8';
+    if (!arg.score) return 'rgba(148, 163, 184, 1)';
     const r = Math.round((arg.score.consensus ?? 0) * 255);
     const g = Math.round((arg.score.fragmentation ?? 0) * 255);
-    const b = Math.round((1 - (arg.score.clarity ?? 0)) * 255);
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    const opacity = arg.score.clarity ?? 0;
+    return `rgba(${r}, ${g}, 0, ${opacity})`;
   }
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const GraphView: React.FC = () => {
     ctx.fill();
 
     if (node.id === selectedNodeId) {
-      ctx.strokeStyle = color + '60';
+      ctx.strokeStyle = color.replace(/[\d.]+\)$/, '0.375)');
       ctx.lineWidth = 8 / globalScale;
       ctx.stroke();
     }
