@@ -33,11 +33,64 @@ export function cosineSimilarityMatrix(matrix: number[][]) {
     
     const similarity = dotProduct.div(magnitudeProduct);
 
+    const result = similarity.arraySync() as number[][];
+
     // Dispose tensors to free memory
     matrixTensor.dispose();
     dotProduct.dispose();
     magnitude.dispose();
     magnitudeProduct.dispose();
+    similarity.dispose();
 
-    return similarity.arraySync() as number[][];
+    return result;
   }
+
+export function computeAllSums(similarityMatrix: number[][], votingMatrix: number[][]) {
+  if (similarityMatrix.length === 0 || similarityMatrix[0].length === 0
+    || votingMatrix.length === 0 || votingMatrix[0].length === 0) {
+    return {
+      sum_pos_pos: [[]],
+      sum_pos_neg: [[]],
+      sum_neg_pos: [[]],
+      sum_neg_neg: [[]]
+    };
+  }
+
+  const S = tf.tensor2d(similarityMatrix);
+  const V = tf.tensor2d(votingMatrix);
+
+  // Create masks for positive and negative similarity
+  const S_pos = S.maximum(0);
+  const S_neg = S.minimum(0);
+
+  // Create masks for positive and negative votes
+  const V_pos = V.equal(1).cast('float32');
+  const V_neg = V.equal(-1).cast('float32');
+
+  // Calculate sums
+  const sum_pos_pos = tf.matMul(S_pos, V_pos).abs();
+  const sum_pos_neg = tf.matMul(S_pos, V_neg).abs();
+  const sum_neg_pos = tf.matMul(S_neg, V_pos).abs();
+  const sum_neg_neg = tf.matMul(S_neg, V_neg).abs();
+
+  const result = {
+    sum_pos_pos: sum_pos_pos.arraySync() as number[][],
+    sum_pos_neg: sum_pos_neg.arraySync() as number[][],
+    sum_neg_pos: sum_neg_pos.arraySync() as number[][],
+    sum_neg_neg: sum_neg_neg.arraySync() as number[][]
+  };
+
+  // Dispose tensors to free memory
+  S.dispose();
+  V.dispose();
+  S_pos.dispose();
+  S_neg.dispose();
+  V_pos.dispose();
+  V_neg.dispose();
+  sum_pos_pos.dispose();
+  sum_pos_neg.dispose();
+  sum_neg_pos.dispose();
+  sum_neg_neg.dispose();
+
+  return result;
+}

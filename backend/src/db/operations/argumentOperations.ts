@@ -14,3 +14,8 @@ export async function addArgument(
   );
   return id;
 }
+
+export async function getArgumentIdsByGraphId(graphId: string): Promise<string[]> {
+  const result = await query('SELECT id FROM arguments WHERE graph_id = $1', [graphId]);
+  return result.rows.map((row: any) => row.id);
+}
