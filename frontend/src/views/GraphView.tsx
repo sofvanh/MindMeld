@@ -1,56 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { ForceGraph2D } from 'react-force-graph';
-import { Argument, Graph } from '../shared/types';
 import { Link, useParams } from 'react-router-dom';
-import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useWebSocket } from '../contexts/WebSocketContext';
+import { useGraph } from '../hooks/useGraph';
+import { ExtendedNodeData } from '../shared/types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import NodeInfoBox from '../components/NodeInfoBox';
+import GraphVisualization from '../components/GraphVisualization';
 import { buttonStyles } from '../styles/defaultStyles';
+import { getColor } from '../utils/colors';
 
-
-interface ForceGraphData {
-  nodes: NodeData[];
-  links: LinkData[];
-}
-
-interface NodeData {
-  id: string;
-  name: string;
-}
-
-interface ExtendedNodeData extends NodeData {
-  color: string;
-  argument: Argument;
-}
-
-interface LinkData {
-  source: NodeData;
-  target: NodeData;
-}
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
-  const { loading, user } = useAuth();
+  const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
+  const { graph, layoutData, loading } = useGraph(graphId!);
+
   const [newArgument, setNewArgument] = useState('');
-  const [graph, setGraph] = useState<Graph | null>(null);
-  const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<ExtendedNodeData | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedNodeIndex, setSelectedNodeIndex] = useState<number>(0);
-
-  useEffect(() => {
-    if (loading) return;
-    socket?.emit('join graph', graphId);
-    socket?.on('graph data', setGraph);
-    socket?.on('graph update', setGraph);
-    return () => {
-      socket?.emit('leave graph', graphId);
-      socket?.off('graph data');
-      socket?.off('graph update');
-    }
-  }, [socket, graphId, loading])
 
   useEffect(() => {
     document.title = graph?.name ? `${graph.name} - MindMeld` : 'Loading... - MindMeld';
@@ -58,83 +28,6 @@ const GraphView: React.FC = () => {
       document.title = 'MindMeld';
     };
   }, [graph?.name]);
-
-  const getColor = (arg: Argument) => {
-    // Default color for unscored arguments
-    if (!arg.score) return 'rgba(148, 163, 184, 1)'; // slate-400
-
-    // Normalize scores to 0.01 if they are 0
-    const consensus = arg.score.consensus === 0 ? 0.01 : arg.score.consensus;
-    const fragmentation = arg.score.fragmentation === 0 ? 0.01 : arg.score.fragmentation;
-    const totalIntensity = consensus + fragmentation;
-
-    let normalizedConsensus = consensus;
-    let normalizedFragmentation = fragmentation;
-
-    // Scale scores to a target intensity (avoid very dark)
-    const targetIntensity = Math.min(Math.max(totalIntensity, 0.3), 1.6);
-    const scaleFactor = targetIntensity / totalIntensity;
-    normalizedConsensus *= scaleFactor;
-    normalizedFragmentation *= scaleFactor;
-
-    const blue500 = {
-      r: 59,
-      g: 130,
-      b: 246
-    };
-
-    const orange500 = {
-      r: 249,
-      g: 115,
-      b: 22
-    };
-
-    // Blend colors based on normalized scores
-    const r = Math.round(blue500.r * normalizedConsensus + orange500.r * normalizedFragmentation);
-    const g = Math.round(blue500.g * normalizedConsensus + orange500.g * normalizedFragmentation);
-    const b = Math.round(blue500.b * normalizedConsensus + orange500.b * normalizedFragmentation);
-
-    // Use clarity for opacity
-    let opacity = arg.score.clarity ?? 0;
-    opacity = Math.max(opacity, 0.2);
-
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  };
-
-  useEffect(() => {
-    if (!graph) return;
-    const newArguments: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement }));
-    const newLinks: LinkData[] = graph.edges.map(edge => ({
-      source: newArguments.find(arg => arg.id === edge.sourceId) as NodeData,
-      target: newArguments.find(arg => arg.id === edge.targetId) as NodeData
-    }));
-    const hasNodesChanged = newArguments.map(node => node.id).sort().join(',') !== layoutData.nodes.map(node => node.id).sort().join(',');
-    const hasLinksChanged = newLinks.map(link => `${link.source}-${link.target}`).sort().join(',') !== layoutData.links.map(link => `${link.source}-${link.target}`).sort().join(',');
-
-    if (hasNodesChanged || hasLinksChanged) {
-      setLayoutData({ nodes: newArguments, links: newLinks });
-    }
-  }, [graph, layoutData.nodes, layoutData.links]);
-
-  const nodeColors = React.useMemo(() => {
-    return new Map(graph?.arguments?.map(arg => [arg.id, getColor(arg)]) || []);
-  }, [graph?.arguments]);
-
-  const nodeCanvasObject = React.useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const radius = 5;
-    const color = nodeColors.get(node.id) || '#94a3b8';
-
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill();
-
-    if (node.id === selectedNodeId) {
-      ctx.strokeStyle = color.replace(/[\d.]+\)$/, '0.375)');
-      ctx.lineWidth = 8 / globalScale;
-      ctx.stroke();
-    }
-  }, [nodeColors, selectedNodeId]);
 
   useEffect(() => {
     if (graph && selectedNodeId) {
@@ -197,16 +90,11 @@ const GraphView: React.FC = () => {
           {graph.arguments.length === 0 && <p className="inline text-sm text-slate-400"> (empty)</p>}
         </p>
       </div>
-      <ForceGraph2D
-        width={window.innerWidth}
-        height={window.innerHeight - 124}
-        graphData={layoutData}
-        nodeLabel="name"
+      <GraphVisualization
+        graph={graph!}
+        layoutData={layoutData}
+        selectedNodeId={selectedNodeId}
         onNodeClick={handleNodeClick}
-        enableNodeDrag={false}
-        nodeCanvasObject={nodeCanvasObject}
-        nodeCanvasObjectMode={() => 'replace'}
-        autoPauseRedraw={true}
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedNode && (

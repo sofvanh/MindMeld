@@ -4,7 +4,28 @@ export interface User {
   email: string;
 }
 
-// Arguments are the nodes in the graph
+// Graph visualization types
+export interface NodeData {
+  id: string;
+  name: string;
+}
+
+export interface ExtendedNodeData extends NodeData {
+  color: string;
+  argument: Argument;
+}
+
+export interface LinkData {
+  source: NodeData;
+  target: NodeData;
+}
+
+export interface ForceGraphData {
+  nodes: NodeData[];
+  links: LinkData[];
+}
+
+// Core data types
 export interface Argument {
   id: string;
   graphId: string;
@@ -28,7 +49,6 @@ export interface Argument {
   };
 }
 
-// Edges are the connections between arguments
 export interface Edge {
   id: string;
   graphId: string;
@@ -36,7 +56,6 @@ export interface Edge {
   targetId: string;
 }
 
-// Graphs are the containers for arguments and edges
 export interface Graph {
   id: string;
   name: string;
