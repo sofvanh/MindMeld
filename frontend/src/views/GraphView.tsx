@@ -104,7 +104,6 @@ const GraphView: React.FC = () => {
 
   useEffect(() => {
     if (graph && selectedNodeId) {
-      console.log('selectedNodeId', selectedNodeId);
       const selectedNode = graph.arguments.find(arg => arg.id === selectedNodeId);
       if (selectedNode) {
         setSelectedNode({
