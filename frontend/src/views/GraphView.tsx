@@ -60,12 +60,46 @@ const GraphView: React.FC = () => {
   }, [graph?.name]);
 
   const getColor = (arg: Argument) => {
-    if (!arg.score) return 'rgba(148, 163, 184, 1)';
-    const r = Math.round((arg.score.consensus ?? 0) * 255);
-    const g = Math.round((arg.score.fragmentation ?? 0) * 255);
-    const opacity = arg.score.clarity ?? 0;
-    return `rgba(${r}, ${g}, 0, ${opacity})`;
-  }
+    // Default color for unscored arguments
+    if (!arg.score) return 'rgba(148, 163, 184, 1)'; // slate-400
+
+    // Normalize scores to 0.01 if they are 0
+    const consensus = arg.score.consensus === 0 ? 0.01 : arg.score.consensus;
+    const fragmentation = arg.score.fragmentation === 0 ? 0.01 : arg.score.fragmentation;
+    const totalIntensity = consensus + fragmentation;
+
+    let normalizedConsensus = consensus;
+    let normalizedFragmentation = fragmentation;
+
+    // Scale scores to a target intensity (avoid very dark)
+    const targetIntensity = Math.min(Math.max(totalIntensity, 0.3), 1.6);
+    const scaleFactor = targetIntensity / totalIntensity;
+    normalizedConsensus *= scaleFactor;
+    normalizedFragmentation *= scaleFactor;
+
+    const blue500 = {
+      r: 59,
+      g: 130,
+      b: 246
+    };
+
+    const orange500 = {
+      r: 249,
+      g: 115,
+      b: 22
+    };
+
+    // Blend colors based on normalized scores
+    const r = Math.round(blue500.r * normalizedConsensus + orange500.r * normalizedFragmentation);
+    const g = Math.round(blue500.g * normalizedConsensus + orange500.g * normalizedFragmentation);
+    const b = Math.round(blue500.b * normalizedConsensus + orange500.b * normalizedFragmentation);
+
+    // Use clarity for opacity
+    let opacity = arg.score.clarity ?? 0;
+    opacity = Math.max(opacity, 0.2);
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
 
   useEffect(() => {
     if (!graph) return;
