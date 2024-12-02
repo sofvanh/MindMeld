@@ -1,14 +1,6 @@
 import { useState, useCallback } from 'react';
 import { NodeData } from '../shared/types';
 
-interface UseNodeNavigationResult {
-  selectedNodeId: string | null;
-  selectedNodeIndex: number;
-  handleNodeClick: (node: NodeData) => void;
-  handlePrevNode: () => void;
-  handleNextNode: () => void;
-  handleCloseNode: () => void;
-}
 
 export function useNodeNavigation(nodes: NodeData[]) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
