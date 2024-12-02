@@ -10,7 +10,7 @@ export function getColor(arg: Argument) {
   let normalizedConsensus = consensus;
   let normalizedFragmentation = fragmentation;
 
-  const targetIntensity = Math.min(Math.max(totalIntensity, 0.3), 1.6);
+  const targetIntensity = Math.min(Math.max(totalIntensity, 0.7), 1.6);
   const scaleFactor = targetIntensity / totalIntensity;
   normalizedConsensus *= scaleFactor;
   normalizedFragmentation *= scaleFactor;
