@@ -36,14 +36,18 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
   }, [argument]);
 
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
+    if (!socket) {
+      console.error('No socket found');
+      return;
+    }
     const newValue = !userReactions[type];
     if (newValue) {
-      socket?.emit('add reaction', {
+      socket.emit('add reaction', {
         argumentId: argument.id,
         type
       });
     } else {
-      socket?.emit('remove reaction', {
+      socket.emit('remove reaction', {
         argumentId: argument.id,
         type
       });

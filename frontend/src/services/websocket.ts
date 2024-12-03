@@ -3,6 +3,8 @@ import { io, Socket } from 'socket.io-client';
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
 let socket: Socket | null = null;
 
+// TODO At some point I'd like a heartbeat to keep the connection alive
+
 export const getSocket = (): Socket => {
   if (!socket) {
     console.log('Connecting to backend at:', backendUrl);

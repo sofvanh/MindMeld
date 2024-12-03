@@ -13,6 +13,7 @@ export const handleAddReaction = async (
   callback?: Function
 ) => {
   if (!socket.data.user) {
+    console.log(`Failed to add reaction: No user data on socket. Argument ID: ${argumentId}, Type: ${type}, Socket ID: ${socket.id}`);
     callback?.({ success: false, error: 'Authentication required' });
     return;
   }
@@ -21,7 +22,7 @@ export const handleAddReaction = async (
     const id = await addReaction(socket.data.user.id, argumentId, type);
     const graphId = (await query('SELECT graph_id FROM arguments WHERE id = $1', [argumentId])).rows[0].graph_id;
     const updatedGraph = await getGraphData(graphId, socket.data.user.id);
-    io.to(graphId).emit('graph update', updatedGraph);
+    io.to(graphId).emit('graph update', updatedGraph); // TODO This breaks, because we're sending the current user's score to all users in the graph!
     callback?.({ success: true, id });
   } catch (error) {
     console.error('Error adding reaction:', error);
@@ -36,6 +37,7 @@ export const handleRemoveReaction = async (
   callback?: Function
 ) => {
   if (!socket.data.user) {
+    console.log(`Failed to remove reaction: No user data on socket. Argument ID: ${argumentId}, Type: ${type}, Socket ID: ${socket.id}`);
     callback?.({ success: false, error: 'Authentication required' });
     return;
   }

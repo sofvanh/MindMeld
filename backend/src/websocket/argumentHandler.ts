@@ -11,6 +11,7 @@ export const handleAddArgument = async (
   callback?: Function
 ) => {
   if (!socket.data.user) {
+    console.log(`Failed to add argument: No user data on socket. Graph ID: ${graphId}, Statement: ${statement}, Socket ID: ${socket.id}`);
     callback?.({ success: false, error: 'Authentication required' });
     return;
   }
@@ -18,6 +19,7 @@ export const handleAddArgument = async (
   try {
     const graph = await getGraphData(graphId, socket.data.user.id);
     if (!graph) {
+      console.log(`Failed to add argument: Graph not found. Graph ID: ${graphId}, Statement: ${statement}, User ID: ${socket.data.user.id}, Socket ID: ${socket.id}`);
       callback?.({ success: false, error: 'Graph not found' });
       return;
     }
