@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 import { addArgument } from '../db/operations/argumentOperations';
-import { getGraphData } from '../db/operations/graphOperations';
+import { getGraphDataWithUserReactions } from '../db/operations/graphOperations';
 import { updateGraphEdges } from '../db/operations/edgeOperations';
 import { embedText, generateTopKSimilarEdges } from '../embeddingHandler';
 
@@ -17,7 +17,7 @@ export const handleAddArgument = async (
   }
 
   try {
-    const graph = await getGraphData(graphId, socket.data.user.id);
+    const graph = await getGraphDataWithUserReactions(graphId, socket.data.user.id);
     if (!graph) {
       console.log(`Failed to add argument: Graph not found. Graph ID: ${graphId}, Statement: ${statement}, User ID: ${socket.data.user.id}, Socket ID: ${socket.id}`);
       callback?.({ success: false, error: 'Graph not found' });
@@ -32,7 +32,7 @@ export const handleAddArgument = async (
     const newEdges = generateTopKSimilarEdges(graph);
     await updateGraphEdges(graphId, newEdges);
 
-    const updatedGraph = await getGraphData(graphId, socket.data.user.id);
+    const updatedGraph = await getGraphDataWithUserReactions(graphId, socket.data.user.id); // TODO This is also broken (shouldn't be using author user id for updating everyone)
     io.to(graphId).emit('graph update', updatedGraph);
     callback?.({ success: true, argument: newArgument });
   } catch (error) {
