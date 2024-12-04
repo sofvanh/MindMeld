@@ -48,7 +48,7 @@ export function useGraph(graphId: string) {
         if (!prevGraph) return prevGraph;
         const updatedArguments = prevGraph.arguments.map(arg => ({
           ...arg,
-          score: newScores[arg.id] || arg.score
+          score: newScores[arg.id]
         }));
         return { ...prevGraph, arguments: updatedArguments };
       });
