@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Graph, ForceGraphData, NodeData, LinkData } from '../shared/types';
+import { Graph, ForceGraphData, NodeData, LinkData, Score, UserReaction, ReactionCounts } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -19,10 +19,41 @@ export function useGraph(graphId: string) {
     socket?.emit('join graph', graphId);
     socket?.on('graph data', setGraph);
     socket?.on('graph update', setGraph);
+    socket?.on('user reaction update', ({ argumentId, userReaction }: { argumentId: string, userReaction: UserReaction }) => {
+      setGraph(prevGraph => {
+        if (!prevGraph) return prevGraph;
+        const updatedArguments = prevGraph.arguments.map(arg =>
+          arg.id === argumentId ? { ...arg, userReaction } : arg
+        );
+        return { ...prevGraph, arguments: updatedArguments };
+      });
+    });
+    socket?.on('argument reactions update', ({ argumentId, reactionCounts }: { argumentId: string, reactionCounts: ReactionCounts }) => {
+      setGraph(prevGraph => {
+        if (!prevGraph) return prevGraph;
+        const updatedArguments = prevGraph.arguments.map(arg =>
+          arg.id === argumentId ? { ...arg, reactionCounts } : arg
+        );
+        return { ...prevGraph, arguments: updatedArguments };
+      });
+    });
+    socket?.on('graph scores update', (newScores: { [key: string]: Score }) => {
+      setGraph(prevGraph => {
+        if (!prevGraph) return prevGraph;
+        const updatedArguments = prevGraph.arguments.map(arg => ({
+          ...arg,
+          score: newScores[arg.id] || arg.score
+        }));
+        return { ...prevGraph, arguments: updatedArguments };
+      });
+    });
     return () => {
       socket?.emit('leave graph', graphId);
       socket?.off('graph data');
       socket?.off('graph update');
+      socket?.off('user reaction update');
+      socket?.off('argument reactions update');
+      socket?.off('graph scores update');
     }
   }, [socket, graphId, user]);
 

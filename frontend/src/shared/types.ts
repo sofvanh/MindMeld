@@ -32,21 +32,27 @@ export interface Argument {
   statement: string;
   embedding: number[];
   authorId?: string;
-  reactionCounts?: {
-    agree: number;
-    disagree: number;
-    unclear: number;
-  };
-  userReaction?: {
-    agree?: boolean;
-    disagree?: boolean;
-    unclear?: boolean;
-  };
-  score?: {
-    consensus: number;
-    fragmentation: number;
-    clarity: number;
-  };
+  reactionCounts?: ReactionCounts;
+  userReaction?: UserReaction;
+  score?: Score;
+}
+
+export interface ReactionCounts {
+  agree: number;
+  disagree: number;
+  unclear: number;
+}
+
+export interface UserReaction {
+  agree?: boolean;
+  disagree?: boolean;
+  unclear?: boolean;
+}
+
+export interface Score {
+  consensus: number;
+  fragmentation: number;
+  clarity: number;
 }
 
 export interface Edge {

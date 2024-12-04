@@ -2,6 +2,7 @@ import { query } from '../db';
 import { generateGraphId } from '../idGenerator';
 import { Argument, Edge, Graph } from '../../.shared/types';
 import { getArgumentScores } from '../../analysis/argumentScoreHandler';
+import { getReactionCounts } from './reactionOperations';
 
 export async function createGraph(name: string, authorId: string): Promise<string> {
   const id = generateGraphId();
@@ -25,35 +26,8 @@ export async function getGraphData(graphId: string): Promise<Graph> {
 
   const argumentsResult = await query('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
   const edgesResult = await query('SELECT * FROM edges WHERE graph_id = $1', [graphId]);
-
-  const reactionCountsResult = await query(
-    `SELECT argument_id, type, COUNT(*) as count
-     FROM reactions 
-     WHERE argument_id IN (SELECT id FROM arguments WHERE graph_id = $1)
-     GROUP BY argument_id, type`,
-    [graphId]
-  );
-
-  const reactionCountsMap = new Map();
-  reactionCountsResult.rows.forEach((row: any) => {
-    if (!reactionCountsMap.has(row.argument_id)) {
-      reactionCountsMap.set(row.argument_id, { agree: 0, disagree: 0, unclear: 0 });
-    }
-    reactionCountsMap.get(row.argument_id)[row.type] = parseInt(row.count);
-  });
-
-  // TODO Just change getArgumentScores so that it already returns a map... We don't even need this ArgumentScore type (or we can change it so that Argument uses it directly)
+  const reactionCounts = await getReactionCounts(graphId);
   const argumentScores = await getArgumentScores(graphId);
-  const scoresMap = new Map(
-    argumentScores.map(score => [
-      score.argumentId,
-      {
-        consensus: score.consensusScore,
-        fragmentation: score.fragmentationScore,
-        clarity: score.clarityScore
-      }
-    ])
-  )
 
   // TODO This is terrible, create types for db results already...
   const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
@@ -62,8 +36,8 @@ export async function getGraphData(graphId: string): Promise<Graph> {
     statement: row.statement,
     embedding: row.embedding,
     authorId: row.author_id,
-    reactionCounts: reactionCountsMap.get(row.id) || { agree: 0, disagree: 0, unclear: 0 },
-    score: scoresMap.get(row.id)
+    reactionCounts: reactionCounts.get(row.id) || { agree: 0, disagree: 0, unclear: 0 },
+    score: argumentScores.get(row.id)
   }));
 
   const links: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({

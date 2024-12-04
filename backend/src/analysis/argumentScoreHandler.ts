@@ -1,15 +1,9 @@
+import { Score } from "../.shared/types";
 import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
 import { cosineSimilarityMatrix } from "../utils/math";
 
 
-interface ArgumentScore {
-  argumentId: string;
-  consensusScore: number;
-  fragmentationScore: number;
-  clarityScore: number;
-}
-
-export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
+export async function getArgumentScores(graphId: string): Promise<Map<string, Score>> {
   const reactionArray: ReactionForGraph[] = await getReactionsForGraph(graphId);
   const minimumVotesUser = 3;
   const minimumVotesArgument = 2;
@@ -80,12 +74,7 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
   const userSimilarityMatrix: number[][] = cosineSimilarityMatrix(votingMatrix);
 
   // Calculate the argument scores for each argument
-  const argumentScores: {
-    argumentId: string,
-    consensusScore: number,
-    fragmentationScore: number
-    clarityScore: number
-  }[] = [];
+  const argumentScores: Map<string, Score> = new Map();
 
   argumentIndexMap.forEach((argumentIndex, argumentId) => {
     //Identify users who voted on this argument
@@ -187,11 +176,10 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
       }
       const argumentClarityScore = 1 - (unclearSum / uniquenessSum);
 
-      argumentScores.push({
-        argumentId,
-        consensusScore: argumentConsensusScore,
-        fragmentationScore: argumentFragmentationScore,
-        clarityScore: argumentClarityScore
+      argumentScores.set(argumentId, {
+        consensus: argumentConsensusScore,
+        fragmentation: argumentFragmentationScore,
+        clarity: argumentClarityScore
       });
     }
   });

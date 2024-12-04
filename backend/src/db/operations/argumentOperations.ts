@@ -1,5 +1,7 @@
+import { Argument } from "../../.shared/types";
 import { query } from "../db";
 import { generateArgumentId } from "../idGenerator";
+import { getReactionCountsForArgument } from "./reactionOperations";
 
 export async function addArgument(
   graphId: string,
@@ -13,4 +15,25 @@ export async function addArgument(
     [id, graphId, statement, embedding, authorId]
   );
   return id;
+}
+
+export async function getArgument(
+  argumentId: string
+): Promise<Argument | null> {
+  const result = await query('SELECT * FROM arguments WHERE id = $1', [argumentId]);
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const reactionCounts = await getReactionCountsForArgument(argumentId);
+
+  const row = result.rows[0];
+  return {
+    id: row.id,
+    graphId: row.graph_id,
+    statement: row.statement,
+    embedding: row.embedding,
+    authorId: row.author_id,
+    reactionCounts: reactionCounts
+  };
 }
