@@ -15,12 +15,25 @@ export function getColor(arg: Argument) {
   normalizedConsensus *= scaleFactor;
   normalizedFragmentation *= scaleFactor;
 
-  const blue500 = { r: 59, g: 130, b: 246 };
-  const orange500 = { r: 249, g: 115, b: 22 };
+  // Define our four corner colors
+  const bottomLeft = { r: 148, g: 163, b: 184 };  // slate-400: (0,0)
+  const topLeft = { r: 6, g: 182, b: 212 };       // cyan-500: (100,0)
+  const bottomRight = { r: 251, g: 113, b: 133 }; // rose-400: (0,100)
+  const topRight = { r: 245, g: 158, b: 11 };     // amber-500: (100,100)
 
-  const r = Math.round(blue500.r * normalizedConsensus + orange500.r * normalizedFragmentation);
-  const g = Math.round(blue500.g * normalizedConsensus + orange500.g * normalizedFragmentation);
-  const b = Math.round(blue500.b * normalizedConsensus + orange500.b * normalizedFragmentation);
+  // Blend between top corners and bottom corners first
+  const bottomR = Math.round(bottomLeft.r * (1 - normalizedFragmentation) + bottomRight.r * normalizedFragmentation);
+  const bottomG = Math.round(bottomLeft.g * (1 - normalizedFragmentation) + bottomRight.g * normalizedFragmentation);
+  const bottomB = Math.round(bottomLeft.b * (1 - normalizedFragmentation) + bottomRight.b * normalizedFragmentation);
+
+  const topR = Math.round(topLeft.r * (1 - normalizedFragmentation) + topRight.r * normalizedFragmentation);
+  const topG = Math.round(topLeft.g * (1 - normalizedFragmentation) + topRight.g * normalizedFragmentation);
+  const topB = Math.round(topLeft.b * (1 - normalizedFragmentation) + topRight.b * normalizedFragmentation);
+
+  // Then blend between top and bottom
+  const r = Math.round(bottomR * (1 - normalizedConsensus) + topR * normalizedConsensus);
+  const g = Math.round(bottomG * (1 - normalizedConsensus) + topG * normalizedConsensus);
+  const b = Math.round(bottomB * (1 - normalizedConsensus) + topB * normalizedConsensus);
 
   let opacity = arg.score.clarity ?? 0;
   opacity = Math.max(opacity, 0.2);
