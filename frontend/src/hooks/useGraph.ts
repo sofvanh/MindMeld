@@ -19,6 +19,12 @@ export function useGraph(graphId: string) {
     socket?.emit('join graph', graphId);
     socket?.on('graph data', setGraph);
     socket?.on('graph update', setGraph);
+    socket?.on('argument added', ({ argument, newEdges }) => {
+      setGraph(prevGraph => {
+        if (!prevGraph) return prevGraph;
+        return { ...prevGraph, arguments: [...prevGraph.arguments, argument], edges: newEdges };
+      });
+    });
     socket?.on('user reaction update', ({ argumentId, userReaction }: { argumentId: string, userReaction: UserReaction }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
@@ -51,6 +57,7 @@ export function useGraph(graphId: string) {
       socket?.emit('leave graph', graphId);
       socket?.off('graph data');
       socket?.off('graph update');
+      socket?.off('argument added');
       socket?.off('user reaction update');
       socket?.off('argument reactions update');
       socket?.off('graph scores update');

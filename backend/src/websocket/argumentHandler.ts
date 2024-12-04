@@ -3,6 +3,7 @@ import { addArgument } from '../db/operations/argumentOperations';
 import { getGraphDataWithUserReactions } from '../db/operations/graphOperations';
 import { updateGraphEdges } from '../db/operations/edgeOperations';
 import { embedText, generateTopKSimilarEdges } from '../embeddingHandler';
+import { sendNewArgumentUpdate } from './updateHandler';
 
 export const handleAddArgument = async (
   socket: Socket,
@@ -32,8 +33,8 @@ export const handleAddArgument = async (
     const newEdges = generateTopKSimilarEdges(graph);
     await updateGraphEdges(graphId, newEdges);
 
-    const updatedGraph = await getGraphDataWithUserReactions(graphId, socket.data.user.id); // TODO This is also broken (shouldn't be using author user id for updating everyone)
-    io.to(graphId).emit('graph update', updatedGraph);
+    sendNewArgumentUpdate(io, graphId, newArgument, newEdges);
+    // TODO Make author 'agree' with their own argument
     callback?.({ success: true, argument: newArgument });
   } catch (error) {
     console.error('Error adding argument:', error);

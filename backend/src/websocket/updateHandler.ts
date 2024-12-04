@@ -1,7 +1,17 @@
 import { Socket } from "socket.io";
 import { getArgumentScores } from "../analysis/argumentScoreHandler";
 import { getReactionCountsForArgument, getUserReactionForArgument } from "../db/operations/reactionOperations";
+import { Argument, Edge } from "../.shared/types";
 
+
+export const sendNewArgumentUpdate = async (
+  io: any,
+  graphId: string,
+  argument: Argument,
+  newEdges: Edge[]
+) => {
+  io.to(graphId).emit('argument added', { argument, newEdges });
+}
 
 export const sendReactionUpdate = async (
   socket: Socket,
