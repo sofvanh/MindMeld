@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Graph, ForceGraphData, NodeData, LinkData } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export interface UseGraphResult {
   graph: Graph | null;
@@ -10,6 +11,7 @@ export interface UseGraphResult {
 
 export function useGraph(graphId: string) {
   const { socket } = useWebSocket();
+  const { user } = useAuth();
   const [graph, setGraph] = useState<Graph | null>(null);
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
 
@@ -22,7 +24,7 @@ export function useGraph(graphId: string) {
       socket?.off('graph data');
       socket?.off('graph update');
     }
-  }, [socket, graphId]);
+  }, [socket, graphId, user]);
 
   useEffect(() => {
     if (!graph) return;
