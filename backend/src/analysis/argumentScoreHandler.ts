@@ -7,34 +7,128 @@ export interface ArgumentScore {
   clarityScore: number;
 }
 
-function getArgumentClarityScore(argumentIndex: number, 
-                                 votingMatrix: number[][],
-                                 unclearMatrix: number[][], 
-                                 uniquenessMatrix: number[][]) {
+function getConsensusScore(argumentIndex: number, 
+                           votingMatrix: number[][], 
+                           sum_neg_pos: number[][], 
+                           sum_neg_neg: number[][], 
+                           uniquenessMatrix: number[][]) {
+  /**
+   * Average alignment with outgroup members
+   */
 
-  //Identify all users who reacted on this argument 
-  let usersWhoReacted: number[] = [];
-  for (let i = 0; i < votingMatrix.length; i++) {
-    if (votingMatrix[i][argumentIndex] !== 0 || unclearMatrix[i][argumentIndex] !== 0) {
-      usersWhoReacted.push(i);
-    }
+  //Identify users who voted on this argument (agree/disagree)
+  const usersWhoVoted = votingMatrix.map((row, i) => 
+    row[argumentIndex] !== 0 ? i : null).filter(i => i !== null) as number[];
+
+  // Filter for users with an outgroup
+  const usersWithOutgroup = usersWhoVoted.filter(i => 
+    sum_neg_pos[i][argumentIndex] + sum_neg_neg[i][argumentIndex] > 0);
+
+  // If no users have an outgroup, can't calculate consensus
+  if (usersWithOutgroup.length === 0) {
+    return null;
   }
 
-  let unclearSum = 0;
-  let uniquenessSum = 0;
-  for (let i = 0; i < usersWhoReacted.length; i++) {
-    let uniqueness = uniquenessMatrix[usersWhoReacted[i]][argumentIndex];
+  // Compute individual user scores (to be aggregated as the final argument score later)
+  const userConsensusScores = new Array(usersWithOutgroup.length).fill(0);
 
-    unclearSum += unclearMatrix[usersWhoReacted[i]][argumentIndex] * uniqueness;
+  for (let i = 0; i < usersWithOutgroup.length; i++) {
+    const vote = votingMatrix[usersWithOutgroup[i]][argumentIndex];
+    const sumOutgroupAgree = sum_neg_pos[usersWithOutgroup[i]][argumentIndex];
+    const sumOutgroupDisagree = sum_neg_neg[usersWithOutgroup[i]][argumentIndex];
+    const sumAlignedOutgroup = vote === 1 ? sumOutgroupAgree : sumOutgroupDisagree;
+
+    userConsensusScores[i] = sumAlignedOutgroup / (sumOutgroupAgree + sumOutgroupDisagree);
+  }
+
+  // Average of user scores, weighted by uniqueness
+  let consensusSum = 0;
+  let uniquenessSum = 0;
+  for (let i = 0; i < usersWithOutgroup.length; i++) {
+    let uniqueness = uniquenessMatrix[usersWithOutgroup[i]][argumentIndex];
+
+    consensusSum += userConsensusScores[i] * uniqueness;
     uniquenessSum += uniqueness;
   }
 
-  return 1 - (unclearSum / uniquenessSum);
+  return consensusSum / uniquenessSum;
+}
+
+function getFragmentationScore(argumentIndex: number, 
+                               votingMatrix: number[][], 
+                               sum_pos_pos: number[][], 
+                               sum_pos_neg: number[][], 
+                               uniquenessMatrix: number[][]) {
+  /**
+   * Average disalignment with ingroup members
+   */
+
+  //Identify users who voted on this argument (agree/disagree)
+  const usersWhoVoted = votingMatrix.map((row, i) => 
+    row[argumentIndex] !== 0 ? i : null).filter(i => i !== null) as number[];
+
+  // Filter for users with an ingroup
+  const usersWithIngroup = usersWhoVoted.filter(i => 
+    sum_pos_pos[i][argumentIndex] + sum_pos_neg[i][argumentIndex] > 0);
+
+  // If no users have an ingroup, can't calculate fragmentation
+  if (usersWithIngroup.length === 0) {
+    return null;
+  }
+
+  // Compute individual user scores (to be aggregated as the final argument score later)
+  const userFragmentationScores = new Array(usersWithIngroup.length).fill(0);
+
+  for (let i = 0; i < usersWithIngroup.length; i++) {
+    const vote = votingMatrix[usersWithIngroup[i]][argumentIndex];
+    const sumIngroupAgree = sum_pos_pos[usersWithIngroup[i]][argumentIndex];
+    const sumIngroupDisagree = sum_pos_neg[usersWithIngroup[i]][argumentIndex];
+    const sumDisalignedIngroup = vote === -1 ? sumIngroupAgree : sumIngroupDisagree;
+
+    userFragmentationScores[i] = sumDisalignedIngroup / (sumIngroupAgree + sumIngroupDisagree);
+  }
+
+  // Average of user scores, weighted by uniqueness
+  let fragmentationSum = 0;
+  let uniquenessSum = 0;
+  for (let i = 0; i < usersWithIngroup.length; i++) {
+    let uniqueness = uniquenessMatrix[usersWithIngroup[i]][argumentIndex];
+
+    fragmentationSum += userFragmentationScores[i] * uniqueness;
+    uniquenessSum += uniqueness;
+  }
+
+  return fragmentationSum / uniquenessSum;
+}
+
+function getClarityScore(argumentIndex: number, 
+                         votingMatrix: number[][],
+                         unclearMatrix: number[][], 
+                         uniquenessMatrix: number[][]) {
+/**
+ * One minus average number of unclear votes
+ */
+
+//Identify all users who reacted on this argument 
+const usersWhoReacted = votingMatrix.map((row, i) => 
+(row[argumentIndex] !== 0 || unclearMatrix[i][argumentIndex] !== 0) ? i : null
+).filter(i => i !== null) as number[];
+
+// Average of unclear scores, weighted by uniqueness
+let unclearSum = 0;
+let uniquenessSum = 0;
+for (let i = 0; i < usersWhoReacted.length; i++) {
+let uniqueness = uniquenessMatrix[usersWhoReacted[i]][argumentIndex];
+
+unclearSum += unclearMatrix[usersWhoReacted[i]][argumentIndex] * uniqueness;
+uniquenessSum += uniqueness;
+}
+
+return 1 - (unclearSum / uniquenessSum);
 }
 
 export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
   const {
-      userIndexMap,
       argumentIndexMap,
       votingMatrix,
       unclearMatrix,
@@ -49,82 +143,18 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
   const argumentScores: ArgumentScore[] = [];
 
   argumentIndexMap.forEach((argumentIndex, argumentId) => {
-    //Identify users who voted on this argument
-    const usersWhoVoted: number[] = [];
-    for (let i = 0; i < userIndexMap.size; i++) {
-      if (votingMatrix[i][argumentIndex] !== 0) {
-        usersWhoVoted.push(i);
-      }
-    }
-    const votes = usersWhoVoted.map(i => votingMatrix[i][argumentIndex]);
+    const consensusScore = getConsensusScore(argumentIndex, votingMatrix, sum_neg_pos, sum_neg_neg, uniquenessMatrix);
+    const fragmentationScore = getFragmentationScore(argumentIndex, votingMatrix, sum_pos_pos, sum_pos_neg, uniquenessMatrix);
+    const clarityScore = getClarityScore(argumentIndex, votingMatrix, unclearMatrix, uniquenessMatrix);
 
-    if (usersWhoVoted.length >= 2) {
-
-      // Compute individual user scores (to be aggregated as the final argument score later)
-      const userConsensusScores = new Array(usersWhoVoted.length).fill(0);
-      const userFragmentationScores = new Array(usersWhoVoted.length).fill(0);
-
-      for (let i = 0; i < usersWhoVoted.length; i++) {
-
-        // Get in-group and out-group users
-        const sumIngroupAgree = sum_pos_pos[usersWhoVoted[i]][argumentIndex];
-        const sumIngroupDisagree = sum_pos_neg[usersWhoVoted[i]][argumentIndex];
-        const sumOutgroupAgree = sum_neg_pos[usersWhoVoted[i]][argumentIndex];
-        const sumOutgroupDisagree = sum_neg_neg[usersWhoVoted[i]][argumentIndex];
-
-        // Calculate user consensus score
-        const sumAlignedOutgroup = votes[i] === 1 ? sumOutgroupAgree : sumOutgroupDisagree;
-        const sumOutgroup = sumOutgroupAgree + sumOutgroupDisagree;
-        if (sumOutgroup > 0) {
-            userConsensusScores[i] = sumAlignedOutgroup / sumOutgroup;
-        }
-        else {
-          userConsensusScores[i] = 0;
-        }
-
-        // Calculate user fragmentation score
-        const sumDisalignedIngroup = votes[i] === -1 ? sumIngroupAgree : sumIngroupDisagree;
-        const sumIngroup = sumIngroupAgree + sumIngroupDisagree;
-        userFragmentationScores[i] = sumDisalignedIngroup / sumIngroup;
-      }
-
-      // Aggregate user scores to get argument scores
-      // Weighted average of user scores, weighted by uniqueness score
-
-      // Calculate argument consensus score
-      let weightedConsensusSum = 0;
-      let uniquenessSum = 0;
-      for (let i = 0; i < usersWhoVoted.length; i++) {
-        weightedConsensusSum += userConsensusScores[i] * uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
-        uniquenessSum += uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
-      }
-      const argumentConsensusScore = weightedConsensusSum / uniquenessSum;
-
-      // Calculate argument fragmentation score
-      let weightedFragmentationSum = 0;
-      for (let i = 0; i < usersWhoVoted.length; i++) {
-        weightedFragmentationSum += userFragmentationScores[i] * uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
-      }
-      // Score is multiplied by 2 to scale it to the range [0, 1]
-      const argumentFragmentationScore = (weightedFragmentationSum / uniquenessSum) * 2;
-
-      // Calculate argument clarity score
-      const argumentClarityScore = getArgumentClarityScore(argumentIndex, 
-                                                           votingMatrix, 
-                                                           unclearMatrix, 
-                                                           uniquenessMatrix);
-
+    if (consensusScore !== null && fragmentationScore !== null) {
       argumentScores.push({
         argumentId,
-        consensusScore: argumentConsensusScore,
-        fragmentationScore: argumentFragmentationScore,
-        clarityScore: argumentClarityScore
+        consensusScore,
+        fragmentationScore,
+        clarityScore
       });
     }
-    else {
-      throw new Error('Argument has less than 2 votes');
-    }
   });
-
   return argumentScores;
 }
