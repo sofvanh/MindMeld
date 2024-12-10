@@ -1,85 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { ForceGraph2D } from 'react-force-graph';
-import { Argument, Graph } from '../shared/types';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useWebSocket } from '../contexts/WebSocketContext';
+import { useGraph } from '../hooks/useGraph';
+import { useNodeNavigation } from '../hooks/useNodeNavigation';
 import LoadingSpinner from '../components/LoadingSpinner';
 import NodeInfoBox from '../components/NodeInfoBox';
+import GraphVisualization from '../components/GraphVisualization';
+import ArgumentForm from '../components/ArgumentForm';
 import { buttonStyles } from '../styles/defaultStyles';
-
-
-interface ForceGraphData {
-  nodes: NodeData[];
-  links: LinkData[];
-}
-
-interface NodeData {
-  id: string;
-  name: string;
-  argument: Argument;
-}
-
-interface LinkData {
-  source: string;
-  target: string;
-}
+import { Argument } from '../shared/types';
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
-  const { loading, user } = useAuth();
+  const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const [newArgument, setNewArgument] = useState('');
-  const [graph, setGraph] = useState<Graph | null>(null);
-  const [graphData, setGraphData] = useState<ForceGraphData>({ nodes: [], links: [] });
-  const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const { graph, layoutData, loading } = useGraph(graphId!);
+  const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
+
+  const {
+    selectedNodeId,
+    selectedNodeIndex,
+    handleNodeClick,
+    handlePrevNode,
+    handleNextNode,
+    handleCloseNode
+  } = useNodeNavigation(layoutData.nodes);
 
   useEffect(() => {
-    if (loading) return;
-    socket?.emit('join graph', graphId);
-    socket?.on('graph data', setGraph);
-    socket?.on('graph update', setGraph);
-    return () => {
-      socket?.emit('leave graph', graphId);
-      socket?.off('graph data');
-      socket?.off('graph update');
-    }
-  }, [socket, graphId, loading])
-
-  useEffect(() => {
-    if (graph) {
-      document.title = `${graph.name} - MindMeld`;
-      const nodes: NodeData[] = graph.arguments.map(arg => {
-        // TODO Make colors nicer
-        const r = Math.round((arg.score?.consensus ?? 0) * 255);
-        const g = Math.round((arg.score?.fragmentation ?? 0) * 255);
-        const b = Math.round((1 - (arg.score?.clarity ?? 0)) * 255);
-
-        return {
-          id: arg.id,
-          name: arg.statement,
-          color: arg.score
-            ? `rgb(${r}, ${g}, ${b})`
-            : '#94a3b8',
-          argument: arg
-        };
-      });
-      const links: LinkData[] = graph.edges.map(edge => ({ source: edge.sourceId, target: edge.targetId }));
-      setGraphData({ nodes, links });
-    }
-  }, [graph]);
-
-  useEffect(() => {
-    if (graph && selectedNodeId) {
-      const updatedNode = graph.arguments.find(arg => arg.id === selectedNodeId);
-      if (updatedNode) {
-        setSelectedNode({ id: updatedNode.id, name: updatedNode.statement, argument: updatedNode });
-      }
+    if (selectedNodeId && graph) {
+      const argument = graph.arguments.find(arg => arg.id === selectedNodeId);
+      setSelectedArgument(argument || null);
     } else {
-      setSelectedNode(null);
+      setSelectedArgument(null);
     }
-  }, [graph, selectedNodeId]);
+  }, [selectedNodeId, graph]);
+
+  useEffect(() => {
+    document.title = graph?.name ? `${graph.name} - MindMeld` : 'Loading... - MindMeld';
+    return () => { document.title = 'MindMeld'; };
+  }, [graph?.name]);
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
@@ -87,7 +47,7 @@ const GraphView: React.FC = () => {
     }
   };
 
-  if (!graph) {
+  if (loading || !graph) {
     return <div className="flex items-center justify-center h-full mt-8">
       <LoadingSpinner size="large" />
     </div>;
@@ -101,50 +61,28 @@ const GraphView: React.FC = () => {
         </Link>
         <p className="text-base m-0">
           {graph.name}
-          {graph.arguments.length === 0 && <p className="inline text-sm text-slate-400"> (empty)</p>}
+          {graph.arguments.length === 0 && <span className="inline text-sm text-slate-400"> (empty)</span>}
         </p>
       </div>
-      <ForceGraph2D
-        width={window.innerWidth}
-        height={window.innerHeight - 124}
-        graphData={graphData}
-        nodeLabel="name"
-        nodeAutoColorBy="id"
-        onNodeClick={node => setSelectedNodeId(node.id)}
-        enableNodeDrag={false}
+      <GraphVisualization
+        graph={graph}
+        layoutData={layoutData}
+        selectedNodeId={selectedNodeId}
+        onNodeClick={handleNodeClick}
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
-        {selectedNode && (
+        {selectedArgument && (
           <NodeInfoBox
-            argument={selectedNode.argument}
-            onClose={() => setSelectedNodeId(null)}
+            argument={selectedArgument}
+            onClose={handleCloseNode}
+            onPrevNode={handlePrevNode}
+            onNextNode={handleNextNode}
+            totalNodes={layoutData.nodes.length}
+            currentIndex={selectedNodeIndex + 1}
           />
         )}
         {user ? (
-          <form
-            className=" flex gap-2 w-full"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (newArgument.trim()) {
-                handleAddArgument(newArgument.trim());
-                setNewArgument('');
-              }
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Enter new argument"
-              className="flex-1 shadow-md"
-              onChange={(e) => setNewArgument(e.target.value)}
-              value={newArgument}
-            />
-            <button
-              type="submit"
-              className={`${buttonStyles.primary} shadow-md`}
-            >
-              Add
-            </button>
-          </form>
+          <ArgumentForm onSubmit={handleAddArgument} />
         ) : (
           <div className="bg-white p-4 rounded-lg shadow-lg">
             <p className="text-sm text-slate-400">Sign in to add arguments</p>

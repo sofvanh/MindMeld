@@ -17,6 +17,7 @@ export const handleAuthenticate = async (socket: Socket, token: string, callback
 
     const user = await findOrCreateUser(payload.sub, payload.email);
     socket.data.user = user;
+    console.log('Authenticated user', user);
     callback?.({ success: true, user });
   } catch (error) {
     console.error('Authentication error:', error);

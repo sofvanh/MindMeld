@@ -1,5 +1,6 @@
+import { Score } from "../.shared/types";
 import { analyzeVotes } from "./voteAnalyzer";
-import { getArgumentScores, ArgumentScore} from "./argumentScoreHandler";
+import { getArgumentScores } from "./argumentScoreHandler";
 import { ReactionForGraph, getReactionsForGraph} from "../db/operations/reactionOperations";
 import { getArgumentIdsByGraphId } from "../db/operations/argumentOperations";
 
@@ -40,12 +41,12 @@ export async function getArgumentPriorities(graphId: string, userId: string): Pr
     );
     
     // Get priority for arguments with scores (consensus, fragmentation, clarity)
-    const argumentScores: ArgumentScore[] = await getArgumentScores(graphId);
+    const argumentScores: Map<string, Score> = await getArgumentScores(graphId);
     const uniquenessScores: Map<string, number> = await getUniquenessScores(userId, graphId);
 
-    for (const { argumentId, consensusScore, fragmentationScore, clarityScore } of argumentScores) {
+    for (const [argumentId, score] of argumentScores) {
         const uniquenessScore = uniquenessScores.get(argumentId) ?? 1;
-        const priority = (1 + 50 * consensusScore + 50 * fragmentationScore) * (clarityScore ** 2) * (uniquenessScore ** 2);
+        const priority = (1 + 50 * score.consensus + 50 * score.fragmentation) * (score.clarity ** 2) * (uniquenessScore ** 2);
         argumentPriorityMap.set(argumentId, priority);
     }
 

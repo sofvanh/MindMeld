@@ -4,31 +4,57 @@ export interface User {
   email: string;
 }
 
-// Arguments are the nodes in the graph
+// Graph visualization types
+export interface NodeData {
+  id: string;
+  name: string;
+}
+
+export interface ExtendedNodeData extends NodeData {
+  color: string;
+  argument: Argument;
+}
+
+export interface LinkData {
+  source: NodeData;
+  target: NodeData;
+}
+
+export interface ForceGraphData {
+  nodes: NodeData[];
+  links: LinkData[];
+}
+
+// Core data types
 export interface Argument {
   id: string;
   graphId: string;
   statement: string;
   embedding: number[];
   authorId?: string;
-  reactionCounts?: {
-    agree: number;
-    disagree: number;
-    unclear: number;
-  };
-  userReaction?: {
-    agree?: boolean;
-    disagree?: boolean;
-    unclear?: boolean;
-  };
-  score?: {
-    consensus: number;
-    fragmentation: number;
-    clarity: number;
-  };
+  reactionCounts?: ReactionCounts;
+  userReaction?: UserReaction;
+  score?: Score;
 }
 
-// Edges are the connections between arguments
+export interface ReactionCounts {
+  agree: number;
+  disagree: number;
+  unclear: number;
+}
+
+export interface UserReaction {
+  agree?: boolean;
+  disagree?: boolean;
+  unclear?: boolean;
+}
+
+export interface Score {
+  consensus: number;
+  fragmentation: number;
+  clarity: number;
+}
+
 export interface Edge {
   id: string;
   graphId: string;
@@ -36,7 +62,6 @@ export interface Edge {
   targetId: string;
 }
 
-// Graphs are the containers for arguments and edges
 export interface Graph {
   id: string;
   name: string;

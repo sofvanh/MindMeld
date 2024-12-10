@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-    if (storedToken && socket && !user && !loading) {
+    if (storedToken && socket) {
       setLoading(true);
       socket.emit('authenticate', storedToken, (response: any) => {
         if (response.success) {
@@ -41,11 +41,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } else {
           console.error('Authentication failed');
           localStorage.removeItem(TOKEN_STORAGE_KEY);
+          setUser(null);
         }
         setLoading(false);
       });
     }
-  }, [socket, loading, user]);
+  }, [socket]);
 
   const signIn = (response: CredentialResponse) => {
     localStorage.setItem(TOKEN_STORAGE_KEY, response.credential!);

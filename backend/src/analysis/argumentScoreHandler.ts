@@ -1,11 +1,5 @@
+import { Score } from "../.shared/types";
 import { analyzeVotes } from "./voteAnalyzer";
-
-export interface ArgumentScore {
-  argumentId: string;
-  consensusScore: number;
-  fragmentationScore: number;
-  clarityScore: number;
-}
 
 function getArgumentClarityScore(argumentIndex: number, 
                                  votingMatrix: number[][],
@@ -32,7 +26,7 @@ function getArgumentClarityScore(argumentIndex: number,
   return 1 - (unclearSum / uniquenessSum);
 }
 
-export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
+export async function getArgumentScores(graphId: string): Promise<Map<string, Score>> {
   const {
       userIndexMap,
       argumentIndexMap,
@@ -46,7 +40,7 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
   } = await analyzeVotes(graphId);
 
   // Calculate the argument scores for each argument
-  const argumentScores: ArgumentScore[] = [];
+  const argumentScores: Map<string, Score> = new Map();
 
   argumentIndexMap.forEach((argumentIndex, argumentId) => {
     //Identify users who voted on this argument
@@ -114,11 +108,10 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
                                                            unclearMatrix, 
                                                            uniquenessMatrix);
 
-      argumentScores.push({
-        argumentId,
-        consensusScore: argumentConsensusScore,
-        fragmentationScore: argumentFragmentationScore,
-        clarityScore: argumentClarityScore
+      argumentScores.set(argumentId, {
+        consensus: argumentConsensusScore,
+        fragmentation: argumentFragmentationScore,
+        clarity: argumentClarityScore
       });
     }
     else {
