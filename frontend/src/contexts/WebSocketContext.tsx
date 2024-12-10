@@ -16,6 +16,21 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const socket = getSocket();
     socket.connect();
+
+    // Handle reconnection authentication
+    socket.io.on('reconnect', () => {
+      const storedToken = localStorage.getItem('mindmeld_auth_token');
+      if (storedToken) {
+        socket.emit('authenticate', storedToken, (response: any) => {
+          if (!response.success) {
+            console.error('Re-authentication failed after reconnect');
+            localStorage.removeItem('mindmeld_auth_token');
+            window.location.reload();
+          }
+        });
+      }
+    });
+
     setSocket(socket);
 
     return () => {

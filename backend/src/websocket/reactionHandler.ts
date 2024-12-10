@@ -1,7 +1,9 @@
 import { Socket } from 'socket.io';
 import { addReaction, removeReaction } from '../db/operations/reactionOperations';
-import { getGraphData } from '../db/operations/graphOperations';
+import { getGraphData, getGraphDataWithUserReactions } from '../db/operations/graphOperations';
 import { query } from '../db/db';
+import { sendReactionUpdate } from './updateHandler';
+
 
 export const handleAddReaction = async (
   socket: Socket,
@@ -10,6 +12,7 @@ export const handleAddReaction = async (
   callback?: Function
 ) => {
   if (!socket.data.user) {
+    console.error(`Failed to add reaction: No user data on socket. Argument ID: ${argumentId}, Type: ${type}, Socket ID: ${socket.id}`);
     callback?.({ success: false, error: 'Authentication required' });
     return;
   }
@@ -17,8 +20,7 @@ export const handleAddReaction = async (
   try {
     const id = await addReaction(socket.data.user.id, argumentId, type);
     const graphId = (await query('SELECT graph_id FROM arguments WHERE id = $1', [argumentId])).rows[0].graph_id;
-    const updatedGraph = await getGraphData(graphId, socket.data.user.id);
-    io.to(graphId).emit('graph update', updatedGraph);
+    sendReactionUpdate(socket, io, graphId, argumentId);
     callback?.({ success: true, id });
   } catch (error) {
     console.error('Error adding reaction:', error);
@@ -33,6 +35,7 @@ export const handleRemoveReaction = async (
   callback?: Function
 ) => {
   if (!socket.data.user) {
+    console.error(`Failed to remove reaction: No user data on socket. Argument ID: ${argumentId}, Type: ${type}, Socket ID: ${socket.id}`);
     callback?.({ success: false, error: 'Authentication required' });
     return;
   }
@@ -40,8 +43,7 @@ export const handleRemoveReaction = async (
   try {
     await removeReaction(socket.data.user.id, argumentId, type);
     const graphId = (await query('SELECT graph_id FROM arguments WHERE id = $1', [argumentId])).rows[0].graph_id;
-    const updatedGraph = await getGraphData(graphId, socket.data.user.id);
-    io.to(graphId).emit('graph update', updatedGraph);
+    sendReactionUpdate(socket, io, graphId, argumentId);
     callback?.({ success: true });
   } catch (error) {
     console.error('Error removing reaction:', error);

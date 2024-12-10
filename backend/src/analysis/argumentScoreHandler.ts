@@ -1,11 +1,5 @@
+import { Score } from "../.shared/types";
 import { analyzeVotes } from "./voteAnalyzer";
-
-export interface ArgumentScore {
-  argumentId: string;
-  consensusScore: number;
-  fragmentationScore: number;
-  clarityScore: number;
-}
 
 function getConsensusScore(argumentIndex: number, 
                            votingMatrix: number[][], 
@@ -127,7 +121,7 @@ uniquenessSum += uniqueness;
 return 1 - (unclearSum / uniquenessSum);
 }
 
-export async function getArgumentScores(graphId: string): Promise<ArgumentScore[]> {
+export async function getArgumentScores(graphId: string): Promise<Map<string, Score>> {
   const {
       argumentIndexMap,
       votingMatrix,
@@ -140,19 +134,18 @@ export async function getArgumentScores(graphId: string): Promise<ArgumentScore[
   } = await analyzeVotes(graphId);
 
   // Calculate the argument scores for each argument
-  const argumentScores: ArgumentScore[] = [];
+  const argumentScores: Map<string, Score> = new Map();
 
   argumentIndexMap.forEach((argumentIndex, argumentId) => {
-    const consensusScore = getConsensusScore(argumentIndex, votingMatrix, sum_neg_pos, sum_neg_neg, uniquenessMatrix);
-    const fragmentationScore = getFragmentationScore(argumentIndex, votingMatrix, sum_pos_pos, sum_pos_neg, uniquenessMatrix);
-    const clarityScore = getClarityScore(argumentIndex, votingMatrix, unclearMatrix, uniquenessMatrix);
+    const consensus = getConsensusScore(argumentIndex, votingMatrix, sum_neg_pos, sum_neg_neg, uniquenessMatrix);
+    const fragmentation = getFragmentationScore(argumentIndex, votingMatrix, sum_pos_pos, sum_pos_neg, uniquenessMatrix);
+    const clarity = getClarityScore(argumentIndex, votingMatrix, unclearMatrix, uniquenessMatrix);
 
-    if (consensusScore !== null && fragmentationScore !== null) {
-      argumentScores.push({
-        argumentId,
-        consensusScore,
-        fragmentationScore,
-        clarityScore
+    if (consensus !== null && fragmentation !== null) {
+      argumentScores.set(argumentId, {
+        consensus,
+        fragmentation,
+        clarity
       });
     }
   });

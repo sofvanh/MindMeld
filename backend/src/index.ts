@@ -35,6 +35,7 @@ io.on('connection', (socket) => {
   socket.on('add reaction', (args, callback) => handleAddReaction(socket, io, args, callback));
   socket.on('remove reaction', (args, callback) => handleRemoveReaction(socket, io, args, callback));
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
+  socket.on('reconnect', () => console.log(`User reconnected: ${socket.id}`));
 });
 
 server.listen(config.port, () => {
