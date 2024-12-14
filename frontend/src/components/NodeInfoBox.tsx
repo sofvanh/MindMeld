@@ -35,6 +35,21 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
     setReactionCounts(argument.reactionCounts);
   }, [argument]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        onPrevNode();
+      } else if (event.key === 'ArrowRight') {
+        onNextNode();
+      } else if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onPrevNode, onNextNode, onClose]);
+
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
     if (!socket) {
       console.error('No socket found');
