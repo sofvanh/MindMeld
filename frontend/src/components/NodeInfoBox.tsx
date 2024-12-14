@@ -70,7 +70,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
+    <div className="bg-white p-4 rounded-lg shadow-md border">
       <div className="flex justify-between items-start gap-4">
         <div className="flex items-center gap-2">
           <button

@@ -71,7 +71,7 @@ const GraphView: React.FC = () => {
         onNodeClick={handleNodeClick}
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
-        {selectedArgument && (
+        {selectedArgument ? (
           <NodeInfoBox
             argument={selectedArgument}
             onClose={handleCloseNode}
@@ -80,13 +80,14 @@ const GraphView: React.FC = () => {
             totalNodes={layoutData.nodes.length}
             currentIndex={selectedNodeIndex + 1}
           />
-        )}
-        {user ? (
-          <ArgumentForm onSubmit={handleAddArgument} />
         ) : (
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <p className="text-sm text-slate-400">Sign in to add arguments</p>
-          </div>
+          user ? (
+            <ArgumentForm onSubmit={handleAddArgument} />
+          ) : (
+            <div className="bg-white p-4 rounded-lg shadow-lg">
+              <p className="text-sm text-slate-400">Sign in to add arguments</p>
+            </div>
+          )
         )}
       </div>
     </div>
