@@ -61,7 +61,7 @@ const GraphView: React.FC = () => {
         </Link>
         <p className="text-base m-0">
           {graph.name}
-          {graph.arguments.length === 0 && <span className="inline text-sm text-slate-400"> (empty)</span>}
+          {graph.arguments.length === 0 && <span className="inline text-sm text-stone-400"> (empty)</span>}
         </p>
       </div>
       <GraphVisualization
@@ -85,7 +85,7 @@ const GraphView: React.FC = () => {
             <ArgumentForm onSubmit={handleAddArgument} />
           ) : (
             <div className="bg-white p-4 rounded-lg shadow-lg">
-              <p className="text-sm text-slate-400">Sign in to add arguments</p>
+              <p className="text-sm text-stone-400">Sign in to add arguments</p>
             </div>
           )
         )}

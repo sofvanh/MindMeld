@@ -21,10 +21,10 @@ const DesignSystemView = () => {
         <div className="mb-8">
           <h3>Text Colors</h3>
           <div>
-            <p className="text-slate-900 mb-2"><b>Primary Text (slate-900)</b></p>
-            <p className="text-slate-700 mb-2">Default paragraph text (slate-700)</p>
-            <p className="text-slate-500 mb-2">Subtle Text (slate-500)</p>
-            <a href="/design" className="mb-2">Link Text (blue-500, hover blue-700)</a>
+            <p className="text-stone-900 mb-2"><b>Primary Text (stone-900)</b></p>
+            <p className="text-stone-700 mb-2">Default paragraph text (stone-700)</p>
+            <p className="text-stone-500 mb-2">Subtle Text (stone-500)</p>
+            <a href="/design" className="mb-2">Link Text (sky-500, hover sky-700)</a>
           </div>
         </div>
         <div className="mb-8">
@@ -35,24 +35,24 @@ const DesignSystemView = () => {
               <p className="text-sm font-medium">white (background)</p>
             </div>
             <div className="space-y-2">
-              <div className="card h-16 !bg-slate-50" />
-              <p className="text-sm font-medium">slate-50 (subtle background)</p>
+              <div className="card h-16 !bg-stone-50" />
+              <p className="text-sm font-medium">stone-50 (subtle background)</p>
             </div>
             <div className="space-y-2">
-              <div className="card h-16 !bg-slate-100" />
-              <p className="text-sm font-medium">slate-100 (hover states)</p>
+              <div className="card h-16 !bg-stone-100" />
+              <p className="text-sm font-medium">stone-100 (hover states)</p>
             </div>
             <div className="space-y-2">
-              <div className="card h-16 !bg-slate-200" />
-              <p className="text-sm font-medium">slate-200 (borders)</p>
+              <div className="card h-16 !bg-stone-200" />
+              <p className="text-sm font-medium">stone-200 (borders)</p>
             </div>
             <div className="space-y-2">
-              <div className="card h-16 !bg-blue-500" />
-              <p className="text-sm font-medium">blue-500 (primary actions)</p>
+              <div className="card h-16 !bg-sky-500" />
+              <p className="text-sm font-medium">sky-500 (primary actions)</p>
             </div>
             <div className="space-y-2">
-              <div className="card h-16 !bg-blue-600" />
-              <p className="text-sm font-medium">blue-600 (primary hover)</p>
+              <div className="card h-16 !bg-sky-600" />
+              <p className="text-sm font-medium">sky-600 (primary hover)</p>
             </div>
           </div>
         </div>
