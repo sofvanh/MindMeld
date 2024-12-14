@@ -1,42 +1,43 @@
 import { Argument } from '../shared/types';
 
-export function getColor(arg: Argument) {
-  if (!arg.score) return 'rgba(148, 163, 184, 1)'; // slate-400
 
-  const consensus = arg.score.consensus === 0 ? 0.01 : arg.score.consensus;
-  const fragmentation = arg.score.fragmentation === 0 ? 0.01 : arg.score.fragmentation;
-  const totalIntensity = consensus + fragmentation;
+interface RGBColor {
+  r: number;
+  g: number;
+  b: number;
+}
 
-  let normalizedConsensus = consensus;
-  let normalizedFragmentation = fragmentation;
+const SLATE_400: RGBColor = { r: 148, g: 163, b: 184 };
+const CYAN_500: RGBColor = { r: 6, g: 182, b: 212 };
+const ROSE_400: RGBColor = { r: 251, g: 113, b: 133 };
+const AMBER_500: RGBColor = { r: 245, g: 158, b: 11 };
 
-  const targetIntensity = Math.min(Math.max(totalIntensity, 0.7), 1.6);
-  const scaleFactor = targetIntensity / totalIntensity;
-  normalizedConsensus *= scaleFactor;
-  normalizedFragmentation *= scaleFactor;
+function blendValues(val1: number, val2: number, ratio: number): number {
+  return Math.round(val1 * ratio + val2 * (1 - ratio))
+}
 
-  // Define our four corner colors
-  const bottomLeft = { r: 148, g: 163, b: 184 };  // slate-400: (0,0)
-  const topLeft = { r: 6, g: 182, b: 212 };       // cyan-500: (100,0)
-  const bottomRight = { r: 251, g: 113, b: 133 }; // rose-400: (0,100)
-  const topRight = { r: 245, g: 158, b: 11 };     // amber-500: (100,100)
+function blendColors(col1: RGBColor, col2: RGBColor, ratio: number): RGBColor {
+  return {
+    r: blendValues(col1.r, col2.r, ratio),
+    g: blendValues(col1.g, col2.g, ratio),
+    b: blendValues(col1.b, col2.b, ratio)
+  };
+}
 
-  // Blend between top corners and bottom corners first
-  const bottomR = Math.round(bottomLeft.r * (1 - normalizedFragmentation) + bottomRight.r * normalizedFragmentation);
-  const bottomG = Math.round(bottomLeft.g * (1 - normalizedFragmentation) + bottomRight.g * normalizedFragmentation);
-  const bottomB = Math.round(bottomLeft.b * (1 - normalizedFragmentation) + bottomRight.b * normalizedFragmentation);
+export function getColor(arg: Argument): string {
+  if (!arg.score) return `rgba(${SLATE_400.r}, ${SLATE_400.g}, ${SLATE_400.b}, 1)`;
 
-  const topR = Math.round(topLeft.r * (1 - normalizedFragmentation) + topRight.r * normalizedFragmentation);
-  const topG = Math.round(topLeft.g * (1 - normalizedFragmentation) + topRight.g * normalizedFragmentation);
-  const topB = Math.round(topLeft.b * (1 - normalizedFragmentation) + topRight.b * normalizedFragmentation);
+  const consensus = arg.score.consensus;
+  const fragmentation = arg.score.fragmentation;
+  const clarity = arg.score.clarity;
 
-  // Then blend between top and bottom
-  const r = Math.round(bottomR * (1 - normalizedConsensus) + topR * normalizedConsensus);
-  const g = Math.round(bottomG * (1 - normalizedConsensus) + topG * normalizedConsensus);
-  const b = Math.round(bottomB * (1 - normalizedConsensus) + topB * normalizedConsensus);
+  const consensusColor = blendColors(CYAN_500, SLATE_400, consensus);
+  const combinedColor = blendColors(ROSE_400, consensusColor, fragmentation);
 
-  let opacity = arg.score.clarity ?? 0;
-  opacity = Math.max(opacity, 0.2);
+  const interestingnessScore = consensus * fragmentation * 1000;
+  const adjustedInterestingnessScore = Math.min(interestingnessScore, 250)
+  const interestingnessRatio = adjustedInterestingnessScore / 250;
+  const finalColor = blendColors(AMBER_500, combinedColor, interestingnessRatio);
 
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  return `rgba(${finalColor.r}, ${finalColor.g}, ${finalColor.b}, ${clarity})`;
 }
