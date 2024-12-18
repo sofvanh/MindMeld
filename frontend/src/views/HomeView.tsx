@@ -60,7 +60,7 @@ const HomeView: React.FC = () => {
           <SignInOutButton />
         </div>
       )}
-      <p className="mb-2 text-slate-400">or</p>
+      <p className="mb-2 text-stone-400">or</p>
       <button>
         <Link to="/graphs" className={buttonStyles.secondary}>
           View Existing Graphs

@@ -35,6 +35,21 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
     setReactionCounts(argument.reactionCounts);
   }, [argument]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        onPrevNode();
+      } else if (event.key === 'ArrowRight') {
+        onNextNode();
+      } else if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onPrevNode, onNextNode, onClose]);
+
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
     if (!socket) {
       console.error('No socket found');
@@ -55,7 +70,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
+    <div className="bg-white p-4 rounded-lg shadow-md border">
       <div className="flex justify-between items-start gap-4">
         <div className="flex items-center gap-2">
           <button
@@ -66,7 +81,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
           >
             ←
           </button>
-          <span className="text-xs text-slate-500 w-12 text-center">
+          <span className="text-xs text-stone-500 w-12 text-center">
             {currentIndex} / {totalNodes}
           </span>
           <button
@@ -110,21 +125,21 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
         <CloseButton onClick={onClose} />
       </div>
 
-      <p className="mt-2 text-sm text-slate-700 flex-1">{argument.statement}</p>
+      <p className="mt-2 text-sm text-stone-700 flex-1">{argument.statement}</p>
 
       <details className="mt-2">
-        <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-700">
+        <summary className="text-xs text-stone-500 cursor-pointer hover:text-stone-700">
           View scores
         </summary>
         <div className="flex flex-col gap-1 mt-1">
           {argument.score ? (
             <>
-              <span className="text-xs text-slate-500">Consensus: {Math.round(argument.score.consensus * 100)}%</span>
-              <span className="text-xs text-slate-500">Fragmentation: {Math.round(argument.score.fragmentation * 100)}%</span>
-              <span className="text-xs text-slate-500">Clarity: {Math.round(argument.score.clarity * 100)}%</span>
+              <span className="text-xs text-stone-500">Consensus: {Math.round(argument.score.consensus * 100)}%</span>
+              <span className="text-xs text-stone-500">Fragmentation: {Math.round(argument.score.fragmentation * 100)}%</span>
+              <span className="text-xs text-stone-500">Clarity: {Math.round(argument.score.clarity * 100)}%</span>
             </>
           ) : (
-            <span className="text-xs text-slate-500">More user feedback is required to generate scores.</span>
+            <span className="text-xs text-stone-500">More user feedback is required to generate scores.</span>
           )}
         </div>
       </details>
