@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import CloseButton from './CloseButton';
-import { buttonStyles, iconClasses, tooltipClasses } from '../styles/defaultStyles';
+import CloseButton from '../CloseButton';
+import { buttonStyles, iconClasses, tooltipClasses } from '../../styles/defaultStyles';
 import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
 import { MdOutlineQuestionMark } from "react-icons/md";
-import { Argument } from '../shared/types';
-import { useWebSocket } from '../contexts/WebSocketContext';
-import { useAuth } from '../contexts/AuthContext';
+import { Argument } from '../../shared/types';
+import { useWebSocket } from '../../contexts/WebSocketContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 
-interface NodeInfoBoxProps {
+interface ArgumentInfoBoxProps {
   argument: Argument;
   onClose: () => void;
-  onPrevNode: () => void;
-  onNextNode: () => void;
-  totalNodes: number;
+  onPrevArg: () => void;
+  onNextArg: () => void;
+  totalArgs: number;
   currentIndex: number;
 }
 
-const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
+const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
   argument,
   onClose,
-  onPrevNode,
-  onNextNode,
-  totalNodes,
+  onPrevArg,
+  onNextArg,
+  totalArgs,
   currentIndex
 }) => {
   const { socket } = useWebSocket();
@@ -38,9 +38,9 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
-        onPrevNode();
+        onPrevArg();
       } else if (event.key === 'ArrowRight') {
-        onNextNode();
+        onNextArg();
       } else if (event.key === 'Escape') {
         onClose();
       }
@@ -48,7 +48,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onPrevNode, onNextNode, onClose]);
+  }, [onPrevArg, onNextArg, onClose]);
 
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
     if (!socket) {
@@ -74,7 +74,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
       <div className="flex justify-between items-start gap-4">
         <div className="flex items-center gap-2">
           <button
-            onClick={onPrevNode}
+            onClick={onPrevArg}
             className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1`}
             data-tooltip="Previous argument"
             aria-label="Previous argument"
@@ -82,10 +82,10 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
             ←
           </button>
           <span className="text-xs text-stone-500 w-12 text-center">
-            {currentIndex} / {totalNodes}
+            {currentIndex} / {totalArgs}
           </span>
           <button
-            onClick={onNextNode}
+            onClick={onNextArg}
             className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1`}
             data-tooltip="Next argument"
             aria-label="Next argument"
@@ -147,4 +147,4 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
   );
 };
 
-export default NodeInfoBox;
+export default ArgumentInfoBox;

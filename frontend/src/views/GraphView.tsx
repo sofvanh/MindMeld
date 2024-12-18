@@ -5,7 +5,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useGraph } from '../hooks/useGraph';
 import { useNodeNavigation } from '../hooks/useNodeNavigation';
 import LoadingSpinner from '../components/LoadingSpinner';
-import NodeInfoBox from '../components/NodeInfoBox';
+import ArgumentInfoBox from '../components/ArgumentInfoBox/ArgumentInfoBox';
 import GraphVisualization from '../components/GraphVisualization';
 import ArgumentForm from '../components/ArgumentForm';
 import { buttonStyles } from '../styles/defaultStyles';
@@ -72,12 +72,12 @@ const GraphView: React.FC = () => {
       />
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedArgument ? (
-          <NodeInfoBox
+          <ArgumentInfoBox
             argument={selectedArgument}
             onClose={handleCloseNode}
-            onPrevNode={handlePrevNode}
-            onNextNode={handleNextNode}
-            totalNodes={layoutData.nodes.length}
+            onPrevArg={handlePrevNode}
+            onNextArg={handleNextNode}
+            totalArgs={layoutData.nodes.length}
             currentIndex={selectedNodeIndex + 1}
           />
         ) : (
