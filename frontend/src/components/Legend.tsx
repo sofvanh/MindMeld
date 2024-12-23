@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { IMPORTANCE_COLOR, CONSENSUS_COLOR, FRAGMENTATION_COLOR } from '../utils/colors';
 
 export default function Legend() {
@@ -27,7 +28,7 @@ export default function Legend() {
             </div>
           </div>
         ))}
-        <a href="/scores" className="flex items-center text-sm h-11 sm:h-auto sm:py-2">What do the scores mean?</a>
+        <Link to="/scores" className="flex items-center text-sm h-11 sm:h-auto sm:py-2">What do the scores mean?</Link>
       </div>
     </details>
   );
