@@ -35,8 +35,8 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
   }, [argument]);
 
   return (
-    <div className="bg-white px-4 rounded-lg shadow-md border">
-      <div className="flex items-start gap-4 pr-8">
+    <div className="bg-white px-4 rounded-lg shadow-md border h-52 flex flex-col">
+      <div className="flex-0 flex items-start gap-4 pr-8">
         <button
           data-tooltip={user ? "Agree" : "Agree (sign in to contribute)"}
           onClick={() => user && handleReaction('agree')}
@@ -66,9 +66,13 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
         </button>
       </div >
 
-      <p className="text-sm text-stone-700 flex-1">{argument.statement}</p>
+      <div className="text-sm text-stone-700 flex-1 overflow-auto">
+        <div className="min-h-full flex items-center">
+          <p className="py-2">{argument.statement}</p>
+        </div>
+      </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex-0 flex justify-between items-center">
         <button
           onClick={onPrevArg}
           className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1 flex-grow min-h-11`}
@@ -77,7 +81,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
         >
           ←
         </button>
-        <span className="text-xs text-stone-500 text-center flex-grow-0 w-auto mx-2">
+        <span className="text-xs text-stone-500 text-center flex-grow-0 w-auto mx-2 min-w-12">
           {currentIndex} / {totalArgs}
         </span>
         <button

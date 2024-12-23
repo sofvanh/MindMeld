@@ -70,7 +70,7 @@ const GraphView: React.FC = () => {
         selectedNodeId={selectedNodeId}
         onNodeClick={handleNodeClick}
       />
-      <div className="absolute bottom-4 sm:bottom-4 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
+      <div className="absolute bottom-0 sm:bottom-4 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedArgument ? (
           <ArgumentInfoBox
             argument={selectedArgument}
