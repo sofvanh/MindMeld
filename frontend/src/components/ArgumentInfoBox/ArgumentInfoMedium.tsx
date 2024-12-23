@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import CloseButton from '../CloseButton';
 import { buttonStyles, iconClasses, tooltipClasses } from '../../styles/defaultStyles';
 import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
 import { MdOutlineQuestionMark } from "react-icons/md";
 import { Argument } from '../../shared/types';
-import { useWebSocket } from '../../contexts/WebSocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 
 

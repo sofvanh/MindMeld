@@ -3,6 +3,7 @@ import CloseButton from '../CloseButton';
 import { Argument } from '../../shared/types';
 import { useWebSocket } from '../../contexts/WebSocketContext';
 import ArgumentInfoMedium from './ArgumentInfoMedium';
+import ArgumentInfoSmall from './ArgumentInfoSmall';
 
 
 interface ArgumentInfoBoxProps {
@@ -64,16 +65,28 @@ const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
   };
 
   return (
-    <div>
-      <ArgumentInfoMedium
-        argument={argument}
-        handleReaction={handleReactionClick}
-        onPrevArg={onPrevArg}
-        onNextArg={onNextArg}
-        totalArgs={totalArgs}
-        currentIndex={currentIndex}
-      />
-      <div className="absolute top-0 right-0 m-4">
+    <div className="relative">
+      <div className="block sm:hidden">
+        <ArgumentInfoSmall
+          argument={argument}
+          handleReaction={handleReactionClick}
+          onPrevArg={onPrevArg}
+          onNextArg={onNextArg}
+          totalArgs={totalArgs}
+          currentIndex={currentIndex}
+        />
+      </div>
+      <div className="hidden sm:block">
+        <ArgumentInfoMedium
+          argument={argument}
+          handleReaction={handleReactionClick}
+          onPrevArg={onPrevArg}
+          onNextArg={onNextArg}
+          totalArgs={totalArgs}
+          currentIndex={currentIndex}
+        />
+      </div>
+      <div className="absolute top-0 right-0">
         <CloseButton onClick={onClose} />
       </div>
     </div>
