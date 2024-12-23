@@ -6,6 +6,7 @@ import GraphListView from './views/GraphListView';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { AuthProvider } from './contexts/AuthContext';
 import DesignSystemView from './views/DesignSystemView';
+import ScoresView from './views/ScoresView';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
               <Route path="/graph/:graphId" element={<GraphView />} />
               <Route path="/graphs" element={<GraphListView />} />
               <Route path="/design" element={<DesignSystemView />} />
+              <Route path="/scores" element={<ScoresView />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>

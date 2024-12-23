@@ -7,7 +7,6 @@ export default function Legend() {
     { color: IMPORTANCE_COLOR, label: 'Important', description: 'Both consensus and fragmentation are high. This node seems important!' },
   ];
 
-  // TODO Create a page explaining the colors/scores!
   return (
     <details className="flex flex-col px-2">
       <summary className="py-3 sm:py-1 cursor-pointer text-sm text-stone-700 font-semibold min-h-11 sm:min-h-0 items-center justify-center">
@@ -28,7 +27,7 @@ export default function Legend() {
             </div>
           </div>
         ))}
-        <a href="/about" className="flex items-center text-sm h-11 sm:h-auto sm:py-2">What do the scores mean?</a>
+        <a href="/scores" className="flex items-center text-sm h-11 sm:h-auto sm:py-2">What do the scores mean?</a>
       </div>
     </details>
   );
