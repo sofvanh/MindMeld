@@ -1,6 +1,9 @@
+import { usePageTitle } from '../hooks/usePageTitle';
 import { buttonStyles, cardStyles, tooltipClasses } from '../styles/defaultStyles';
 
 const DesignSystemView = () => {
+  usePageTitle('Design system');
+
   return (
     <div className="max-w-4xl mx-auto p-8">
       <h1 className="mb-12">MindMeld Design System</h1>

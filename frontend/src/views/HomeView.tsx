@@ -4,6 +4,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { buttonStyles } from '../styles/defaultStyles';
 import { useAuth } from '../contexts/AuthContext';
 import SignInOutButton from '../components/SignInOutButton';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 
 const HomeView: React.FC = () => {
@@ -12,6 +13,7 @@ const HomeView: React.FC = () => {
   const [graphName, setGraphName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  usePageTitle();
 
   const handleCreateGraph = (e: React.FormEvent) => {
     e.preventDefault();
