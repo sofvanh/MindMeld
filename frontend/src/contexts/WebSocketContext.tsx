@@ -18,6 +18,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     socket.connect();
 
     // Handle reconnection authentication
+    // TODO Probably this should be with the other auth logic
     socket.io.on('reconnect', () => {
       const storedToken = localStorage.getItem('mindmeld_auth_token');
       if (storedToken) {

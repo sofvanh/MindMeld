@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
 let socket: Socket | null = null;
 
+// TODO Think about creating a map of socket events and simplifying all the socket code, including bringing all types to shared code
 // TODO At some point I'd like a heartbeat to keep the connection alive
 
 export const getSocket = (): Socket => {
