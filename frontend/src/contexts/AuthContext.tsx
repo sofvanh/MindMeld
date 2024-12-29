@@ -35,11 +35,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     if (storedToken && socket) {
       setLoading(true);
-      socket.emit('authenticate', storedToken, (response: any) => {
+      socket.emit('authenticate', { token: storedToken }, (response: any) => {
         if (response.success) {
-          setUser(response.user);
+          setUser(response.data.user);
         } else {
-          console.error('Authentication failed');
+          console.error('Authentication failed:', response.error);
           localStorage.removeItem(TOKEN_STORAGE_KEY);
           setUser(null);
         }
@@ -54,12 +54,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   const signOut = () => {
-    socket?.emit('logout', () => {
-      setLoading(true);
-      googleLogout();
-      setUser(null);
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-      window.location.reload();
+    socket?.emit('logout', {}, (response: any) => {
+      if (response.success) {
+        googleLogout();
+        setUser(null);
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
+        window.location.reload();
+      } else {
+        console.error('Logout failed:', response.error);
+      }
     });
   }
 
