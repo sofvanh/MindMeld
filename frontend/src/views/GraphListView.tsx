@@ -4,6 +4,7 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 
 import LoadingSpinner from '../components/LoadingSpinner';
 import { buttonStyles } from '../styles/defaultStyles';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Graph {
   id: string;
@@ -13,6 +14,7 @@ interface Graph {
 const GraphListView: React.FC = () => {
   const { socket } = useWebSocket();
   const [graphs, setGraphs] = useState<Graph[]>([]);
+  usePageTitle('All graphs');
 
   useEffect(() => {
     socket?.emit('get graphs');

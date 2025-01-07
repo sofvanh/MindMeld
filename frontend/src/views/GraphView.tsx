@@ -5,11 +5,12 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useGraph } from '../hooks/useGraph';
 import { useNodeNavigation } from '../hooks/useNodeNavigation';
 import LoadingSpinner from '../components/LoadingSpinner';
-import NodeInfoBox from '../components/NodeInfoBox';
+import ArgumentInfoBox from '../components/ArgumentInfoBox/ArgumentInfoBox';
 import GraphVisualization from '../components/GraphVisualization';
 import ArgumentForm from '../components/ArgumentForm';
 import { buttonStyles } from '../styles/defaultStyles';
 import { Argument } from '../shared/types';
+import Legend from '../components/Legend';
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
@@ -55,14 +56,17 @@ const GraphView: React.FC = () => {
 
   return (
     <div className="w-full h-[calc(100vh-8rem)] relative">
-      <div className="absolute top-4 left-4 z-10 bg-white/80 px-2 py-1 rounded-lg shadow-sm flex items-center gap-2">
-        <Link to="/graphs" className={`${buttonStyles.secondary} !p-1 min-w-8 flex items-center justify-center`}>
-          ←
-        </Link>
-        <p className="text-base m-0">
-          {graph.name}
-          {graph.arguments.length === 0 && <span className="inline text-sm text-stone-400"> (empty)</span>}
-        </p>
+      <div className="absolute top-4 left-4 z-10 bg-white/80 sm:px-2 sm:py-1 rounded-lg shadow-sm flex flex-col">
+        <div className="flex items-center">
+          <Link to="/graphs" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
+            ←
+          </Link>
+          <p className="text-base m-0">
+            {graph.name}
+            {graph.arguments.length === 0 && <span className="inline text-sm text-stone-400"> (empty)</span>}
+          </p>
+        </div>
+        <Legend />
       </div>
       <GraphVisualization
         graph={graph}
@@ -70,14 +74,14 @@ const GraphView: React.FC = () => {
         selectedNodeId={selectedNodeId}
         onNodeClick={handleNodeClick}
       />
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
+      <div className="absolute bottom-0 sm:bottom-4 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
         {selectedArgument ? (
-          <NodeInfoBox
+          <ArgumentInfoBox
             argument={selectedArgument}
             onClose={handleCloseNode}
-            onPrevNode={handlePrevNode}
-            onNextNode={handleNextNode}
-            totalNodes={layoutData.nodes.length}
+            onPrevArg={handlePrevNode}
+            onNextArg={handleNextNode}
+            totalArgs={layoutData.nodes.length}
             currentIndex={selectedNodeIndex + 1}
           />
         ) : (

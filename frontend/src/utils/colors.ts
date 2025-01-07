@@ -12,6 +12,11 @@ const EMERALD_500: RGBColor = { r: 16, g: 185, b: 129 };
 const ORANGE_500: RGBColor = { r: 249, g: 115, b: 22 };
 const YELLOW_400: RGBColor = { r: 250, g: 204, b: 21 };
 
+export const BASE_COLOR = STONE_400;
+export const CONSENSUS_COLOR = EMERALD_500;
+export const FRAGMENTATION_COLOR = ORANGE_500;
+export const IMPORTANCE_COLOR = YELLOW_400;
+
 function blendValues(val1: number, val2: number, ratio: number): number {
   return Math.round(val1 * ratio + val2 * (1 - ratio))
 }
@@ -25,19 +30,19 @@ function blendColors(col1: RGBColor, col2: RGBColor, ratio: number): RGBColor {
 }
 
 export function getColor(arg: Argument): string {
-  if (!arg.score) return `rgba(${STONE_400.r}, ${STONE_400.g}, ${STONE_400.b}, 1)`;
+  if (!arg.score) return `rgba(${BASE_COLOR.r}, ${BASE_COLOR.g}, ${BASE_COLOR.b}, 1)`;
 
   const consensus = arg.score.consensus;
   const fragmentation = arg.score.fragmentation;
   const clarity = arg.score.clarity;
 
-  const consensusColor = blendColors(EMERALD_500, STONE_400, consensus);
-  const combinedColor = blendColors(ORANGE_500, consensusColor, fragmentation);
+  const consensusColor = blendColors(CONSENSUS_COLOR, BASE_COLOR, consensus);
+  const combinedColor = blendColors(FRAGMENTATION_COLOR, consensusColor, fragmentation);
 
   const interestingnessScore = consensus * fragmentation * 1000;
   const adjustedInterestingnessScore = Math.min(interestingnessScore, 250)
   const interestingnessRatio = adjustedInterestingnessScore / 250;
-  const finalColor = blendColors(YELLOW_400, combinedColor, interestingnessRatio);
+  const finalColor = blendColors(IMPORTANCE_COLOR, combinedColor, interestingnessRatio);
 
   return `rgba(${finalColor.r}, ${finalColor.g}, ${finalColor.b}, ${clarity})`;
 }

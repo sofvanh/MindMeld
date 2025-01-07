@@ -1,31 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import CloseButton from './CloseButton';
-import { buttonStyles, iconClasses, tooltipClasses } from '../styles/defaultStyles';
+import { buttonStyles, iconClasses, tooltipClasses } from '../../styles/defaultStyles';
 import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
 import { MdOutlineQuestionMark } from "react-icons/md";
-import { Argument } from '../shared/types';
-import { useWebSocket } from '../contexts/WebSocketContext';
-import { useAuth } from '../contexts/AuthContext';
+import { Argument } from '../../shared/types';
+import { useAuth } from '../../contexts/AuthContext';
 
 
-interface NodeInfoBoxProps {
+interface ArgumentInfoMediumProps {
   argument: Argument;
-  onClose: () => void;
-  onPrevNode: () => void;
-  onNextNode: () => void;
-  totalNodes: number;
+  handleReaction: (type: 'agree' | 'disagree' | 'unclear') => void;
+  onPrevArg: () => void;
+  onNextArg: () => void;
+  totalArgs: number;
   currentIndex: number;
 }
 
-const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
+const ArgumentInfoMedium: React.FC<ArgumentInfoMediumProps> = ({
   argument,
-  onClose,
-  onPrevNode,
-  onNextNode,
-  totalNodes,
+  handleReaction,
+  onPrevArg,
+  onNextArg,
+  totalArgs,
   currentIndex
 }) => {
-  const { socket } = useWebSocket();
   const { user } = useAuth();
   const [userReactions, setUserReactions] = useState(argument.userReaction || {});
   const [reactionCounts, setReactionCounts] = useState(argument.reactionCounts);
@@ -35,46 +32,12 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
     setReactionCounts(argument.reactionCounts);
   }, [argument]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
-        onPrevNode();
-      } else if (event.key === 'ArrowRight') {
-        onNextNode();
-      } else if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onPrevNode, onNextNode, onClose]);
-
-  const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
-    if (!socket) {
-      console.error('No socket found');
-      return;
-    }
-    const newValue = !userReactions[type];
-    if (newValue) {
-      socket.emit('add reaction', {
-        argumentId: argument.id,
-        type
-      });
-    } else {
-      socket.emit('remove reaction', {
-        argumentId: argument.id,
-        type
-      });
-    }
-  };
-
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border">
       <div className="flex justify-between items-start gap-4">
         <div className="flex items-center gap-2">
           <button
-            onClick={onPrevNode}
+            onClick={onPrevArg}
             className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1`}
             data-tooltip="Previous argument"
             aria-label="Previous argument"
@@ -82,10 +45,10 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
             ←
           </button>
           <span className="text-xs text-stone-500 w-12 text-center">
-            {currentIndex} / {totalNodes}
+            {currentIndex} / {totalArgs}
           </span>
           <button
-            onClick={onNextNode}
+            onClick={onNextArg}
             className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1`}
             data-tooltip="Next argument"
             aria-label="Next argument"
@@ -95,7 +58,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
           <div className="flex gap-2">
             <button
               data-tooltip={user ? "Agree" : "Agree (sign in to contribute)"}
-              onClick={() => user && handleReactionClick('agree')}
+              onClick={() => user && handleReaction('agree')}
               disabled={!user}
               className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.agree ? buttonStyles.icon.green : buttonStyles.icon.default} ${!user && 'opacity-50'}`}
             >
@@ -104,7 +67,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
             </button>
             <button
               data-tooltip={user ? "Disagree" : "Disagree (sign in to contribute)"}
-              onClick={() => user && handleReactionClick('disagree')}
+              onClick={() => user && handleReaction('disagree')}
               disabled={!user}
               className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.disagree ? buttonStyles.icon.red : buttonStyles.icon.default} ${!user && 'opacity-50'}`}
             >
@@ -113,7 +76,7 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
             </button>
             <button
               data-tooltip={user ? "Unclear" : "Unclear (sign in to contribute)"}
-              onClick={() => user && handleReactionClick('unclear')}
+              onClick={() => user && handleReaction('unclear')}
               disabled={!user}
               className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.unclear ? buttonStyles.icon.amber : buttonStyles.icon.default} ${!user && 'opacity-50'}`}
             >
@@ -122,7 +85,6 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
             </button>
           </div>
         </div>
-        <CloseButton onClick={onClose} />
       </div>
 
       <p className="mt-2 text-sm text-stone-700 flex-1">{argument.statement}</p>
@@ -147,4 +109,4 @@ const NodeInfoBox: React.FC<NodeInfoBoxProps> = ({
   );
 };
 
-export default NodeInfoBox;
+export default ArgumentInfoMedium;
