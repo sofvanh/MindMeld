@@ -32,9 +32,9 @@ function blendColors(col1: RGBColor, col2: RGBColor, ratio: number): RGBColor {
 export function getColor(arg: Argument): string {
   if (!arg.score) return `rgba(${BASE_COLOR.r}, ${BASE_COLOR.g}, ${BASE_COLOR.b}, 1)`;
 
-  const consensus = arg.score.consensus;
-  const fragmentation = arg.score.fragmentation;
-  const clarity = arg.score.clarity;
+  const consensus = arg.score.consensus || 0;
+  const fragmentation = arg.score.fragmentation || 0;
+  const clarity = arg.score.clarity || 0;
 
   const consensusColor = blendColors(CONSENSUS_COLOR, BASE_COLOR, consensus);
   const combinedColor = blendColors(FRAGMENTATION_COLOR, consensusColor, fragmentation);
