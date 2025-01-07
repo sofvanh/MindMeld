@@ -50,8 +50,8 @@ export interface UserReaction {
 }
 
 export interface Score {
-  consensus: number;
-  fragmentation: number;
+  consensus?: number;
+  fragmentation?: number;
   clarity: number;
 }
 
