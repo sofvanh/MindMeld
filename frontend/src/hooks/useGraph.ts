@@ -16,8 +16,13 @@ export function useGraph(graphId: string) {
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
 
   useEffect(() => {
-    socket?.emit('join graph', graphId);
-    socket?.on('graph data', setGraph);
+    socket?.emit('join graph', { graphId }, (response: any) => {
+      if (response.success) {
+        setGraph(response.data.graph);
+      } else {
+        console.error('Failed to join graph:', response.error);
+      }
+    });
     socket?.on('graph update', setGraph);
     socket?.on('argument added', ({ argument, newEdges }) => {
       setGraph(prevGraph => {
@@ -55,7 +60,6 @@ export function useGraph(graphId: string) {
     });
     return () => {
       socket?.emit('leave graph', graphId);
-      socket?.off('graph data');
       socket?.off('graph update');
       socket?.off('argument added');
       socket?.off('user reaction update');
