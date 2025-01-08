@@ -1,7 +1,7 @@
 import { Score } from "../.shared/types";
 import { analyzeVotes } from "./voteAnalyzer";
 import { getArgumentScores } from "./argumentScoreHandler";
-import { ReactionForGraph, getReactionsForGraph} from "../db/operations/reactionOperations";
+import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
 import { getArgumentIdsByGraphId } from "../db/operations/argumentOperations";
 
 interface ArgumentPriority {
@@ -30,6 +30,7 @@ async function getUniquenessScores(userId: string, graphId: string): Promise<Map
     }
 }
 
+// TODO Update this now that consensus or fragmentation can be undefined
 export async function getArgumentPriorities(graphId: string, userId: string): Promise<ArgumentPriority[]> {
     const argumentIds = await getArgumentIdsByGraphId(graphId);
     const argumentPriorityMap = new Map<string, number>();
@@ -39,14 +40,14 @@ export async function getArgumentPriorities(graphId: string, userId: string): Pr
     const userReactedMap = new Map<string, boolean>(
         reactions.filter(reaction => reaction.userId === userId).map(reaction => [reaction.argumentId, true])
     );
-    
+
     // Get priority for arguments with scores (consensus, fragmentation, clarity)
     const argumentScores: Map<string, Score> = await getArgumentScores(graphId);
     const uniquenessScores: Map<string, number> = await getUniquenessScores(userId, graphId);
 
     for (const [argumentId, score] of argumentScores) {
         const uniquenessScore = uniquenessScores.get(argumentId) ?? 1;
-        const priority = (1 + 50 * score.consensus + 50 * score.fragmentation) * (score.clarity ** 2) * (uniquenessScore ** 2);
+        const priority = (1 + 50 * (score.consensus ?? 0) + 50 * (score.fragmentation ?? 0)) * (score.clarity ** 2) * (uniquenessScore ** 2);
         argumentPriorityMap.set(argumentId, priority);
     }
 
@@ -64,5 +65,5 @@ export async function getArgumentPriorities(graphId: string, userId: string): Pr
 
     // Sort arguments by priority and return
     return Array.from(argumentPriorityMap, ([argumentId, priority]) => ({ argumentId, priority }))
-                .sort((a, b) => b.priority - a.priority);
+        .sort((a, b) => b.priority - a.priority);
 }
