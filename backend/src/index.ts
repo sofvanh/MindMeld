@@ -4,13 +4,14 @@ import { Server } from 'socket.io';
 import config from './config';
 import { handleAuthenticate } from './websocket/auth/authenticate';
 import { handleLogout } from './websocket/auth/logout';
-import { handleAddReaction, handleRemoveReaction } from './websocket/reactionHandler';
 import { SocketHandler, SocketResponse } from './backendTypes';
 import { handleGetGraphs } from './websocket/graph/getGraphs';
 import { handleCreateGraph } from './websocket/graph/createGraph';
 import { handleJoinGraph } from './websocket/graph/joinGraph';
 import { handleLeaveGraph } from './websocket/graph/leaveGraph';
 import { handleAddArgument } from './websocket/argument/addArgument';
+import { handleAddReaction } from './websocket/reaction/addReaction';
+import { handleRemoveReaction } from './websocket/reaction/removeReaction';
 
 const app = express();
 const server = http.createServer(app);
@@ -62,9 +63,9 @@ io.on('connection', (socket) => {
   socket.on('join graph', wrapHandler(handleJoinGraph));
   socket.on('leave graph', wrapHandler(handleLeaveGraph));
   socket.on('add argument', wrapHandler(handleAddArgument));
+  socket.on('add reaction', wrapHandler(handleAddReaction));
+  socket.on('remove reaction', wrapHandler(handleRemoveReaction));
   // TODO Finish transition
-  socket.on('add reaction', (args, callback) => handleAddReaction(socket, io, args, callback));
-  socket.on('remove reaction', (args, callback) => handleRemoveReaction(socket, io, args, callback));
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
   socket.on('reconnect', () => console.log(`User reconnected: ${socket.id}`));
 });

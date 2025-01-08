@@ -55,11 +55,19 @@ const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
       socket.emit('add reaction', {
         argumentId: argument.id,
         type
+      }, (response: any) => {
+        if (!response.success) {
+          console.error('Failed to add reaction:', response.error);
+        }
       });
     } else {
       socket.emit('remove reaction', {
         argumentId: argument.id,
         type
+      }, (response: any) => {
+        if (!response.success) {
+          console.error('Failed to remove reaction:', response.error);
+        }
       });
     }
   };
