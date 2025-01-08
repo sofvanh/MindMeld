@@ -65,8 +65,8 @@ io.on('connection', (socket) => {
   socket.on('add argument', wrapHandler(handleAddArgument));
   socket.on('add reaction', wrapHandler(handleAddReaction));
   socket.on('remove reaction', wrapHandler(handleRemoveReaction));
-  // TODO Finish transition
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
+  // TODO Maybe we need to look at re-authenticating on reconnect
   socket.on('reconnect', () => console.log(`User reconnected: ${socket.id}`));
 });
 
