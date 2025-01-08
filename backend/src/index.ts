@@ -4,11 +4,12 @@ import { Server } from 'socket.io';
 import config from './config';
 import { handleAuthenticate } from './websocket/auth/authenticate';
 import { handleLogout } from './websocket/auth/logout';
-import { handleCreateGraph, handleJoinGraph, handleLeaveGraph } from './websocket/graphHandler';
+import { handleJoinGraph, handleLeaveGraph } from './websocket/graphHandler';
 import { handleAddArgument } from './websocket/argumentHandler';
 import { handleAddReaction, handleRemoveReaction } from './websocket/reactionHandler';
 import { SocketHandler, SocketResponse } from './backendTypes';
 import { handleGetGraphs } from './websocket/graph/getGraphs';
+import { handleCreateGraph } from './websocket/graph/createGraph';
 
 const app = express();
 const server = http.createServer(app);
@@ -56,8 +57,8 @@ io.on('connection', (socket) => {
   socket.on('authenticate', wrapHandler(handleAuthenticate));
   socket.on('logout', wrapHandler(handleLogout));
   socket.on('get graphs', wrapHandler(handleGetGraphs));
+  socket.on('create graph', wrapHandler(handleCreateGraph));
   // TODO Finish transition
-  socket.on('create graph', (name, callback) => handleCreateGraph(socket, name, callback));
   socket.on('join graph', (graphId: string) => handleJoinGraph(socket, graphId));
   socket.on('leave graph', (graphId: string) => handleLeaveGraph(socket, graphId));
   socket.on('add argument', (args, callback) => handleAddArgument(socket, io, args, callback));

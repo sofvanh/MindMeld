@@ -18,21 +18,16 @@ const HomeView: React.FC = () => {
   const handleCreateGraph = (e: React.FormEvent) => {
     e.preventDefault();
     if (graphName.trim() && socket) {
-      console.log('Sending create graph event');
-      socket.emit('create graph', graphName);
-      setGraphName('');
+      socket.emit('create graph', { name: graphName }, (response: any) => {
+        if (response.success) {
+          navigate(`/graph/${response.data.id}`);
+        } else {
+          console.error('Failed to create graph:', response.error);
+          setError(response.error);
+        }
+      });
     }
   };
-
-  React.useEffect(() => {
-    socket?.on('graph created', ({ id }) => navigate(`/graph/${id}`));
-    socket?.on('graph creation error', ({ message }) => setError(message));
-
-    return () => {
-      socket?.off('graph created');
-      socket?.off('graph creation error');
-    };
-  }, [socket, navigate]);
 
   return (
     <div className="text-center px-4">
