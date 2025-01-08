@@ -17,15 +17,14 @@ const GraphListView: React.FC = () => {
   usePageTitle('All graphs');
 
   useEffect(() => {
-    socket?.emit('get graphs');
-
-    socket?.on('graphs list', (graphsList: Graph[]) => {
-      setGraphs(graphsList);
+    socket?.emit('get graphs', {}, (response: any) => {
+      if (response.success) {
+        setGraphs(response.data.graphs);
+      } else {
+        console.error('Failed to get graphs:', response.error);
+        // TODO Don't show loading indicator if this fails
+      }
     });
-
-    return () => {
-      socket?.off('graphs list');
-    };
   }, [socket]);
 
   return (
