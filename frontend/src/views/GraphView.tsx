@@ -44,7 +44,12 @@ const GraphView: React.FC = () => {
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
-      socket.emit('add argument', { graphId, statement });
+      socket.emit('add argument', { graphId, statement }, (response: any) => {
+        // TODO Show loading indicator / feedback that argument is being added
+        if (!response.success) {
+          console.error('Failed to add argument:', response.error);
+        }
+      });
     }
   };
 
