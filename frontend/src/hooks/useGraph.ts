@@ -59,7 +59,11 @@ export function useGraph(graphId: string) {
       });
     });
     return () => {
-      socket?.emit('leave graph', graphId);
+      socket?.emit('leave graph', { graphId }, (response: any) => {
+        if (!response.success) {
+          console.error('Failed to leave graph:', response.error);
+        }
+      });
       socket?.off('graph update');
       socket?.off('argument added');
       socket?.off('user reaction update');
