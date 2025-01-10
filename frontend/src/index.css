@@ -8,7 +8,7 @@
     }
 
     h1 {
-        @apply font-bricolage mb-4 text-4xl font-semibold text-stone-700;
+        @apply font-bricolage mb-4 text-4xl font-bold text-stone-700;
     }
 
     h2 {
@@ -28,7 +28,7 @@
     }
 
     p {
-        @apply text-stone-700;
+        @apply text-stone-700 my-4;
     }
 
     .card {

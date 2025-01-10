@@ -17,7 +17,7 @@ export const FeaturedGraphsList = () => {
   }, [socket]);
 
   return (
-    <div className="flex flex-col mx-auto mt-4">
+    <div className="flex flex-col mx-auto my-4">
       <h2>Featured graphs</h2>
       <GraphsList graphs={graphs} />
     </div>

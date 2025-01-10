@@ -32,9 +32,20 @@ const HomeView: React.FC = () => {
 
   return (
     <div className="px-4 max-w-screen-md mx-auto">
-      <h1 className="my-16">Welcome to MindMeld</h1>
+      <div className="my-16">
+        <h1>Welcome to MindMeld</h1>
+        <p className="text-lg text-stone-500 mb-8 font-semibold">
+          Group deliberation, empowered.
+        </p>
+        <p>
+          MindMeld is an experimental platform for group deliberation. Our aim is to use large language models to help groups understand each other better and surface insights and solutions that wouldn't have been found otherwise.
+        </p>
+        <p>
+          MindMeld is being built by <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">a small research team</a> with a strong background in generative AI, group dynamics, software engineering, and AI safety.
+        </p>
+      </div>
       <FeaturedGraphsList />
-      {user && (
+      {user ? (
         <>
           <div className="my-8">
             <MyGraphsList />
@@ -62,8 +73,9 @@ const HomeView: React.FC = () => {
             </form>
           </div>
         </>
-      )
-      }
+      ) : (
+        <p>Sign in to create your own graphs, contribute to existing graphs, and more!</p>
+      )}
     </div >
   );
 };
