@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useWebSocket } from '../contexts/WebSocketContext';
-import { Graph } from '../shared/types';
+import { GraphData } from '../shared/types';
 import { GraphsList } from './GraphsList';
 
 
 export const MyGraphsList = () => {
   const { socket } = useWebSocket();
-  const [graphs, setGraphs] = useState<Graph[]>([]);
+  const [graphs, setGraphs] = useState<GraphData[]>([]);
 
   useEffect(() => {
     socket?.emit('get my graphs', {}, (response: any) => {

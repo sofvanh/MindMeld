@@ -1,7 +1,7 @@
 import { SocketHandler } from "../../backendTypes";
 import { generateTopKSimilarEdges } from "../../embeddingHandler";
 import { addArgument } from "../../db/operations/argumentOperations";
-import { getGraphDataWithUserReactions } from "../../db/operations/graphOperations";
+import { getFullGraphWithUserReactions } from "../../db/operations/graphOperations";
 import { embedText } from "../../embeddingHandler";
 import { sendNewArgumentUpdate } from "../updateHandler";
 import { updateGraphEdges } from "../../db/operations/edgeOperations";
@@ -16,7 +16,7 @@ export const handleAddArgument: SocketHandler<AddArgumentData, {}> = async (sock
     return { success: false, error: 'Authentication required' };
   }
 
-  const graph = await getGraphDataWithUserReactions(graphId, socket.data.user.id);
+  const graph = await getFullGraphWithUserReactions(graphId, socket.data.user.id);
   if (!graph) {
     return { success: false, error: 'Graph not found' };
   }

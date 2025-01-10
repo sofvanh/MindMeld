@@ -1,8 +1,9 @@
-import { Graph } from '../shared/types';
+import { GraphData } from '../shared/types';
 import { GraphInfoBox } from './GraphInfoBox';
 import LoadingSpinner from './LoadingSpinner';
+
 interface GraphsListProps {
-  graphs: Graph[];
+  graphs: GraphData[];
 }
 
 export const GraphsList = ({ graphs }: GraphsListProps) => {

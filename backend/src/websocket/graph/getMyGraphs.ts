@@ -1,9 +1,9 @@
 import { SocketHandler } from "../../backendTypes";
 import { getUserGraphs } from "../../db/operations/graphOperations";
-import { Graph } from "../../.shared/types";
+import { GraphData } from "../../.shared/types";
 
 interface GetMyGraphsResponse {
-  graphs: Graph[]
+  graphs: GraphData[]
 }
 
 export const handleGetMyGraphs: SocketHandler<{}, GetMyGraphsResponse> = async (socket, io, { }) => {
