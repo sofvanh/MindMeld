@@ -4,12 +4,12 @@ import { Graph } from '../shared/types';
 import { GraphsList } from './GraphsList';
 
 
-export const FeaturedGraphsList = () => {
+export const MyGraphsList = () => {
   const { socket } = useWebSocket();
   const [graphs, setGraphs] = useState<Graph[]>([]);
 
   useEffect(() => {
-    socket?.emit('get featured graphs', {}, (response: any) => {
+    socket?.emit('get my graphs', {}, (response: any) => {
       if (response.success) {
         setGraphs(response.data.graphs);
       }
@@ -18,7 +18,7 @@ export const FeaturedGraphsList = () => {
 
   return (
     <div className="flex flex-col mx-auto mt-4">
-      <h2>Featured graphs</h2>
+      <h2>My graphs</h2>
       <GraphsList graphs={graphs} />
     </div>
   );

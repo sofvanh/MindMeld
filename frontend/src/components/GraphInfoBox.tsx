@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { Graph } from '../shared/types';
-import { buttonStyles } from '../styles/defaultStyles';
 
 export const GraphInfoBox = ({ id, name, arguments: args = [] }: Graph) => {
   return (

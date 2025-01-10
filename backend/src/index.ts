@@ -6,12 +6,14 @@ import { handleAuthenticate } from './websocket/auth/authenticate';
 import { handleLogout } from './websocket/auth/logout';
 import { SocketHandler, SocketResponse } from './backendTypes';
 import { handleGetGraphs } from './websocket/graph/getGraphs';
+import { handleGetFeaturedGraphs } from './websocket/graph/getFeaturedGraphs';
 import { handleCreateGraph } from './websocket/graph/createGraph';
 import { handleJoinGraph } from './websocket/graph/joinGraph';
 import { handleLeaveGraph } from './websocket/graph/leaveGraph';
 import { handleAddArgument } from './websocket/argument/addArgument';
 import { handleAddReaction } from './websocket/reaction/addReaction';
 import { handleRemoveReaction } from './websocket/reaction/removeReaction';
+import { handleGetMyGraphs } from './websocket/graph/getMyGraphs';
 
 const app = express();
 const server = http.createServer(app);
@@ -59,6 +61,8 @@ io.on('connection', (socket) => {
   socket.on('authenticate', wrapHandler(handleAuthenticate));
   socket.on('logout', wrapHandler(handleLogout));
   socket.on('get graphs', wrapHandler(handleGetGraphs));
+  socket.on('get featured graphs', wrapHandler(handleGetFeaturedGraphs));
+  socket.on('get my graphs', wrapHandler(handleGetMyGraphs));
   socket.on('create graph', wrapHandler(handleCreateGraph));
   socket.on('join graph', wrapHandler(handleJoinGraph));
   socket.on('leave graph', wrapHandler(handleLeaveGraph));

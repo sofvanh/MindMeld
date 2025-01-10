@@ -18,6 +18,45 @@ export async function getGraphs(): Promise<{ id: string; name: string }[]> {
   return result.rows;
 }
 
+export async function getFeaturedGraphs(): Promise<Graph[]> {
+  const FEATURED_GRAPH_IDS = [
+    "gra_m47bz12vUA7fMZ",
+    "gra_m4a9lakjDPG7vU",
+    "gra_m4abp2spuJ9yW5"
+  ]
+  const graphs = await Promise.all(FEATURED_GRAPH_IDS.map(id => getGraphData(id)));
+  return graphs;
+}
+
+
+// TODO This is incredibly slow!
+export async function getUserGraphs(userId: string): Promise<Graph[]> {
+  const graphIdsResult = await query(
+    `SELECT DISTINCT g.id
+     FROM graphs g
+     LEFT JOIN arguments a ON g.id = a.graph_id 
+     LEFT JOIN reactions r ON g.id = (
+       SELECT graph_id 
+       FROM arguments 
+       WHERE id = r.argument_id
+     )
+     WHERE g.author_id = $1 
+        OR a.author_id = $1
+        OR r.user_id = $1`,
+    [userId]
+  );
+
+  const graphs: Graph[] = [];
+  for (const row of graphIdsResult.rows) {
+    const graphData = await getGraphData(row.id);
+    graphs.push(graphData);
+  }
+
+  return graphs;
+}
+
+
+
 export async function getGraphData(graphId: string): Promise<Graph> {
   const graphResult = await query('SELECT * FROM graphs WHERE id = $1', [graphId]);
   if (graphResult.rows.length === 0) {

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { buttonStyles } from '../styles/defaultStyles';
 import { useAuth } from '../contexts/AuthContext';
-import SignInOutButton from '../components/SignInOutButton';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { FeaturedGraphsList } from '../components/FeaturedGraphsList';
+import { MyGraphsList } from '../components/MyGraphsList';
 
 
 const HomeView: React.FC = () => {
@@ -37,8 +37,7 @@ const HomeView: React.FC = () => {
       {user && (
         <>
           <div className="my-8">
-            <h2>My graphs</h2>
-            <p>No graphs yet.</p>
+            <MyGraphsList />
           </div>
           <div>
             <h3>Create new graph</h3>
