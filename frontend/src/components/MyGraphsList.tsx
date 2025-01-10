@@ -16,6 +16,7 @@ export const MyGraphsList = () => {
     });
   }, [socket]);
 
+  // TODO This should be paginated!
   return (
     <div className="flex flex-col mx-auto mt-4">
       <h2>My graphs</h2>
