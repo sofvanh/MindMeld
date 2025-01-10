@@ -1,8 +1,9 @@
 import { query } from '../db';
 import { generateGraphId } from '../idGenerator';
-import { Argument, Edge, Graph } from '../../.shared/types';
+import { Argument, Edge, Graph, GraphData } from '../../.shared/types';
 import { getArgumentScores } from '../../analysis/argumentScoreHandler';
 import { getReactionCounts } from './reactionOperations';
+import { getTimestamp } from '../getTimestamp';
 
 export async function createGraph(name: string, authorId: string): Promise<string> {
   const id = generateGraphId();
@@ -18,7 +19,67 @@ export async function getGraphs(): Promise<{ id: string; name: string }[]> {
   return result.rows;
 }
 
-export async function getGraphData(graphId: string): Promise<Graph> {
+export async function getFeaturedGraphs(): Promise<GraphData[]> {
+  const FEATURED_GRAPH_IDS = [
+    "gra_m47bz12vUA7fMZ",
+    "gra_m4a9lakjDPG7vU",
+    "gra_m4abp2spuJ9yW5"
+  ]
+  const graphs = await Promise.all(FEATURED_GRAPH_IDS.map(id => getGraphData(id)));
+  return graphs;
+}
+
+export async function getUserGraphs(userId: string): Promise<GraphData[]> {
+  const graphIdsResult = await query(
+    `SELECT DISTINCT g.id
+     FROM graphs g
+     LEFT JOIN arguments a ON g.id = a.graph_id 
+     LEFT JOIN reactions r ON g.id = (
+       SELECT graph_id 
+       FROM arguments 
+       WHERE id = r.argument_id
+     )
+     WHERE g.author_id = $1 
+        OR a.author_id = $1
+        OR r.user_id = $1`,
+    [userId]
+  );
+
+  const graphs: GraphData[] = [];
+  for (const row of graphIdsResult.rows) {
+    const graphData = await getGraphData(row.id);
+    graphs.push(graphData);
+  }
+
+  return graphs;
+}
+
+export async function getGraphData(graphId: string): Promise<GraphData> {
+  const graphResult = await query('SELECT * FROM graphs WHERE id = $1', [graphId]);
+  if (graphResult.rows.length === 0) {
+    throw new Error('Graph not found');
+  }
+
+  const statsResult = await query(
+    `SELECT 
+      COUNT(*) as argument_count,
+      MAX(id) as latest_argument_id
+     FROM arguments 
+     WHERE graph_id = $1`,
+    [graphId]
+  );
+
+  const lastActivity = statsResult.rows[0].latest_argument_id ? getTimestamp(statsResult.rows[0].latest_argument_id) : undefined;
+
+  return {
+    id: graphResult.rows[0].id,
+    name: graphResult.rows[0].name,
+    argumentCount: parseInt(statsResult.rows[0].argument_count),
+    lastActivity: lastActivity
+  };
+}
+
+export async function getFullGraph(graphId: string): Promise<Graph> {
   const graphResult = await query('SELECT * FROM graphs WHERE id = $1', [graphId]);
   if (graphResult.rows.length === 0) {
     throw new Error('Graph not found');
@@ -55,8 +116,8 @@ export async function getGraphData(graphId: string): Promise<Graph> {
   } as Graph;
 }
 
-export async function getGraphDataWithUserReactions(graphId: string, userId: string): Promise<Graph> {
-  const graphData = await getGraphData(graphId);
+export async function getFullGraphWithUserReactions(graphId: string, userId: string): Promise<Graph> {
+  const graph = await getFullGraph(graphId);
   let userReactionsMap = new Map();
   const userReactionsResult = await query(
     `SELECT argument_id, type
@@ -71,15 +132,15 @@ export async function getGraphDataWithUserReactions(graphId: string, userId: str
     userReactionsMap.get(row.argument_id)[row.type] = true;
   });
 
-  const argsWithUserReactions = graphData.arguments.map(arg => ({
+  const argsWithUserReactions = graph.arguments.map(arg => ({
     ...arg,
     userReaction: userReactionsMap.get(arg.id) || {} // TODO I also want typing of the user reaction
   }));
 
   return {
     id: graphId,
-    name: graphData.name,
+    name: graph.name,
     arguments: argsWithUserReactions,
-    edges: graphData.edges
+    edges: graph.edges
   } as Graph;
 }

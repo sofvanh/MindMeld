@@ -5,7 +5,7 @@ const amberButtonColors = "text-amber-500 hover:text-amber-600 hover:bg-amber-50
 const baseIconButtonClasses = `p-0 w-6 h-6 flex items-center justify-center`;
 
 export const buttonStyles = {
-  primary: `bg-sky-500 hover:bg-sky-600 text-white py-2 px-4`,
+  primary: `bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4`,
   secondary: `${secondaryButtonColors} py-2 px-4`,
   green: `${greenButtonColors} py-2 px-4`,
   red: `${redButtonColors} py-2 px-4`,

@@ -62,6 +62,13 @@ export interface Edge {
   targetId: string;
 }
 
+export interface GraphData {
+  id: string;
+  name: string;
+  argumentCount: number;
+  lastActivity: number;
+}
+
 export interface Graph {
   id: string;
   name: string;
