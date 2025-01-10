@@ -17,8 +17,9 @@ const Header: React.FC = () => {
   }, [user]);
 
   return (
-    <header className="bg-white border-b border-stone-200 px-2 sm:px-6 h-16">
-      <div className="max-w-7xl mx-auto h-full flex justify-between items-center">
+    // We need to overflow-x-hidden because the Google Login button, for some reason, makes the header overflow slightly on smaller screens
+    <header className="bg-white border-b border-stone-200 px-2 sm:px-6 h-16 overflow-x-hidden">
+      <div className="w-full h-full flex justify-between items-center">
         <div className="flex items-center gap-2 sm:gap-4">
           <Link to="/" className="flex items-center gap-2 sm:gap-4">
             <h3 className="text-xl sm:text-2xl font-bold text-stone-900 hover:text-stone-700 m-0" style={{ fontFamily: 'Bricolage Grotesque' }}>
