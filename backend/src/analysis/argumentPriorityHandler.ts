@@ -1,5 +1,5 @@
 import { Score } from "../.shared/types";
-import { analyzeVotes } from "./reactionAnalyzer";
+import { analyzeReactions } from "./reactionAnalyzer";
 import { getArgumentScores } from "./argumentScoreHandler";
 import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
 import { getArgumentIdsByGraphId } from "../db/operations/argumentOperations";
@@ -14,7 +14,7 @@ async function getUniquenessScores(userId: string, graphId: string): Promise<Map
         userIndexMap,
         argumentIndexMap,
         uniquenessMatrix
-    } = await analyzeVotes(graphId);
+    } = await analyzeReactions(graphId);
 
     const userIndex = userIndexMap.get(userId);
     if (!userIndex) {

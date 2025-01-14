@@ -1,5 +1,5 @@
 import { Score } from "../.shared/types";
-import { analyzeVotes } from "./reactionAnalyzer";
+import { analyzeReactions } from "./reactionAnalyzer";
 
 function getConsensusScore(argumentIndex: number,
   votingMatrix: number[][],
@@ -131,7 +131,7 @@ export async function getArgumentScores(graphId: string): Promise<Map<string, Sc
     sum_pos_neg,
     sum_neg_pos,
     sum_neg_neg,
-  } = await analyzeVotes(graphId);
+  } = await analyzeReactions(graphId);
 
   // Calculate the argument scores for each argument
   const argumentScores: Map<string, Score> = new Map();

@@ -1,7 +1,7 @@
 import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
 import { cosineSimilarityMatrix, computeAllSums } from "../utils/math";
 
-export interface VoteAnalysis {
+export interface ReactionAnalysis {
     userIndexMap: Map<string, number>;
     argumentIndexMap: Map<string, number>;
     votingMatrix: number[][];
@@ -26,7 +26,7 @@ function filterReactions(reactions: ReactionForGraph[]): ReactionForGraph[] {
     );
 }
 
-export async function analyzeVotes(graphId: string): Promise<VoteAnalysis> {
+export async function analyzeReactions(graphId: string): Promise<ReactionAnalysis> {
     const reactionArray: ReactionForGraph[] = await getReactionsForGraph(graphId);
     const filteredReactions = filterReactions(reactionArray);
 
