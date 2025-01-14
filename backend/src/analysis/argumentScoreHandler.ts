@@ -143,8 +143,8 @@ export async function getArgumentScores(graphId: string): Promise<Map<string, Sc
 
 
     argumentScores.set(argumentId, {
-      consensus: consensus || undefined,
-      fragmentation: fragmentation || undefined,
+      consensus: consensus === null ? undefined : consensus,
+      fragmentation: fragmentation === null ? undefined : fragmentation,
       clarity
     });
   });
