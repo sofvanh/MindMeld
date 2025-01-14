@@ -64,6 +64,63 @@ export async function getReactionsForGraph(
   }));
 }
 
+export interface ReactionForAnalysis {
+  reactions: {
+    userId: string;
+    argumentId: string;
+    voteValue: number;
+    unclearValue: number;
+  }[];
+}
+
+export async function getReactionsForAnalysis(
+  graphId: string
+): Promise<ReactionForAnalysis> {
+  const result = await query(
+    `WITH filtered_users AS (
+      SELECT user_id
+      FROM reactions r
+      JOIN arguments a ON r.argument_id = a.id
+      WHERE a.graph_id = $1
+        AND r.type IN ('agree', 'disagree')
+      GROUP BY user_id
+      HAVING COUNT(*) >= 3
+    ),
+    reaction_matrices AS (
+      SELECT 
+        r.user_id,
+        r.argument_id,
+        CASE 
+          WHEN r.type = 'agree' THEN 1
+          WHEN r.type = 'disagree' THEN -1
+          ELSE 0
+        END as vote_value,
+        CASE WHEN r.type = 'unclear' THEN 1 ELSE 0 END as unclear_value
+      FROM reactions r
+      JOIN arguments a ON r.argument_id = a.id
+      JOIN filtered_users fu ON r.user_id = fu.user_id
+      WHERE a.graph_id = $1
+    )
+    SELECT 
+      user_id,
+      argument_id,
+      vote_value,
+      unclear_value
+    FROM reaction_matrices
+    ORDER BY user_id, argument_id`,
+    [graphId]
+  );
+
+  return {
+    reactions: result.rows.map(row => ({
+      userId: row.user_id,
+      argumentId: row.argument_id,
+      voteValue: row.vote_value,
+      unclearValue: row.unclear_value
+    }))
+  };
+}
+
 export async function getReactionCounts(
   graphId: string
 ): Promise<Map<string, ReactionCounts>> {
