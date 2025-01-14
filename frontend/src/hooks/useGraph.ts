@@ -16,21 +16,25 @@ export function useGraph(graphId: string) {
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
 
   useEffect(() => {
-    socket?.emit('join graph', { graphId }, (response: any) => {
+    if (!socket) return;
+    const startTime = performance.now();
+    socket.emit('join graph', { graphId }, (response: any) => {
       if (response.success) {
         setGraph(response.data.graph);
       } else {
         console.error('Failed to join graph:', response.error);
       }
+      const duration = ((performance.now() - startTime) / 1000).toFixed(3);
+      console.log(`Graph loaded in ${duration}s`);
     });
-    socket?.on('graph update', setGraph);
-    socket?.on('argument added', ({ argument, newEdges }) => {
+    socket.on('graph update', setGraph);
+    socket.on('argument added', ({ argument, newEdges }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
         return { ...prevGraph, arguments: [...prevGraph.arguments, argument], edges: newEdges };
       });
     });
-    socket?.on('user reaction update', ({ argumentId, userReaction }: { argumentId: string, userReaction: UserReaction }) => {
+    socket.on('user reaction update', ({ argumentId, userReaction }: { argumentId: string, userReaction: UserReaction }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
         const updatedArguments = prevGraph.arguments.map(arg =>
@@ -39,7 +43,7 @@ export function useGraph(graphId: string) {
         return { ...prevGraph, arguments: updatedArguments };
       });
     });
-    socket?.on('argument reactions update', ({ argumentId, reactionCounts }: { argumentId: string, reactionCounts: ReactionCounts }) => {
+    socket.on('argument reactions update', ({ argumentId, reactionCounts }: { argumentId: string, reactionCounts: ReactionCounts }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
         const updatedArguments = prevGraph.arguments.map(arg =>
@@ -48,7 +52,7 @@ export function useGraph(graphId: string) {
         return { ...prevGraph, arguments: updatedArguments };
       });
     });
-    socket?.on('graph scores update', (newScores: { [key: string]: Score }) => {
+    socket.on('graph scores update', (newScores: { [key: string]: Score }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
         const updatedArguments = prevGraph.arguments.map(arg => ({
