@@ -1,5 +1,5 @@
 import { Score } from "../.shared/types";
-import { analyzeVotes } from "./voteAnalyzer";
+import { analyzeVotes } from "./reactionAnalyzer";
 import { getArgumentScores } from "./argumentScoreHandler";
 import { ReactionForGraph, getReactionsForGraph } from "../db/operations/reactionOperations";
 import { getArgumentIdsByGraphId } from "../db/operations/argumentOperations";
