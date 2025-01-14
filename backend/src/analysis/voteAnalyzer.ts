@@ -15,33 +15,15 @@ export interface VoteAnalysis {
 
 function filterReactions(reactions: ReactionForGraph[]): ReactionForGraph[] {
     const MINIMUM_VOTES_USER = 3;
-    const MINIMUM_VOTES_ARGUMENT = 2;
-  
-    let filteredReactions = reactions
-    let hasChanges = true;
-  
-    while (hasChanges) {
-        const userCounts = new Map<string, number>();
-        const argumentCounts = new Map<string, number>();
-        
-        for (const reaction of filteredReactions) {
-            if (reaction.type === 'agree' || reaction.type === 'disagree') {
-            userCounts.set(reaction.userId, (userCounts.get(reaction.userId) || 0) + 1);
-            argumentCounts.set(reaction.argumentId, (argumentCounts.get(reaction.argumentId) || 0) + 1);
-            }
+    const userCounts = reactions.reduce((counts, reaction) => {
+        if (reaction.type === 'agree' || reaction.type === 'disagree') {
+            counts[reaction.userId] = (counts[reaction.userId] || 0) + 1;
         }
-        
-        const newFilteredReactions: ReactionForGraph[] = filteredReactions.filter(reaction => {
-            const userCount = userCounts.get(reaction.userId) || 0;
-            const argumentCount = argumentCounts.get(reaction.argumentId) || 0;
-        
-            return userCount >= MINIMUM_VOTES_USER && argumentCount >= MINIMUM_VOTES_ARGUMENT;
-        });
-
-        hasChanges = newFilteredReactions.length !== filteredReactions.length;
-        filteredReactions = newFilteredReactions;
-    }
-    return filteredReactions;
+        return counts;
+    }, {} as Record<string, number>);
+    return reactions.filter(reaction =>
+        (userCounts[reaction.userId] || 0) >= MINIMUM_VOTES_USER
+    );
 }
 
 export async function analyzeVotes(graphId: string): Promise<VoteAnalysis> {
@@ -94,7 +76,7 @@ export async function analyzeVotes(graphId: string): Promise<VoteAnalysis> {
     const userSimilarityMatrix: number[][] = cosineSimilarityMatrix(votingMatrix);
 
     // Calculate the sum matrices
-    const { sum_pos_pos, sum_pos_neg, sum_neg_pos, sum_neg_neg} = computeAllSums(userSimilarityMatrix, votingMatrix);
+    const { sum_pos_pos, sum_pos_neg, sum_neg_pos, sum_neg_neg } = computeAllSums(userSimilarityMatrix, votingMatrix);
 
     // Calculate the uniqueness matrix
     const uniquenessMatrix = votingMatrix.map((row, i) => row.map((value, j) => {
