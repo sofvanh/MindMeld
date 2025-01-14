@@ -51,7 +51,7 @@ docker run -p 3001:3001 -v $(pwd):/app mindmeld-backend-dev
 
 View Cloud Run logs:
 ```bash
-gcloud run services logs read mindmeld
+gcloud run services logs read mindmeld --project=mindmeld-backend
 ```
 
 List container images:
