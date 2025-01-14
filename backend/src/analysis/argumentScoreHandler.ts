@@ -1,5 +1,5 @@
 import { Score } from "../.shared/types";
-import { analyzeVotes } from "./reactionAnalyzer";
+import { analyzeVotes } from "./voteAnalyzer";
 
 function getConsensusScore(argumentIndex: number,
   votingMatrix: number[][],
