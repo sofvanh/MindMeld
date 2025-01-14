@@ -44,5 +44,7 @@ export function getColor(arg: Argument): string {
   const interestingnessRatio = adjustedInterestingnessScore / 250;
   const finalColor = blendColors(IMPORTANCE_COLOR, combinedColor, interestingnessRatio);
 
-  return `rgba(${finalColor.r}, ${finalColor.g}, ${finalColor.b}, ${clarity})`;
+  const alpha = clarity * 0.85 + 0.15;
+
+  return `rgba(${finalColor.r}, ${finalColor.g}, ${finalColor.b}, ${alpha})`;
 }
