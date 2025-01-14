@@ -117,30 +117,65 @@ export async function getFullGraph(graphId: string): Promise<Graph> {
 }
 
 export async function getFullGraphWithUserReactions(graphId: string, userId: string): Promise<Graph> {
-  const graph = await getFullGraph(graphId);
-  let userReactionsMap = new Map();
-  const userReactionsResult = await query(
-    `SELECT argument_id, type
+  const [
+    { rows: [{ name }] },
+    argumentsResult,
+    edgesResult,
+    userReactionsResult,
+    reactionCounts,
+    argumentScores
+  ] = await Promise.all([
+    query('SELECT name FROM graphs WHERE id = $1', [graphId]),
+    query('SELECT * FROM arguments WHERE graph_id = $1', [graphId]),
+    query('SELECT * FROM edges WHERE graph_id = $1', [graphId]),
+    query(
+      `SELECT argument_id, type
        FROM reactions 
        WHERE user_id = $1 AND argument_id IN (SELECT id FROM arguments WHERE graph_id = $2)`,
-    [userId, graphId]
-  );
-  userReactionsResult.rows.forEach((row: any) => {
-    if (!userReactionsMap.has(row.argument_id)) {
-      userReactionsMap.set(row.argument_id, {});
-    }
-    userReactionsMap.get(row.argument_id)[row.type] = true;
-  });
+      [userId, graphId]
+    ),
+    getReactionCounts(graphId),
+    getArgumentScores(graphId)
+  ]);
 
-  const argsWithUserReactions = graph.arguments.map(arg => ({
-    ...arg,
-    userReaction: userReactionsMap.get(arg.id) || {} // TODO I also want typing of the user reaction
+  if (!name) {
+    throw new Error('Graph not found');
+  }
+
+  const userReactionsMap = new Map(
+    userReactionsResult.rows.reduce((acc: [string, Record<string, boolean>][], row: { argument_id: string, type: string }) => {
+      const existing = acc.find(([id]) => id === row.argument_id);
+      if (existing) {
+        existing[1][row.type] = true;
+      } else {
+        acc.push([row.argument_id, { [row.type]: true }]);
+      }
+      return acc;
+    }, [])
+  );
+
+  const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
+    id: row.id,
+    graphId: row.graph_id,
+    statement: row.statement,
+    embedding: row.embedding,
+    authorId: row.author_id,
+    reactionCounts: reactionCounts.get(row.id) || { agree: 0, disagree: 0, unclear: 0 },
+    score: argumentScores.get(row.id),
+    userReaction: userReactionsMap.get(row.id) || {}
+  }));
+
+  const edges: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({
+    id: row.id,
+    graphId: row.graph_id,
+    sourceId: row.source_id,
+    targetId: row.target_id
   }));
 
   return {
     id: graphId,
-    name: graph.name,
-    arguments: argsWithUserReactions,
-    edges: graph.edges
+    name,
+    arguments: args,
+    edges
   } as Graph;
 }
