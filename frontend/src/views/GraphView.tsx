@@ -63,7 +63,7 @@ const GraphView: React.FC = () => {
     <div className="w-full h-[calc(100vh-8rem)] relative">
       <div className="absolute top-4 left-4 z-10 bg-white/80 sm:px-2 sm:py-1 rounded-lg shadow-sm flex flex-col">
         <div className="flex items-center">
-          <Link to="/graphs" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
+          <Link to="/" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
             ←
           </Link>
           <p className="text-base m-0">
