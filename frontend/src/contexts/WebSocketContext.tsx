@@ -22,7 +22,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     socket.io.on('reconnect', () => {
       const storedToken = localStorage.getItem('mindmeld_auth_token');
       if (storedToken) {
-        socket.emit('authenticate', storedToken, (response: any) => {
+        socket.emit('authenticate', { token: storedToken }, (response: any) => {
           if (!response.success) {
             console.error('Re-authentication failed after reconnect');
             localStorage.removeItem('mindmeld_auth_token');
