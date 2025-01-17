@@ -41,7 +41,7 @@ const HomeView: React.FC = () => {
           MindMeld is an experimental platform for group deliberation. Our aim is to use large language models to help groups understand each other better and surface insights and solutions that wouldn't have been found otherwise.
         </p>
         <p>
-          MindMeld is being built by <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">a small research team</a> with a strong background in generative AI, group dynamics, software engineering, and AI safety.
+          MindMeld is being built by <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">a small research team</a> working on applying AI to group reasoning problems.
         </p>
       </div>
       <FeaturedGraphsList />
