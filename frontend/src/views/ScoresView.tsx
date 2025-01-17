@@ -111,12 +111,6 @@ export default function ScoresView() {
           These arguments tend to reveal interesting differences in how users think about the topic.
         </p>
       </div>
-
-      <div className="mt-12">
-        <Link to="/graphs" className="text-sky-500 hover:text-sky-700">
-          ← Back to graphs
-        </Link>
-      </div>
     </div>
   );
 }
