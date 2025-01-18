@@ -18,6 +18,7 @@ const GraphView: React.FC = () => {
   const { graphId } = useParams<{ graphId: string }>();
   const { graph, layoutData, loading } = useGraph(graphId!);
   const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
+  const [argumentsInQueue, setArgumentsInQueue] = useState<number>(0);
 
   const {
     selectedNodeId,
@@ -38,16 +39,21 @@ const GraphView: React.FC = () => {
   }, [selectedNodeId, graph]);
 
   useEffect(() => {
+    setArgumentsInQueue(0)
+  }, [graph])
+
+  useEffect(() => {
     document.title = graph?.name ? `${graph.name} - MindMeld` : 'Loading... - MindMeld';
     return () => { document.title = 'MindMeld'; };
   }, [graph?.name]);
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
+      setArgumentsInQueue(argumentsInQueue + 1)
       socket.emit('add argument', { graphId, statement }, (response: any) => {
-        // TODO Show loading indicator / feedback that argument is being added
         if (!response.success) {
           console.error('Failed to add argument:', response.error);
+          setArgumentsInQueue(argumentsInQueue - 1)
         }
       });
     }
@@ -79,7 +85,7 @@ const GraphView: React.FC = () => {
         selectedNodeId={selectedNodeId}
         onNodeClick={handleNodeClick}
       />
-      <div className="absolute bottom-0 sm:bottom-4 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[600px] flex flex-col gap-4">
+      <div className="absolute bottom-0 sm:bottom-4 bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2">
         {selectedArgument ? (
           <ArgumentInfoBox
             argument={selectedArgument}
@@ -91,7 +97,12 @@ const GraphView: React.FC = () => {
           />
         ) : (
           user ? (
-            <ArgumentForm onSubmit={handleAddArgument} />
+            <>
+              {argumentsInQueue > 0 &&
+                <p className="m-1 text-xs text-stone-400">Adding arguments ({argumentsInQueue} queued)...</p>
+              }
+              <ArgumentForm onSubmit={handleAddArgument} />
+            </>
           ) : (
             <div className="bg-white p-4 rounded-lg shadow-lg">
               <p className="text-sm text-stone-400">Sign in to add arguments</p>
