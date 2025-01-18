@@ -1,22 +1,30 @@
-import { query } from '../db';
 import { generateGraphId } from '../idGenerator';
 import { Argument, Edge, Graph, GraphData } from '../../.shared/types';
 import { getArgumentScores } from '../../analysis/argumentScoreHandler';
 import { getReactionCounts } from './reactionOperations';
 import { getTimestamp } from '../getTimestamp';
+import { DbArgument, DbEdge, DbGraph, DbReaction } from '../dbTypes';
+import { query, queryMany, queryOne } from '../db';
 
 export async function createGraph(name: string, authorId: string): Promise<string> {
   const id = generateGraphId();
-  await query(
+  await queryOne(
     'INSERT INTO graphs (id, name, author_id) VALUES ($1, $2, $3)',
     [id, name, authorId]
   );
   return id;
 }
 
-export async function getGraphs(): Promise<{ id: string; name: string }[]> {
-  const result = await query('SELECT id, name FROM graphs ORDER BY name', []);
-  return result.rows;
+export async function getGraphs(graphIds: string[]): Promise<DbGraph[]> {
+  const placeholders = graphIds.map((_, i) => `$${i + 1}`).join(',');
+  return await queryMany<DbGraph>(
+    `SELECT * FROM graphs WHERE id IN (${placeholders})`,
+    graphIds
+  );
+}
+
+export async function getAllGraphs(): Promise<DbGraph[]> {
+  return await queryMany<DbGraph>('SELECT * FROM graphs ORDER BY name');
 }
 
 export async function getFeaturedGraphs(): Promise<GraphData[]> {
@@ -85,27 +93,26 @@ export async function getFullGraph(graphId: string): Promise<Graph> {
     throw new Error('Graph not found');
   }
 
-  const argumentsResult = await query('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
-  const edgesResult = await query('SELECT * FROM edges WHERE graph_id = $1', [graphId]);
+  const argumentsResult = await queryMany<DbArgument>('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
+  const edgesResult = await queryMany<DbEdge>('SELECT * FROM edges WHERE graph_id = $1', [graphId]);
   const reactionCounts = await getReactionCounts(graphId);
   const argumentScores = await getArgumentScores(graphId);
 
-  // TODO This is terrible, create types for db results already...
-  const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
-    id: row.id,
-    graphId: row.graph_id,
-    statement: row.statement,
-    embedding: row.embedding,
-    authorId: row.author_id,
-    reactionCounts: reactionCounts.get(row.id) || { agree: 0, disagree: 0, unclear: 0 },
-    score: argumentScores.get(row.id)
+  const args: Argument[] = argumentsResult.map(argument => ({
+    id: argument.id,
+    graphId: argument.graph_id,
+    statement: argument.statement,
+    embedding: argument.embedding,
+    authorId: argument.author_id,
+    reactionCounts: reactionCounts.get(argument.id) || { agree: 0, disagree: 0, unclear: 0 },
+    score: argumentScores.get(argument.id)
   }));
 
-  const links: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({
-    id: row.id,
-    graphId: row.graph_id,
-    sourceId: row.source_id,
-    targetId: row.target_id
+  const links: Edge[] = edgesResult.map(edge => ({
+    id: edge.id,
+    graphId: edge.graph_id,
+    sourceId: edge.source_id,
+    targetId: edge.target_id
   }));
 
   return {
@@ -126,10 +133,10 @@ export async function getFullGraphWithUserReactions(graphId: string, userId: str
     argumentScores
   ] = await Promise.all([
     query('SELECT name FROM graphs WHERE id = $1', [graphId]),
-    query('SELECT * FROM arguments WHERE graph_id = $1', [graphId]),
-    query('SELECT * FROM edges WHERE graph_id = $1', [graphId]),
-    query(
-      `SELECT argument_id, type
+    queryMany<DbArgument>('SELECT * FROM arguments WHERE graph_id = $1', [graphId]),
+    queryMany<DbEdge>('SELECT * FROM edges WHERE graph_id = $1', [graphId]),
+    queryMany<DbReaction>(
+      `SELECT *
        FROM reactions 
        WHERE user_id = $1 AND argument_id IN (SELECT id FROM arguments WHERE graph_id = $2)`,
       [userId, graphId]
@@ -143,7 +150,7 @@ export async function getFullGraphWithUserReactions(graphId: string, userId: str
   }
 
   const userReactionsMap = new Map(
-    userReactionsResult.rows.reduce((acc: [string, Record<string, boolean>][], row: { argument_id: string, type: string }) => {
+    userReactionsResult.reduce((acc: [string, Record<string, boolean>][], row: { argument_id: string, type: string }) => {
       const existing = acc.find(([id]) => id === row.argument_id);
       if (existing) {
         existing[1][row.type] = true;
@@ -154,7 +161,7 @@ export async function getFullGraphWithUserReactions(graphId: string, userId: str
     }, [])
   );
 
-  const args: Argument[] = argumentsResult.rows.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
+  const args: Argument[] = argumentsResult.map((row: { id: string; graph_id: string; statement: string; embedding: number[], author_id: string }) => ({
     id: row.id,
     graphId: row.graph_id,
     statement: row.statement,
@@ -165,7 +172,7 @@ export async function getFullGraphWithUserReactions(graphId: string, userId: str
     userReaction: userReactionsMap.get(row.id) || {}
   }));
 
-  const edges: Edge[] = edgesResult.rows.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({
+  const edges: Edge[] = edgesResult.map((row: { id: string; graph_id: string; source_id: string; target_id: string }) => ({
     id: row.id,
     graphId: row.graph_id,
     sourceId: row.source_id,

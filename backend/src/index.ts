@@ -10,10 +10,10 @@ import { handleGetFeaturedGraphs } from './websocket/graph/getFeaturedGraphs';
 import { handleCreateGraph } from './websocket/graph/createGraph';
 import { handleJoinGraph } from './websocket/graph/joinGraph';
 import { handleLeaveGraph } from './websocket/graph/leaveGraph';
-import { handleAddArgument } from './websocket/argument/addArgument';
 import { handleAddReaction } from './websocket/reaction/addReaction';
 import { handleRemoveReaction } from './websocket/reaction/removeReaction';
 import { handleGetMyGraphs } from './websocket/graph/getMyGraphs';
+import batchManager from './websocket/batchProcessing/batchManager';
 
 const app = express();
 const server = http.createServer(app);
@@ -66,11 +66,18 @@ io.on('connection', (socket) => {
   socket.on('create graph', wrapHandler(handleCreateGraph));
   socket.on('join graph', wrapHandler(handleJoinGraph));
   socket.on('leave graph', wrapHandler(handleLeaveGraph));
-  socket.on('add argument', wrapHandler(handleAddArgument));
-  socket.on('add reaction', wrapHandler(handleAddReaction));
+  socket.on('add argument', (data, callback) => {
+    batchManager.addAction({
+      type: 'add argument',
+      socket,
+      io,
+      data,
+      callback
+    })
+  });
+  socket.on('add reaction', wrapHandler(handleAddReaction)); // TODO Handle this and remove reaction in batch
   socket.on('remove reaction', wrapHandler(handleRemoveReaction));
   socket.on('disconnect', () => console.log(`User disconnected: ${socket.id}`));
-  // TODO Maybe we need to look at re-authenticating on reconnect
   socket.on('reconnect', () => console.log(`User reconnected: ${socket.id}`));
 });
 

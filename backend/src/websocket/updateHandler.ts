@@ -1,11 +1,11 @@
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { getArgumentScores } from "../analysis/argumentScoreHandler";
 import { getReactionCountsForArgument, getUserReactionForArgument } from "../db/operations/reactionOperations";
 import { Argument, Edge } from "../.shared/types";
 
 
 export const sendNewArgumentUpdate = async (
-  io: any,
+  io: Server,
   graphId: string,
   argument: Argument,
   newEdges: Edge[]
@@ -15,7 +15,7 @@ export const sendNewArgumentUpdate = async (
 
 export const sendReactionUpdate = async (
   socket: Socket,
-  io: any,
+  io: Server,
   graphId: string,
   argumentId: string
 ) => {

@@ -6,7 +6,7 @@ import { embedText } from "../../embeddingHandler";
 import { sendNewArgumentUpdate } from "../updateHandler";
 import { updateGraphEdges } from "../../db/operations/edgeOperations";
 
-interface AddArgumentData {
+export interface AddArgumentData {
   graphId: string;
   statement: string;
 }
@@ -26,10 +26,10 @@ export const handleAddArgument: SocketHandler<AddArgumentData, {}> = async (sock
   const newArgument = { id, graphId, statement, embedding, authorId: socket.data.user.id };
 
   graph.arguments.push(newArgument);
-  const newEdges = generateTopKSimilarEdges(graph);
-  await updateGraphEdges(graphId, newEdges);
+  const newEdges = generateTopKSimilarEdges(graph.arguments.map(arg => ({ id: arg.id, embedding: arg.embedding })));
+  const newEdgeObjects = await updateGraphEdges(graphId, newEdges);
 
-  sendNewArgumentUpdate(io, graphId, newArgument, newEdges);
+  sendNewArgumentUpdate(io, graphId, newArgument, newEdgeObjects);
   // TODO Make author 'agree' with their own argument
   return { success: true };
 }

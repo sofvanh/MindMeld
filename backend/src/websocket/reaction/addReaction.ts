@@ -3,7 +3,7 @@ import { query } from "../../db/db";
 import { addReaction } from "../../db/operations/reactionOperations";
 import { sendReactionUpdate } from "../updateHandler";
 
-interface AddReactionData {
+export interface AddReactionData {
   argumentId: string;
   type: 'agree' | 'disagree' | 'unclear';
 }

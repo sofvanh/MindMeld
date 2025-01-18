@@ -1,5 +1,6 @@
 import { Argument } from "../../.shared/types";
-import { query } from "../db";
+import { query, queryMany } from "../db";
+import { DbArgument } from "../dbTypes";
 import { generateArgumentId } from "../idGenerator";
 import { getReactionCountsForArgument } from "./reactionOperations";
 
@@ -15,6 +16,39 @@ export async function addArgument(
     [id, graphId, statement, embedding, authorId]
   );
   return id;
+}
+
+export async function addArguments(
+  args: {
+    graphId: string;
+    statement: string;
+    embedding: number[];
+    authorId: string;
+  }[]
+): Promise<DbArgument[]> {
+  const dbArguments = args.map(arg => ({
+    id: generateArgumentId(),
+    graph_id: arg.graphId,
+    statement: arg.statement,
+    embedding: arg.embedding,
+    author_id: arg.authorId
+  }));
+
+  const values = dbArguments.map((_, i) => {
+    const base = i * 5 + 1;
+    return `($${base}, $${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`;
+  }).join(',');
+
+  const flatParams = dbArguments.flatMap(arg => [
+    arg.id, arg.graph_id, arg.statement, arg.embedding, arg.author_id
+  ]);
+
+  await query(
+    `INSERT INTO arguments (id, graph_id, statement, embedding, author_id) VALUES ${values}`,
+    flatParams
+  );
+
+  return dbArguments;
 }
 
 export async function getArgument(
@@ -36,6 +70,13 @@ export async function getArgument(
     authorId: row.author_id,
     reactionCounts: reactionCounts
   };
+}
+
+export async function getArguments(graphIds: string[]): Promise<DbArgument[]> {
+  return await queryMany<DbArgument>(
+    `SELECT * FROM arguments WHERE graph_id = ANY($1)`,
+    [graphIds]
+  );
 }
 
 export async function getArgumentIdsByGraphId(graphId: string): Promise<string[]> {
