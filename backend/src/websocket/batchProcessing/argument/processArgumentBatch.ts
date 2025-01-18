@@ -56,6 +56,7 @@ export async function processArgumentBatch(
   console.timeEnd("processArgumentBatch")
 }
 
+// TODO Emit all updates at once
 async function emitUpdates(io: Server, graphIds: string[], args: DbArgument[], edges: DbEdge[]) {
   const argumentsByGraph = _.groupBy(args, 'graph_id');
   const edgesByGraph = _.groupBy(edges, 'graph_id');
