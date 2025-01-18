@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Graph, ForceGraphData, NodeData, LinkData, Score, UserReaction, ReactionCounts } from '../shared/types';
+import { Graph, ForceGraphData, NodeData, LinkData, Score, UserReaction, ReactionCounts, Argument, Edge } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -28,7 +28,7 @@ export function useGraph(graphId: string) {
       console.log(`Graph loaded in ${duration}s`);
     });
     socket.on('graph update', setGraph);
-    socket.on('argument added', ({ argument, newEdges }) => {
+    socket.on('argument added', ({ argument, newEdges }: { argument: Argument, newEdges: Edge[] }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
         return { ...prevGraph, arguments: [...prevGraph.arguments, argument], edges: newEdges };
