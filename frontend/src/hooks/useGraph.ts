@@ -28,10 +28,10 @@ export function useGraph(graphId: string) {
       console.log(`Graph loaded in ${duration}s`);
     });
     socket.on('graph update', setGraph);
-    socket.on('argument added', ({ argument, newEdges }: { argument: Argument, newEdges: Edge[] }) => {
+    socket.on('arguments added', ({ newArguments, allGraphEdges }: { newArguments: Argument[], allGraphEdges: Edge[] }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
-        return { ...prevGraph, arguments: [...prevGraph.arguments, argument], edges: newEdges };
+        return { ...prevGraph, arguments: [...prevGraph.arguments, ...newArguments], edges: allGraphEdges };
       });
     });
     socket.on('user reaction update', ({ argumentId, userReaction }: { argumentId: string, userReaction: UserReaction }) => {
@@ -69,7 +69,7 @@ export function useGraph(graphId: string) {
         }
       });
       socket?.off('graph update');
-      socket?.off('argument added');
+      socket?.off('arguments added');
       socket?.off('user reaction update');
       socket?.off('argument reactions update');
       socket?.off('graph scores update');

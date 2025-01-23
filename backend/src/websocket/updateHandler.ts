@@ -3,14 +3,13 @@ import { getArgumentScores } from "../analysis/argumentScoreHandler";
 import { getReactionCountsForArgument, getUserReactionForArgument } from "../db/operations/reactionOperations";
 import { Argument, Edge } from "../.shared/types";
 
-
-export const sendNewArgumentUpdate = async (
+export const sendNewArgumentsUpdate = async (
   io: Server,
   graphId: string,
-  argument: Argument,
-  newEdges: Edge[]
+  newArguments: Argument[],
+  allGraphEdges: Edge[]
 ) => {
-  io.to(graphId).emit('argument added', { argument, newEdges });
+  io.to(graphId).emit('arguments added', { newArguments, allGraphEdges });
 }
 
 export const sendReactionUpdate = async (

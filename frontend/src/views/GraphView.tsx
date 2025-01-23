@@ -39,21 +39,17 @@ const GraphView: React.FC = () => {
   }, [selectedNodeId, graph]);
 
   useEffect(() => {
-    setArgumentsInQueue(0)
-  }, [graph])
-
-  useEffect(() => {
     document.title = graph?.name ? `${graph.name} - MindMeld` : 'Loading... - MindMeld';
     return () => { document.title = 'MindMeld'; };
   }, [graph?.name]);
 
   const handleAddArgument = (statement: string) => {
     if (socket && user) {
-      setArgumentsInQueue(argumentsInQueue + 1)
+      setArgumentsInQueue(prev => prev + 1)
       socket.emit('add argument', { graphId, statement }, (response: any) => {
+        setArgumentsInQueue(prev => prev - 1)
         if (!response.success) {
           console.error('Failed to add argument:', response.error);
-          setArgumentsInQueue(argumentsInQueue - 1)
         }
       });
     }

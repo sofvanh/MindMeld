@@ -5,7 +5,7 @@ import { getGraphs } from '../../../db/operations/graphOperations';
 import { embedText, generateTopKSimilarEdges } from '../../../embeddingHandler';
 import { addArguments, getArguments } from '../../../db/operations/argumentOperations';
 import { updateGraphEdges } from '../../../db/operations/edgeOperations';
-import { sendNewArgumentUpdate } from '../../updateHandler';
+import { sendNewArgumentsUpdate } from '../../updateHandler';
 import { Server } from 'socket.io';
 import { DbArgument, DbEdge } from '../../../db/dbTypes';
 import { Argument, Edge } from '../../../.shared/types';
@@ -56,28 +56,28 @@ export async function processArgumentBatch(
   console.timeEnd("processArgumentBatch")
 }
 
-// TODO Emit all updates at once
 async function emitUpdates(io: Server, graphIds: string[], args: DbArgument[], edges: DbEdge[]) {
   const argumentsByGraph = _.groupBy(args, 'graph_id');
   const edgesByGraph = _.groupBy(edges, 'graph_id');
   for (const graphId of graphIds) {
-    const graphArguments = argumentsByGraph[graphId];
-    const graphEdges = edgesByGraph[graphId];
-    for (const argData of graphArguments) {
-      const argument: Argument = {
-        id: argData.id,
-        graphId: argData.graph_id,
-        statement: argData.statement,
-        embedding: argData.embedding,
-        authorId: argData.author_id
-      };
-      const edges: Edge[] = graphEdges.map(edge => ({
-        id: edge.id,
-        graphId: edge.graph_id,
-        sourceId: edge.source_id,
-        targetId: edge.target_id
-      }));
-      await sendNewArgumentUpdate(io, graphId, argument, edges);
-    }
+    const graphArguments = argumentsByGraph[graphId] || [];
+    const graphEdges = edgesByGraph[graphId] || [];
+
+    const args: Argument[] = graphArguments.map(argData => ({
+      id: argData.id,
+      graphId: argData.graph_id,
+      statement: argData.statement,
+      embedding: argData.embedding,
+      authorId: argData.author_id
+    }));
+
+    const edges: Edge[] = graphEdges.map(edge => ({
+      id: edge.id,
+      graphId: edge.graph_id,
+      sourceId: edge.source_id,
+      targetId: edge.target_id
+    }));
+
+    await sendNewArgumentsUpdate(io, graphId, args, edges);
   }
 }
