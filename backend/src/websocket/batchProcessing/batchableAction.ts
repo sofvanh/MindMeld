@@ -4,6 +4,14 @@ import { AddArgumentData } from "../argument/addArgument";
 import { AddReactionData } from "../reaction/addReaction";
 import { RemoveReactionData } from "../reaction/removeReaction";
 
+export type ReactionBatchableAction = {
+  type: 'add reaction' | 'remove reaction';
+  socket: Socket;
+  io: Server;
+  data: AddReactionData | RemoveReactionData;
+  callback: (response: SocketResponse<{}>) => void;
+};
+
 export type BatchableAction =
   | {
     type: 'add argument';
@@ -12,17 +20,4 @@ export type BatchableAction =
     data: AddArgumentData;
     callback: (response: SocketResponse<{}>) => void;
   }
-  | {
-    type: 'add reaction';
-    socket: Socket;
-    io: Server;
-    data: AddReactionData;
-    callback: (response: SocketResponse<{}>) => void;
-  }
-  | {
-    type: 'remove reaction';
-    socket: Socket;
-    io: Server;
-    data: RemoveReactionData;
-    callback: (response: SocketResponse<{}>) => void;
-  };
+  | ReactionBatchableAction;

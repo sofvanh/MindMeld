@@ -1,5 +1,6 @@
-import { BatchableAction } from './batchableAction';
+import { BatchableAction, ReactionBatchableAction } from './batchableAction';
 import { processArgumentBatch } from './argument/processArgumentBatch';
+import { processReactionBatch } from './reaction/processReactionBatch';
 
 class BatchManager {
   private pendingActions: BatchableAction[] = [];
@@ -43,13 +44,13 @@ class BatchManager {
     const actions = [...this.pendingActions];
     this.pendingActions = [];
 
-    const argumentActions = actions.filter(a => a.type === 'add argument');
-    const reactionActions = actions.filter(a => a.type === 'add reaction' || a.type === 'remove reaction');
+    const argumentActions: Array<BatchableAction & { type: 'add argument' }> = actions.filter(a => a.type === 'add argument');
+    const reactionActions: ReactionBatchableAction[] = actions.filter((a): a is ReactionBatchableAction => a.type === 'add reaction' || a.type === 'remove reaction');
 
     try {
       await Promise.all([
-        processArgumentBatch(argumentActions)
-        // this.processReactionBatch(reactionActions)
+        processArgumentBatch(argumentActions),
+        processReactionBatch(reactionActions)
       ]);
       actions.forEach(action => {
         action.callback({

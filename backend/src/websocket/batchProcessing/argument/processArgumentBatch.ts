@@ -14,6 +14,11 @@ import { Argument, Edge } from '../../../.shared/types';
 export async function processArgumentBatch(
   actions: Array<BatchableAction & { type: 'add argument' }>
 ) {
+  if (actions.length === 0) {
+    console.log("No new arguments to process")
+    return;
+  }
+
   console.log("In processArgumentBatch")
   console.time("processArgumentBatch")
 

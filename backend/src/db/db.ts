@@ -1,4 +1,4 @@
-import { Pool, QueryResultRow } from 'pg';
+import { Pool, PoolClient, QueryResultRow } from 'pg';
 import config from '../config';
 
 const pool = new Pool({
@@ -30,4 +30,21 @@ export const queryMany = async <T extends QueryResultRow>(
 ): Promise<T[]> => {
   const result = await query<T>(text, params);
   return result.rows;
+};
+
+export const transaction = async <T>(
+  callback: (client: PoolClient) => Promise<T>
+): Promise<T> => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await callback(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 };

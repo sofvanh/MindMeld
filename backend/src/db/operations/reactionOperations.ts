@@ -1,6 +1,7 @@
-import { query } from '../db';
+import { query, queryMany, transaction } from '../db';
 import { generateReactionId } from '../idGenerator';
 import { ReactionCounts, UserReaction } from '../../.shared/types';
+import { DbReaction } from '../dbTypes';
 
 export async function addReaction(
   userId: string,
@@ -174,4 +175,54 @@ export async function getUserReactionForArgument(userId: string, argumentId: str
   });
 
   return userReaction;
+}
+
+export async function getSpecificUserArgumentReactions(
+  userArgumentPairs: { userId: string; argumentId: string }[]
+): Promise<DbReaction[]> {
+  const values: string[] = [];
+  const conditions: string[] = [];
+
+  userArgumentPairs.forEach((pair, index) => {
+    values.push(pair.userId, pair.argumentId);
+    conditions.push(`(user_id = $${2 * index + 1} AND argument_id = $${2 * index + 2})`);
+  });
+
+  const result = await queryMany<DbReaction>(
+    `SELECT *
+     FROM reactions
+     WHERE ${conditions.join(' OR ')}`,
+    values
+  );
+
+  return result;
+}
+
+export async function addAndRemoveReactions(reactionsToAdd: { userId: string, argumentId: string, type: 'agree' | 'disagree' | 'unclear' }[], reactionIdsToRemove: string[]) {
+  await transaction(async (client) => {
+    // Delete existing reactions if any
+    if (reactionIdsToRemove.length > 0) {
+      const deletePlaceholders = reactionIdsToRemove.map((_, i) => `$${i + 1}`).join(',');
+      await client.query(
+        `DELETE FROM reactions WHERE id IN (${deletePlaceholders})`,
+        reactionIdsToRemove
+      );
+    }
+
+    // Insert new reactions if any
+    if (reactionsToAdd.length > 0) {
+      const valueGroups: string[] = [];
+      const values: any[] = [];
+      reactionsToAdd.forEach((reaction, index) => {
+        const id = generateReactionId();
+        values.push(id, reaction.userId, reaction.argumentId, reaction.type);
+        valueGroups.push(`($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`);
+      });
+
+      await client.query(
+        `INSERT INTO reactions (id, user_id, argument_id, type) VALUES ${valueGroups.join(',')}`,
+        values
+      );
+    }
+  });
 }
