@@ -34,30 +34,23 @@ export function useGraph(graphId: string) {
         return { ...prevGraph, arguments: [...prevGraph.arguments, ...newArguments], edges: allGraphEdges };
       });
     });
-    socket.on('user reaction update', ({ argumentId, userReaction }: { argumentId: string, userReaction: UserReaction }) => {
+    socket.on('user reactions update', ({ argumentIdToUserReaction }: { argumentIdToUserReaction: Record<string, UserReaction> }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
-        const updatedArguments = prevGraph.arguments.map(arg =>
-          arg.id === argumentId ? { ...arg, userReaction } : arg
-        );
+        const updatedArguments = prevGraph.arguments.map(arg => {
+          const userReaction = argumentIdToUserReaction[arg.id];
+          return userReaction ? { ...arg, userReaction } : arg;
+        });
         return { ...prevGraph, arguments: updatedArguments };
       });
     });
-    socket.on('argument reactions update', ({ argumentId, reactionCounts }: { argumentId: string, reactionCounts: ReactionCounts }) => {
-      setGraph(prevGraph => {
-        if (!prevGraph) return prevGraph;
-        const updatedArguments = prevGraph.arguments.map(arg =>
-          arg.id === argumentId ? { ...arg, reactionCounts } : arg
-        );
-        return { ...prevGraph, arguments: updatedArguments };
-      });
-    });
-    socket.on('graph scores update', (newScores: { [key: string]: Score }) => {
+    socket.on('graph reactions and scores update', ({ graphReactions, argumentScores }: { graphReactions: Record<string, ReactionCounts>, argumentScores: Record<string, Score> }) => {
       setGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
         const updatedArguments = prevGraph.arguments.map(arg => ({
           ...arg,
-          score: newScores[arg.id]
+          reactionCounts: graphReactions[arg.id],
+          score: argumentScores[arg.id]
         }));
         return { ...prevGraph, arguments: updatedArguments };
       });

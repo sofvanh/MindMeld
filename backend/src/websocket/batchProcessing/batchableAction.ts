@@ -1,8 +1,22 @@
 import { Socket, Server } from "socket.io";
 import { SocketResponse } from "../../backendTypes";
-import { AddArgumentData } from "../argument/addArgument";
-import { AddReactionData } from "../reaction/addReaction";
-import { RemoveReactionData } from "../reaction/removeReaction";
+
+interface AddArgumentData {
+  graphId: string;
+  statement: string;
+}
+
+interface AddReactionData {
+  graphId: string;
+  argumentId: string;
+  type: 'agree' | 'disagree' | 'unclear';
+}
+
+interface RemoveReactionData {
+  graphId: string;
+  argumentId: string;
+  type: 'agree' | 'disagree' | 'unclear';
+}
 
 export type ReactionBatchableAction = {
   type: 'add reaction' | 'remove reaction';

@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { getArgumentScores } from "../analysis/argumentScoreHandler";
-import { getReactionCountsForArgument, getUserReactionForArgument } from "../db/operations/reactionOperations";
-import { Argument, Edge } from "../.shared/types";
+import { getReactionCounts } from "../db/operations/reactionOperations";
+import { Argument, Edge, ReactionCounts, Score, UserReaction } from "../.shared/types";
 
 export const sendNewArgumentsUpdate = async (
   io: Server,
@@ -12,22 +12,21 @@ export const sendNewArgumentsUpdate = async (
   io.to(graphId).emit('arguments added', { newArguments, allGraphEdges });
 }
 
-export const sendReactionUpdate = async (
+export const sendUserReactionsUpdate = async (
   socket: Socket,
-  io: Server,
-  graphId: string,
-  argumentId: string
+  argumentIdToUserReaction: Map<string, UserReaction>
 ) => {
-  // Send new UserReaction state to the user who performed the action
-  const userReaction = await getUserReactionForArgument(socket.data.user.id, argumentId);
-  socket.emit('user reaction update', { argumentId, userReaction })
-  // Send new ReactionCounts states to all users currently in the graph
-  const reactionCounts = await getReactionCountsForArgument(argumentId);
-  io.to(graphId).emit('argument reactions update', { argumentId, reactionCounts });
-  // Send the new argument scores to all users currently in the graph
-  // TODO Only send scores that changed
-  const newScores = await getArgumentScores(graphId);
-  // Convert Map to plain object before sending
-  const scoresObject = Object.fromEntries(newScores);
-  io.to(graphId).emit('graph scores update', scoresObject);
+  const argumentIdToUserReactionRecord = Object.fromEntries(argumentIdToUserReaction);
+  socket.emit('user reactions update', { argumentIdToUserReaction: argumentIdToUserReactionRecord });
+}
+
+export const sendGraphReactionsAndScoresUpdate = async (
+  io: Server,
+  graphId: string
+) => {
+  const reactionCounts: Map<string, ReactionCounts> = await getReactionCounts(graphId);
+  const argumentScores: Map<string, Score> = await getArgumentScores(graphId);
+  const graphReactionsRecord = Object.fromEntries(reactionCounts);
+  const argumentScoresRecord = Object.fromEntries(argumentScores);
+  io.to(graphId).emit('graph reactions and scores update', { graphReactions: graphReactionsRecord, argumentScores: argumentScoresRecord });
 }

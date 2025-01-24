@@ -53,6 +53,7 @@ const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
     const newValue = !userReactions[type];
     if (newValue) {
       socket.emit('add reaction', {
+        graphId: argument.graphId,
         argumentId: argument.id,
         type
       }, (response: any) => {
@@ -62,6 +63,7 @@ const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
       });
     } else {
       socket.emit('remove reaction', {
+        graphId: argument.graphId,
         argumentId: argument.id,
         type
       }, (response: any) => {
