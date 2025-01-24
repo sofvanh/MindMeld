@@ -63,9 +63,8 @@ export function useGraph(graphId: string) {
       });
       socket?.off('graph update');
       socket?.off('arguments added');
-      socket?.off('user reaction update');
-      socket?.off('argument reactions update');
-      socket?.off('graph scores update');
+      socket?.off('user reactions update');
+      socket?.off('graph reactions and scores update');
     }
   }, [socket, graphId, user]);
 
