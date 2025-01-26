@@ -16,7 +16,7 @@ const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, layoutData, loading } = useGraph(graphId!);
+  const { graph, layoutData, loading, addPendingReaction, removePendingReaction } = useGraph(graphId!);
   const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
   const [argumentsInQueue, setArgumentsInQueue] = useState<number>(0);
 
@@ -90,6 +90,8 @@ const GraphView: React.FC = () => {
             onNextArg={handleNextNode}
             totalArgs={layoutData.nodes.length}
             currentIndex={selectedNodeIndex + 1}
+            addPendingReaction={addPendingReaction}
+            removePendingReaction={removePendingReaction}
           />
         ) : (
           user ? (

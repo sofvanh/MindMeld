@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import CloseButton from '../CloseButton';
-import { Argument } from '../../shared/types';
+import { Argument, ReactionAction } from '../../shared/types';
 import { useWebSocket } from '../../contexts/WebSocketContext';
 import ArgumentInfoMedium from './ArgumentInfoMedium';
 import ArgumentInfoSmall from './ArgumentInfoSmall';
@@ -13,6 +13,8 @@ interface ArgumentInfoBoxProps {
   onNextArg: () => void;
   totalArgs: number;
   currentIndex: number;
+  addPendingReaction: (reaction: ReactionAction) => void;
+  removePendingReaction: (reaction: ReactionAction) => void;
 }
 
 const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
@@ -21,14 +23,11 @@ const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
   onPrevArg,
   onNextArg,
   totalArgs,
-  currentIndex
+  currentIndex,
+  addPendingReaction,
+  removePendingReaction
 }) => {
   const { socket } = useWebSocket();
-  const [userReactions, setUserReactions] = useState(argument.userReaction || {});
-
-  useEffect(() => {
-    setUserReactions(argument.userReaction || {});
-  }, [argument]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -50,23 +49,38 @@ const ArgumentInfoBox: React.FC<ArgumentInfoBoxProps> = ({
       console.error('No socket found');
       return;
     }
-    const newValue = !userReactions[type];
+    const isCurrentlySelected = argument.userReaction?.[type] || false;
+    const newValue = !isCurrentlySelected;
     if (newValue) {
+      const pendingReaction: ReactionAction = {
+        actionType: 'add',
+        reactionType: type,
+        argumentId: argument.id
+      };
+      addPendingReaction(pendingReaction);
       socket.emit('add reaction', {
         graphId: argument.graphId,
         argumentId: argument.id,
         type
       }, (response: any) => {
+        removePendingReaction(pendingReaction);
         if (!response.success) {
           console.error('Failed to add reaction:', response.error);
         }
       });
     } else {
+      const pendingReaction: ReactionAction = {
+        actionType: 'remove',
+        reactionType: type,
+        argumentId: argument.id
+      };
+      addPendingReaction(pendingReaction);
       socket.emit('remove reaction', {
         graphId: argument.graphId,
         argumentId: argument.id,
         type
       }, (response: any) => {
+        removePendingReaction(pendingReaction);
         if (!response.success) {
           console.error('Failed to remove reaction:', response.error);
         }

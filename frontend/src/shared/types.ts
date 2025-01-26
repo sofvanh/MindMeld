@@ -77,9 +77,17 @@ export interface Graph {
   edges: Edge[];
 }
 
+export type ReactionType = 'agree' | 'disagree' | 'unclear';
+
 export interface Reaction {
   id: string;
   userId: string;
   argumentId: string;
-  type: 'agree' | 'disagree' | 'unclear';
+  type: ReactionType;
+}
+
+export interface ReactionAction {
+  actionType: 'add' | 'remove';
+  argumentId: string;
+  reactionType: ReactionType;
 }
