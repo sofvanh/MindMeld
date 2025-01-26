@@ -99,9 +99,9 @@ export function useGraph(graphId: string) {
       });
     });
     socket.on('graph reactions and scores update', ({ graphReactions, argumentScores }: { graphReactions: Record<string, ReactionCounts>, argumentScores: Record<string, Score> }) => {
-      setGraph(prevGraph => {
+      setServerGraph(prevGraph => {
         if (!prevGraph) return prevGraph;
-        const updatedArguments = prevGraph.arguments.map(arg => ({
+        const updatedArguments: Argument[] = prevGraph.arguments.map(arg => ({
           ...arg,
           reactionCounts: graphReactions[arg.id],
           score: argumentScores[arg.id]
