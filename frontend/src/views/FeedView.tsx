@@ -44,25 +44,23 @@ export const FeedView: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-[calc(100vh-8rem)] relative">
-      <div className="absolute top-4 left-4 z-10">
-        <div className="flex items-center">
-          <Link to="/" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
-            ← Home
-          </Link>
+    <div className="w-full h-[calc(100vh-8rem)] relative flex flex-col">
+      <div className="flex flex-col text-center">
+        <h3 className="my-2">{graph?.name}</h3>
+        <div className="flex justify-between px-2">
+          <div className="flex items-center">
+            <Link to="/" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
+              ← Home
+            </Link>
+          </div>
+          <div className="flex items-center">
+            <Link to={`/graph/${graphId}`} className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
+              View graph →
+            </Link>
+          </div>
         </div>
       </div>
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 sm:px-2 sm:py-1">
-        <h3>{graph?.name}</h3>
-      </div>
-      <div className="absolute top-4 right-4 z-10">
-        <div className="flex items-center">
-          <Link to={`/graph/${graphId}`} className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
-            View graph →
-          </Link>
-        </div>
-      </div>
-      <div className="flex flex-col items-center justify-center h-full">
+      <div className="flex flex-col items-center justify-center flex-1">
         {!currentCard ? (
           <div className="flex items-center justify-center mb-4">
             <LoadingSpinner size="large" />
