@@ -79,7 +79,6 @@ export async function getArguments(graphIds: string[]): Promise<DbArgument[]> {
   );
 }
 
-export async function getArgumentIdsByGraphId(graphId: string): Promise<string[]> {
-  const result = await query('SELECT id FROM arguments WHERE graph_id = $1', [graphId]);
-  return result.rows.map((row: any) => row.id);
+export async function getArgumentsByGraphId(graphId: string): Promise<DbArgument[]> {
+  return await queryMany<DbArgument>('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
 }
