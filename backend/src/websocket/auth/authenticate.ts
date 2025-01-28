@@ -26,7 +26,12 @@ export const handleAuthenticate: SocketHandler<AuthenticateData, AuthenticateRes
     }
   }
 
-  const user = await findOrCreateUser(payload.sub, payload.email);
+  const dbUser = await findOrCreateUser(payload.sub, payload.email);
+  const user: User = {
+    id: dbUser.id,
+    googleId: dbUser.google_id,
+    email: dbUser.email
+  };
   socket.data.user = user;
 
   return {

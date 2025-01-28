@@ -13,9 +13,9 @@ export async function addReaction(
   // If adding agree/disagree, remove any existing agree/disagree reactions
   if (type === 'agree' || type === 'disagree') {
     await query(
-      `DELETE FROM reactions 
-       WHERE user_id = $1 
-       AND argument_id = $2 
+      `DELETE FROM reactions
+       WHERE user_id = $1
+       AND argument_id = $2
        AND type IN ('agree', 'disagree')`,
       [userId, argumentId]
     );
@@ -88,10 +88,10 @@ export async function getReactionsForAnalysis(
       HAVING COUNT(*) >= 3
     ),
     reaction_matrices AS (
-      SELECT 
+      SELECT
         r.user_id,
         r.argument_id,
-        CASE 
+        CASE
           WHEN r.type = 'agree' THEN 1
           WHEN r.type = 'disagree' THEN -1
           ELSE 0
@@ -102,7 +102,7 @@ export async function getReactionsForAnalysis(
       JOIN filtered_users fu ON r.user_id = fu.user_id
       WHERE a.graph_id = $1
     )
-    SELECT 
+    SELECT
       user_id,
       argument_id,
       vote_value,
@@ -127,7 +127,7 @@ export async function getReactionCounts(
 ): Promise<Map<string, ReactionCounts>> {
   const reactionCountsResult = await query(
     `SELECT argument_id, type, COUNT(*) as count
-     FROM reactions 
+     FROM reactions
      WHERE argument_id IN (SELECT id FROM arguments WHERE graph_id = $1)
      GROUP BY argument_id, type`,
     [graphId]
@@ -147,15 +147,15 @@ export async function getReactionCounts(
 export async function getReactionCountsForArgument(argumentId: string): Promise<ReactionCounts> {
   const reactionCountsResult = await query(
     `SELECT type, COUNT(*) as count
-     FROM reactions 
+     FROM reactions
      WHERE argument_id = $1
      GROUP BY type`,
     [argumentId]
   );
 
   const reactionCounts: ReactionCounts = { agree: 0, disagree: 0, unclear: 0 };
-  reactionCountsResult.rows.forEach((row: { type: keyof ReactionCounts; count: string }) => {
-    reactionCounts[row.type] = parseInt(row.count);
+  reactionCountsResult.rows.forEach((row) => {
+    reactionCounts[row.type as keyof ReactionCounts] = parseInt(row.count as string);
   });
 
   return reactionCounts;
@@ -164,14 +164,14 @@ export async function getReactionCountsForArgument(argumentId: string): Promise<
 export async function getUserReactionForArgument(userId: string, argumentId: string): Promise<UserReaction> {
   const userReactionResult = await query(
     `SELECT type
-     FROM reactions 
+     FROM reactions
      WHERE user_id = $1 AND argument_id = $2`,
     [userId, argumentId]
   );
 
   const userReaction: UserReaction = {};
-  userReactionResult.rows.forEach((row: { type: keyof UserReaction }) => {
-    userReaction[row.type] = true;
+  userReactionResult.rows.forEach((row) => {
+    userReaction[row.type as keyof UserReaction] = true;
   });
 
   return userReaction;

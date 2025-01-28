@@ -1,12 +1,13 @@
-import { query } from '../db';
+import { query, queryOne } from '../db';
 import { generateUserId } from '../idGenerator';
-import { User } from '../../.shared/types';
+import { DbUser } from '../dbTypes';
 
-export async function findOrCreateUser(googleId: string, email: string): Promise<User> {
-  let user = await query('SELECT * FROM users WHERE google_id = $1', [googleId]);
-  if (user.rows[0]) return user.rows[0];
+export async function findOrCreateUser(googleId: string, email: string): Promise<DbUser> {
+  let user = await queryOne<DbUser>('SELECT * FROM users WHERE google_id = $1', [googleId]);
+  if (user) return user;
 
   const id = generateUserId();
-  const result = await query('INSERT INTO users (id, google_id, email) VALUES ($1, $2, $3) RETURNING *', [id, googleId, email]);
-  return result.rows[0];
+  const result = await queryOne<DbUser>('INSERT INTO users (id, google_id, email) VALUES ($1, $2, $3) RETURNING *', [id, googleId, email]);
+  if (!result) throw new Error('Query to create user failed');
+  return result;
 }
