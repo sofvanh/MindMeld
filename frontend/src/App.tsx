@@ -1,5 +1,6 @@
 import Layout from './components/Layout';
 import GraphView from './views/GraphView';
+import { FeedView } from './views/FeedView';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import HomeView from './views/HomeView';
 import GraphListView from './views/GraphListView';
@@ -18,6 +19,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomeView />} />
               <Route path="/graph/:graphId" element={<GraphView />} />
+              <Route path="/feed/:graphId" element={<FeedView />} />
               <Route path="/graphs" element={<GraphListView />} />
               <Route path="/design" element={<DesignSystemView />} />
               <Route path="/scores" element={<ScoresView />} />

@@ -55,6 +55,7 @@ const GraphView: React.FC = () => {
     }
   };
 
+  // TODO We should show the back button and legend even while loading
   if (loading || !graph) {
     return <div className="flex items-center justify-center h-full mt-8">
       <LoadingSpinner size="large" />
