@@ -12,7 +12,7 @@ export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
   const { loading: userLoading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, loading } = useGraph(graphId!);
+  const { graph, loading } = useGraph(graphId!); // TODO We only need the graph name
   const [feedArguments, setFeedArguments] = useState<Argument[]>([]);
   const [currentCard, setCurrentCard] = useState<Argument | null>(null);
 
@@ -69,7 +69,7 @@ export const FeedView: React.FC = () => {
           <div className="max-w-screen-md w-full px-4">
             <FeedCard
               key={currentCard.id}
-              statement={currentCard.statement}
+              argument={currentCard}
             />
           </div>
         )}
