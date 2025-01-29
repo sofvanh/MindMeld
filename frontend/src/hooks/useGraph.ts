@@ -4,6 +4,11 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { applyReactionActions } from '../shared/reactionHelper';
 
+// TODO Proper caching, and not just for graph data
+const graphCache: Record<string, Graph> = {};
+const loadingGraphs: Set<string> = new Set();
+const subscribers: Record<string, ((graph: Graph) => void)[]> = {};
+
 export interface UseGraphResult {
   graph: Graph | null;
   layoutData: ForceGraphData;
@@ -13,7 +18,7 @@ export interface UseGraphResult {
 export function useGraph(graphId: string) {
   const { socket } = useWebSocket();
   const { user } = useAuth();
-  const [serverGraph, setServerGraph] = useState<Graph | null>(null);
+  const [serverGraph, setServerGraph] = useState<Graph | null>(() => graphCache[graphId] || null);
   const [pendingReactions, setPendingReactions] = useState<ReactionAction[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
@@ -71,13 +76,34 @@ export function useGraph(graphId: string) {
 
   useEffect(() => {
     if (!socket) return;
+
+    // If already cached, no need to load
+    if (graphCache[graphId]) {
+      return;
+    }
+
+    // If already loading, just subscribe to updates
+    if (loadingGraphs.has(graphId)) {
+      if (!subscribers[graphId]) {
+        subscribers[graphId] = [];
+      }
+      subscribers[graphId].push(setServerGraph);
+      return;
+    }
+
+    loadingGraphs.add(graphId);
     const startTime = performance.now();
+
     socket.emit('join graph', { graphId }, (response: any) => {
       if (response.success) {
+        graphCache[graphId] = response.data.graph;
         setServerGraph(response.data.graph);
+        // Notify all subscribers
+        subscribers[graphId]?.forEach(callback => callback(response.data.graph));
       } else {
         console.error('Failed to join graph:', response.error);
       }
+      loadingGraphs.delete(graphId);
       const duration = ((performance.now() - startTime) / 1000).toFixed(3);
       console.log(`Graph loaded in ${duration}s`);
     });
@@ -110,11 +136,20 @@ export function useGraph(graphId: string) {
       });
     });
     return () => {
-      socket?.emit('leave graph', { graphId }, (response: any) => {
-        if (!response.success) {
-          console.error('Failed to leave graph:', response.error);
-        }
-      });
+      // Clean up subscriber when component unmounts
+      if (subscribers[graphId]) {
+        subscribers[graphId] = subscribers[graphId].filter(cb => cb !== setServerGraph);
+      }
+      // Only leave graph if no more subscribers
+      if (!subscribers[graphId]?.length) {
+        socket?.emit('leave graph', { graphId }, (response: any) => {
+          if (!response.success) {
+            console.error('Failed to leave graph:', response.error);
+          }
+          delete graphCache[graphId];
+          delete subscribers[graphId];
+        });
+      }
       socket?.off('graph update');
       socket?.off('arguments added');
       socket?.off('user reactions update');
