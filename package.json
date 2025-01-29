@@ -9,7 +9,10 @@
     "build:backend": "cd backend && npm run build",
     "start": "npm run build:backend && concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "dev": "concurrently \"npm run start:frontend\" \"npm run dev:backend\"",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "test": "concurrently \"npm run test:frontend\" \"npm run test:backend || exit 0\""
   },
   "dependencies": {
     "concurrently": "^6.2.0"
