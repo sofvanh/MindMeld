@@ -13,17 +13,24 @@ export const FeedView: React.FC = () => {
   const { loading: userLoading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
   const { graph, loading } = useGraph(graphId!); // TODO We only need the graph name
-  const [feedArguments, setFeedArguments] = useState<Argument[]>([]);
-  const [currentCard, setCurrentCard] = useState<Argument | null>(null);
+  const [feedArguments, setFeedArguments] = useState<Argument[] | null>(null);
+  const [currentArgument, setCurrentArgument] = useState<Argument | null>(null);
 
   useEffect(() => {
     if (socket && user) {
       socket.emit('get feed', { graphId }, (response: any) => {
         setFeedArguments(response.data.arguments);
-        setCurrentCard(response.data.arguments[0]);
+        setCurrentArgument(response.data.arguments[0]);
       });
     }
   }, [socket, user]);
+
+  const handleNext = () => {
+    if (!feedArguments || !currentArgument) return;
+    const newFeedArguments = feedArguments.filter(arg => arg.id !== currentArgument.id);
+    setFeedArguments(newFeedArguments);
+    setCurrentArgument(newFeedArguments[0]);
+  }
 
   useEffect(() => {
     document.title = graph?.name ? `${graph.name} - feed - MindMeld` : 'Loading feed... - MindMeld';
@@ -61,16 +68,30 @@ export const FeedView: React.FC = () => {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center flex-1">
-        {!currentCard ? (
+        {feedArguments?.length === 0 ? (
+          <div className="text-center">
+            <h2 className="text-xl mb-2">No arguments to show</h2>
+            <Link to={`/graph/${graphId}`} className={buttonStyles.link}>
+              View graph
+            </Link>
+          </div>
+        ) : !currentArgument ? (
           <div className="flex items-center justify-center mb-4">
             <LoadingSpinner size="large" />
           </div>
         ) : (
-          <div className="max-w-screen-md w-full px-4">
-            <FeedCard
-              key={currentCard.id}
-              argument={currentCard}
-            />
+          <div className="flex flex-col items-center justify-center w-full">
+            <div className="max-w-screen-md w-full px-4">
+              <FeedCard
+                key={currentArgument.id}
+                argument={currentArgument}
+              />
+            </div>
+            <button
+              onClick={handleNext}
+              className={`${buttonStyles.secondary} mt-4`}>
+              Next <span className="font-normal text-stone-500 text-sm">({feedArguments?.length ? feedArguments.length - 1 : 0} left)</span>
+            </button>
           </div>
         )}
       </div>
