@@ -27,64 +27,57 @@ export async function getAllGraphs(): Promise<DbGraph[]> {
   return await queryMany<DbGraph>('SELECT * FROM graphs ORDER BY name');
 }
 
-export async function getFeaturedGraphs(): Promise<GraphData[]> {
+export async function getFeaturedGraphs(userId?: string): Promise<GraphData[]> {
   const FEATURED_GRAPH_IDS = [
     "gra_m47bz12vUA7fMZ",
     "gra_m4a9lakjDPG7vU",
     "gra_m4abp2spuJ9yW5"
   ]
-  const graphs = await Promise.all(FEATURED_GRAPH_IDS.map(id => getGraphData(id)));
-  return graphs;
+  return await getGraphData(FEATURED_GRAPH_IDS, userId);
 }
 
 export async function getUserGraphs(userId: string): Promise<GraphData[]> {
   const graphIdsResult = await query(
     `SELECT DISTINCT g.id
      FROM graphs g
-     LEFT JOIN arguments a ON g.id = a.graph_id 
+     LEFT JOIN arguments a ON g.id = a.graph_id
      LEFT JOIN reactions r ON g.id = (
-       SELECT graph_id 
-       FROM arguments 
+       SELECT graph_id
+       FROM arguments
        WHERE id = r.argument_id
      )
-     WHERE g.author_id = $1 
+     WHERE g.author_id = $1
         OR a.author_id = $1
         OR r.user_id = $1`,
     [userId]
   );
 
-  const graphs: GraphData[] = [];
-  for (const row of graphIdsResult.rows) {
-    const graphData = await getGraphData(row.id);
-    graphs.push(graphData);
-  }
-
-  return graphs;
+  return await getGraphData(graphIdsResult.rows.map(row => row.id), userId);
 }
 
-export async function getGraphData(graphId: string): Promise<GraphData> {
-  const graphResult = await query('SELECT * FROM graphs WHERE id = $1', [graphId]);
-  if (graphResult.rows.length === 0) {
-    throw new Error('Graph not found');
-  }
-
-  const statsResult = await query(
-    `SELECT 
-      COUNT(*) as argument_count,
-      MAX(id) as latest_argument_id
-     FROM arguments 
-     WHERE graph_id = $1`,
-    [graphId]
+export async function getGraphData(graphIds: string[], userId?: string): Promise<GraphData[]> {
+  const placeholders = graphIds.map((_, i) => `$${i + 1}`).join(',');
+  const result = await query(
+    `SELECT g.id, g.name,
+      COUNT(a.id) as argument_count,
+      MAX(a.id) as latest_argument_id
+     FROM graphs g
+     LEFT JOIN arguments a ON g.id = a.graph_id
+     WHERE g.id IN (${placeholders})
+     GROUP BY g.id, g.name`,
+    graphIds
   );
 
-  const lastActivity = statsResult.rows[0].latest_argument_id ? getTimestamp(statsResult.rows[0].latest_argument_id) : undefined;
+  if (result.rows.length === 0) {
+    throw new Error('Graphs not found');
+  }
 
-  return {
-    id: graphResult.rows[0].id,
-    name: graphResult.rows[0].name,
-    argumentCount: parseInt(statsResult.rows[0].argument_count),
-    lastActivity: lastActivity
-  };
+  return result.rows.map(row => ({
+    id: row.id,
+    name: row.name,
+    argumentCount: parseInt(row.argument_count),
+    lastActivity: row.latest_argument_id ? getTimestamp(row.latest_argument_id) : undefined
+  }));
 }
 
 export async function getFullGraph(graphId: string): Promise<Graph> {
@@ -137,7 +130,7 @@ export async function getFullGraphWithUserReactions(graphId: string, userId: str
     queryMany<DbEdge>('SELECT * FROM edges WHERE graph_id = $1', [graphId]),
     queryMany<DbReaction>(
       `SELECT *
-       FROM reactions 
+       FROM reactions
        WHERE user_id = $1 AND argument_id IN (SELECT id FROM arguments WHERE graph_id = $2)`,
       [userId, graphId]
     ),
