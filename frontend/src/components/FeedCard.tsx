@@ -74,7 +74,7 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
         <div className="block sm:hidden"></div>
         <button
           className={`${buttonStyles.icon.default} ${tooltipClasses} min-h-11 w-full ${userReaction.unclear ? '!bg-amber-100' : ''}`}
-          data-tooltip="This argument is unclear or poor quality"
+          data-tooltip="Unclear or poor quality"
           aria-label="Unclear"
           onClick={() => handleReactionClick('unclear')}
         >
