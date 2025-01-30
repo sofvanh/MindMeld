@@ -7,6 +7,8 @@ import { FeedCard } from '../components/FeedCard';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Argument } from '../shared/types';
+import ViewSelector from '../components/ViewSelector';
+import SignInOutButton from '../components/SignInOutButton';
 
 export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
@@ -37,38 +39,25 @@ export const FeedView: React.FC = () => {
     return () => { document.title = 'MindMeld'; };
   }, [graph?.name]);
 
-  if (!userLoading && !user) {
-    return (
-      <div className="w-full h-[calc(100vh-8rem)] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl mb-2">Please log in to see the feed</h2>
-          <Link to="/" className={buttonStyles.secondary}>
-            Return home
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full h-[calc(100vh-8rem)] relative flex flex-col">
       <div className="flex flex-col text-center">
         <h3 className="my-2">{graph?.name}</h3>
         <div className="flex justify-between px-2">
           <div className="flex items-center">
-            <Link to="/" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
+            <Link to="/" className={`${buttonStyles.link} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
               ← Home
-            </Link>
-          </div>
-          <div className="flex items-center">
-            <Link to={`/graph/${graphId}`} className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
-              View graph →
             </Link>
           </div>
         </div>
       </div>
       <div className="flex flex-col items-center justify-center flex-1">
-        {feedArguments?.length === 0 ? (
+        {!userLoading && !user ? (
+          <div className="text-center flex flex-col items-center justify-center">
+            <h2 className="text-xl mb-2">Please log in to see the feed</h2>
+            <SignInOutButton />
+          </div>
+        ) : feedArguments?.length === 0 ? (
           <div className="text-center">
             <h2 className="text-xl mb-2">No arguments to show</h2>
             <Link to={`/graph/${graphId}`} className={buttonStyles.link}>
@@ -95,6 +84,7 @@ export const FeedView: React.FC = () => {
           </div>
         )}
       </div>
+      <ViewSelector graphId={graphId || ""} currentView="feed" />
     </div>
   );
 };

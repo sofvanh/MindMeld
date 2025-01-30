@@ -11,6 +11,7 @@ import ArgumentForm from '../components/ArgumentForm';
 import { buttonStyles } from '../styles/defaultStyles';
 import { Argument } from '../shared/types';
 import Legend from '../components/Legend';
+import ViewSelector from '../components/ViewSelector';
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
@@ -63,7 +64,7 @@ const GraphView: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-[calc(100vh-8rem)] relative">
+    <div className="w-full flex-1 relative flex flex-col">
       <div className="absolute top-4 left-4 z-10 bg-white/80 sm:px-2 sm:py-1 rounded-lg shadow-sm flex flex-col">
         <div className="flex items-center">
           <Link to="/" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
@@ -76,13 +77,15 @@ const GraphView: React.FC = () => {
         </div>
         <Legend />
       </div>
-      <GraphVisualization
-        graph={graph}
-        layoutData={layoutData}
-        selectedNodeId={selectedNodeId}
-        onNodeClick={handleNodeClick}
-      />
-      <div className="absolute bottom-0 sm:bottom-4 bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2">
+      <div className="flex-grow">
+        <GraphVisualization
+          graph={graph}
+          layoutData={layoutData}
+          selectedNodeId={selectedNodeId}
+          onNodeClick={handleNodeClick}
+        />
+      </div>
+      <div className="absolute bottom-14 sm:bottom-14 bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2">
         {selectedArgument ? (
           <ArgumentInfoBox
             argument={selectedArgument}
@@ -109,6 +112,7 @@ const GraphView: React.FC = () => {
           )
         )}
       </div>
+      <ViewSelector graphId={graphId || ""} currentView="graph" />
     </div>
   );
 };
