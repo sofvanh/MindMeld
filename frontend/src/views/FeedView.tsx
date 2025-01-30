@@ -58,17 +58,7 @@ export const FeedView: React.FC = () => {
   }, [graph?.name]);
 
   return (
-    <div className="w-full h-[calc(100vh-8rem)] relative flex flex-col">
-      <div className="flex flex-col text-center">
-        <h3 className="my-2">{graph?.name}</h3>
-        <div className="flex justify-between px-2">
-          <div className="flex items-center">
-            <Link to="/" className={`${buttonStyles.link} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
-              ← Home
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="w-full relative flex flex-col flex-grow">
       <div className="flex flex-col items-center justify-center flex-1">
         {!userLoading && !user ? (
           <div className="text-center flex flex-col items-center justify-center">
@@ -76,8 +66,9 @@ export const FeedView: React.FC = () => {
             <SignInOutButton />
           </div>
         ) : feedArguments?.length === 0 ? (
-          <div className="text-center">
-            <h2 className="text-xl mb-2">No arguments to show</h2>
+          <div className="text-center px-4">
+            <h2 className="text-xl mb-2">No statements to show</h2>
+            <p><small>Statements that you haven't reacted to yet will appear here.</small></p>
             <Link to={`/graph/${graphId}`} className={buttonStyles.link}>
               View graph
             </Link>
@@ -102,7 +93,6 @@ export const FeedView: React.FC = () => {
           </div>
         )}
       </div>
-      <ViewSelector graphId={graphId || ""} currentView="feed" />
     </div>
   );
 };

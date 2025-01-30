@@ -31,6 +31,10 @@
         @apply text-stone-700 my-4;
     }
 
+    small {
+        @apply text-stone-500;
+    }
+
     .card {
         @apply bg-white border border-stone-200 rounded-lg p-6;
     }

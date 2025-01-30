@@ -39,7 +39,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   return (
     <ForceGraph2D
       width={window.innerWidth}
-      height={window.innerHeight - 168}
+      height={window.innerHeight - 213}
       graphData={layoutData}
       nodeLabel="name"
       onNodeClick={onNodeClick}

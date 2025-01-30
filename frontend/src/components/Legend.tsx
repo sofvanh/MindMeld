@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { IMPORTANCE_COLOR, CONSENSUS_COLOR, FRAGMENTATION_COLOR } from '../utils/colors';
+import React from 'react';
 
 export default function Legend() {
   const legendItems = [
@@ -9,8 +10,8 @@ export default function Legend() {
   ];
 
   return (
-    <details className="flex flex-col px-2">
-      <summary className="py-3 sm:py-1 cursor-pointer text-sm text-stone-700 font-semibold min-h-11 sm:min-h-0 items-center justify-center">
+    <details className="bg-white/80 rounded-lg shadow-sm flex flex-col">
+      <summary className="py-3 p-2 cursor-pointer text-sm text-stone-700 font-semibold min-h-10 items-center justify-center">
         Legend
       </summary>
       <div className="bg-white rounded-lg p-2">

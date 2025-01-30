@@ -56,36 +56,26 @@ const GraphView: React.FC = () => {
     }
   };
 
-  // TODO We should show the back button and legend even while loading
-  if (loading || !graph) {
-    return <div className="flex items-center justify-center h-full mt-8">
-      <LoadingSpinner size="large" />
-    </div>;
-  }
-
   return (
-    <div className="w-full flex-1 relative flex flex-col">
-      <div className="absolute top-4 left-4 z-10 bg-white/80 sm:px-2 sm:py-1 rounded-lg shadow-sm flex flex-col">
-        <div className="flex items-center">
-          <Link to="/" className={`${buttonStyles.secondary} !p-1 min-w-11 sm:min-w-8 min-h-11 sm:min-h-8 flex items-center justify-center`}>
-            ←
-          </Link>
-          <p className="text-base m-0">
-            {graph.name}
-            {graph.arguments.length === 0 && <span className="inline text-sm text-stone-400"> (empty)</span>}
-          </p>
-        </div>
+    <div className="w-full relative flex flex-col flex-grow">
+      <div className="absolute top-4 left-4 z-10 ">
         <Legend />
       </div>
-      <div className="flex-grow">
-        <GraphVisualization
-          graph={graph}
-          layoutData={layoutData}
-          selectedNodeId={selectedNodeId}
-          onNodeClick={handleNodeClick}
-        />
-      </div>
-      <div className="absolute bottom-14 sm:bottom-14 bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2">
+      {loading || !graph ? (
+        <div className="flex-grow flex items-center justify-center h-full mt-8">
+          <LoadingSpinner size="large" />
+        </div>
+      ) : (
+        <div className="flex-grow">
+          <GraphVisualization
+            graph={graph}
+            layoutData={layoutData}
+            selectedNodeId={selectedNodeId}
+            onNodeClick={handleNodeClick}
+          />
+        </div>
+      )}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2">
         {selectedArgument ? (
           <ArgumentInfoBox
             argument={selectedArgument}
@@ -112,7 +102,6 @@ const GraphView: React.FC = () => {
           )
         )}
       </div>
-      <ViewSelector graphId={graphId || ""} currentView="graph" />
     </div>
   );
 };

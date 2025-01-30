@@ -8,6 +8,7 @@ import { WebSocketProvider } from './contexts/WebSocketContext';
 import { AuthProvider } from './contexts/AuthContext';
 import DesignSystemView from './views/DesignSystemView';
 import ScoresView from './views/ScoresView';
+import GraphLayout from './components/graph/GraphLayout';
 
 
 function App() {
@@ -18,8 +19,16 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<HomeView />} />
-              <Route path="/graph/:graphId" element={<GraphView />} />
-              <Route path="/feed/:graphId" element={<FeedView />} />
+              <Route path="/graph/:graphId" element={
+                <GraphLayout>
+                  <GraphView />
+                </GraphLayout>
+              } />
+              <Route path="/feed/:graphId" element={
+                <GraphLayout>
+                  <FeedView />
+                </GraphLayout>
+              } />
               <Route path="/graphs" element={<GraphListView />} />
               <Route path="/design" element={<DesignSystemView />} />
               <Route path="/scores" element={<ScoresView />} />
