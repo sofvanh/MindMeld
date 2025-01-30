@@ -10,9 +10,13 @@ interface FeedCardProps {
   argument: Argument;
 }
 
+const reactionCache: Record<string, UserReaction> = {};
+
 export const FeedCard = ({ argument }: FeedCardProps) => {
   const { socket } = useWebSocket();
-  const [userReaction, setUserReaction] = useState<UserReaction>({});
+  const [userReaction, setUserReaction] = useState<UserReaction>(() =>
+    reactionCache[argument.id] || {}
+  );
 
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
     if (!socket) {
@@ -28,7 +32,9 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
       argumentId: argument.id
     };
     const newUserReaction = applyReactionToUserReaction(userReaction, reactionAction);
+    reactionCache[argument.id] = newUserReaction;
     setUserReaction(newUserReaction);
+
     socket.emit(reactionAction.actionType + ' reaction', {
       graphId: argument.graphId,
       argumentId: argument.id,
@@ -36,6 +42,8 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
     }, (response: any) => {
       if (!response.success) {
         console.error('Failed to add reaction:', response.error);
+        reactionCache[argument.id] = userReaction;
+        setUserReaction(userReaction);
       }
     });
   };

@@ -10,26 +10,44 @@ import { Argument } from '../shared/types';
 import ViewSelector from '../components/ViewSelector';
 import SignInOutButton from '../components/SignInOutButton';
 
+
+const feedCache: Record<string, Argument[]> = {};
+
 export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
   const { loading: userLoading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, loading } = useGraph(graphId!); // TODO We only need the graph name
-  const [feedArguments, setFeedArguments] = useState<Argument[] | null>(null);
-  const [currentArgument, setCurrentArgument] = useState<Argument | null>(null);
+  const { graph, loading } = useGraph(graphId!);
+
+  const [feedArguments, setFeedArguments] = useState<Argument[] | null>(() =>
+    graphId ? feedCache[graphId] || null : null
+  );
+  const [currentArgument, setCurrentArgument] = useState<Argument | null>(() =>
+    graphId && feedCache[graphId] ? feedCache[graphId][0] : null
+  );
 
   useEffect(() => {
-    if (socket && user) {
+    if (socket && user && graphId) {
+      // If we have cached data, use it immediately
+      if (feedCache[graphId]) {
+        setFeedArguments(feedCache[graphId]);
+        setCurrentArgument(feedCache[graphId][0]);
+        return;
+      }
+
       socket.emit('get feed', { graphId }, (response: any) => {
-        setFeedArguments(response.data.arguments);
-        setCurrentArgument(response.data.arguments[0]);
+        const args = response.data.arguments;
+        feedCache[graphId] = args;
+        setFeedArguments(args);
+        setCurrentArgument(args[0]);
       });
     }
-  }, [socket, user]);
+  }, [socket, user, graphId]);
 
   const handleNext = () => {
-    if (!feedArguments || !currentArgument) return;
+    if (!feedArguments || !currentArgument || !graphId) return;
     const newFeedArguments = feedArguments.filter(arg => arg.id !== currentArgument.id);
+    feedCache[graphId] = newFeedArguments;
     setFeedArguments(newFeedArguments);
     setCurrentArgument(newFeedArguments[0]);
   }
