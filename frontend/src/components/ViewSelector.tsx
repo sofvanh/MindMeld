@@ -1,6 +1,7 @@
 import React from 'react';
-import { FiGitBranch, FiList } from 'react-icons/fi';
 import TabButton from './TabButton';
+import { PiCardsThree } from "react-icons/pi";
+import { PiGraphDuotone } from "react-icons/pi";
 
 interface ViewSelectorProps {
   graphId: string;
@@ -12,13 +13,13 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ graphId, currentView }) => 
     <div className="flex h-10 border-t border-stone-200">
       <TabButton
         label="Feed"
-        icon={FiList}
+        icon={PiCardsThree}
         to={`/feed/${graphId}`}
         color={currentView === 'feed' ? 'text-emerald-500' : 'text-stone-700'}
       />
       <TabButton
         label="Graph"
-        icon={FiGitBranch}
+        icon={PiGraphDuotone}
         to={`/graph/${graphId}`}
         color={currentView === 'graph' ? 'text-emerald-500' : 'text-stone-700'}
       />
