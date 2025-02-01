@@ -75,12 +75,20 @@ export function useGraph(graphId: string) {
   }, [serverGraph, pendingReactions]);
 
   useEffect(() => {
-    if (!socket) return;
+    socket?.emit('join graph', { graphId }, (response: any) => {
+      // TODO This is hacky and basically just for the user reactions - they need to be updated on login and logout
+      if (response.success) {
+        graphCache[graphId] = response.data.graph;
+        setServerGraph(response.data.graph);
+        subscribers[graphId]?.forEach(callback => callback(response.data.graph));
+      } else {
+        console.error('Failed to join graph:', response.error);
+      }
+    });
+  }, [user, socket, graphId]);
 
-    // If already cached, no need to load
-    if (graphCache[graphId]) {
-      return;
-    }
+  useEffect(() => {
+    if (!socket) return;
 
     // If already loading, just subscribe to updates
     if (loadingGraphs.has(graphId)) {
@@ -155,7 +163,7 @@ export function useGraph(graphId: string) {
       socket?.off('user reactions update');
       socket?.off('graph reactions and scores update');
     }
-  }, [socket, graphId, user]);
+  }, [socket, graphId]);
 
   useEffect(() => {
     if (!graph) return;
