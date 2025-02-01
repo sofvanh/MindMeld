@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { CONSENSUS_COLOR, FRAGMENTATION_COLOR, IMPORTANCE_COLOR, BASE_COLOR } from '../utils/colors';
 import { usePageTitle } from '../hooks/usePageTitle';
 

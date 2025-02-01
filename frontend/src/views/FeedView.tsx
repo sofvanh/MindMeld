@@ -7,7 +7,6 @@ import { FeedCard } from '../components/FeedCard';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Argument } from '../shared/types';
-import ViewSelector from '../components/ViewSelector';
 import SignInOutButton from '../components/SignInOutButton';
 
 
@@ -17,7 +16,7 @@ export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
   const { loading: userLoading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, loading } = useGraph(graphId!);
+  const { graph } = useGraph(graphId!);
 
   const [feedArguments, setFeedArguments] = useState<Argument[] | null>(() =>
     graphId ? feedCache[graphId] || null : null

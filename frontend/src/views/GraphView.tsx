@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useGraph } from '../hooks/useGraph';
@@ -8,10 +8,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ArgumentInfoBox from '../components/ArgumentInfoBox/ArgumentInfoBox';
 import GraphVisualization from '../components/GraphVisualization';
 import ArgumentForm from '../components/ArgumentForm';
-import { buttonStyles } from '../styles/defaultStyles';
 import { Argument } from '../shared/types';
 import Legend from '../components/Legend';
-import ViewSelector from '../components/ViewSelector';
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
