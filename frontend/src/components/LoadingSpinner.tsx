@@ -20,8 +20,9 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       <div
         className={`
           ${sizeClasses[size]}
-          border-4 border-stone-200
-          border-t-stone-500
+          border
+          border-stone-600
+          border-t-transparent
           rounded-full
           animate-spin
         `}
