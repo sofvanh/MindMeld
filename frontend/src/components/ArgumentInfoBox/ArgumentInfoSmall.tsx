@@ -76,8 +76,8 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
         <button
           onClick={onPrevArg}
           className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1 flex-grow min-h-11`}
-          data-tooltip="Previous argument"
-          aria-label="Previous argument"
+          data-tooltip="Previous statement"
+          aria-label="Previous statement"
         >
           ←
         </button>
@@ -87,8 +87,8 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
         <button
           onClick={onNextArg}
           className={`${buttonStyles.icon.default} ${tooltipClasses} !p-1 flex-grow min-h-11`}
-          data-tooltip="Next argument"
-          aria-label="Next argument"
+          data-tooltip="Next statement"
+          aria-label="Next statement"
         >
           →
         </button>
