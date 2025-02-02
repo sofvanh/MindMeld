@@ -94,8 +94,8 @@ const GraphView: React.FC = () => {
               <ArgumentForm onSubmit={handleAddArgument} />
             </>
           ) : (
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <p className="text-sm text-stone-400">Sign in to add arguments</p>
+            <div className="flex justify-center w-full">
+              <small className="text-stone-400">Sign in to add and react to statements</small>
             </div>
           )
         )}
