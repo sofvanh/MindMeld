@@ -46,6 +46,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       enableNodeDrag={false}
       nodeCanvasObject={nodeCanvasObject}
       nodeCanvasObjectMode={() => 'replace'}
+      nodeRelSize={15}
       autoPauseRedraw={true}
     />
   );
