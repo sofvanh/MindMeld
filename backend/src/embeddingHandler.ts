@@ -55,8 +55,11 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
   // Sort connections by mutual rank score (higher is better)
   potentialEdges.sort((a, b) => b.edgePriority - a.edgePriority);
 
+  // Normalize nodeCount to account for clarity scores
+  const normalizedNodeCount = nodes.reduce((sum, node) => sum + (node.clarity ?? 1), 0);
+
   // Select top n*k connections
-  const topConnections = potentialEdges.slice(0, nodeCount * k);
+  const topConnections = potentialEdges.slice(0, normalizedNodeCount * k);
 
   return topConnections.map(link => ({
     sourceId: link.sourceId,
