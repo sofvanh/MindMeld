@@ -5,13 +5,13 @@ import config from './config';
 
 /**
  * Generates edges between the most semantically similar nodes using mutual rank scoring.
- * 
+ *
  * For each pair of nodes, calculates their cosine similarity and relative ranking in each other's
  * similarity lists. The mutual rank score is the product of these rankings (lower is better).
- * 
+ *
  * For example, if node A ranks node B as its 2nd most similar, and B ranks A as its 3rd most
  * similar, their mutual rank score would be 2 * 3 = 6.
- * 
+ *
  * @param nodes - Array of nodes with embeddings to analyze
  * @param k - Number of edges per node to generate (default 2)
  * @returns Array of edges connecting the most similar node pairs
@@ -36,7 +36,7 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
     for (let j = i + 1; j < nodeCount; j++) { // Only process each pair once
       const rankAtoB = similarityRankings[i].findIndex(r => r.targetIndex === j) + 1;
       const rankBtoA = similarityRankings[j].findIndex(r => r.targetIndex === i) + 1;
-      const mutualRankScore = rankAtoB * rankBtoA;
+      const mutualRankScore = rankAtoB + rankBtoA;
 
       // Order links lexicographically for deterministic results that are easier to filter
       const id1 = nodes[i].id;
