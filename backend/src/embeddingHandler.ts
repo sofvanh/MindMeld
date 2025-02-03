@@ -16,9 +16,9 @@ import config from './config';
  * @param k - Number of edges per node to generate (default 2)
  * @returns Array of edges connecting the most similar node pairs
  */
-export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[] }[], k = 2): { sourceId: string, targetId: string }[] {
+export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[], clarity?: number }[], k = 2): { sourceId: string, targetId: string }[] {
   const nodeCount = nodes.length;
-  const potentialEdges: { sourceId: string, targetId: string, mutualRankScore: number }[] = [];
+  const potentialEdges: { sourceId: string, targetId: string, edgePriority: number }[] = [];
 
   // Calculate similarity rankings for each node pair, in both directions
   const similarityRankings = nodes.map((sourceNode, sourceIndex) => {
@@ -38,19 +38,22 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
       const rankBtoA = similarityRankings[j].findIndex(r => r.targetIndex === i) + 1;
       const mutualRankScore = 1 / (rankAtoB + rankBtoA);
 
+      // Adjust priority based on clarity scores
+      const edgePriority = mutualRankScore * (nodes[i].clarity ?? 1) * (nodes[j].clarity ?? 1);
+
       // Order links lexicographically for deterministic results that are easier to filter
       const id1 = nodes[i].id;
       const id2 = nodes[j].id;
       potentialEdges.push({
         sourceId: id1 < id2 ? id1 : id2,
         targetId: id1 < id2 ? id2 : id1,
-        mutualRankScore
+        edgePriority
       });
     }
   }
 
   // Sort connections by mutual rank score (higher is better)
-  potentialEdges.sort((a, b) => b.mutualRankScore - a.mutualRankScore);
+  potentialEdges.sort((a, b) => b.edgePriority - a.edgePriority);
 
   // Select top n*k connections
   const topConnections = potentialEdges.slice(0, nodeCount * k);
