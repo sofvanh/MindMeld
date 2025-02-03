@@ -7,10 +7,12 @@ import config from './config';
  * Generates edges between the most semantically similar nodes using mutual rank scoring.
  *
  * For each pair of nodes, calculates their cosine similarity and relative ranking in each other's
- * similarity lists. The mutual rank score is the product of these rankings (lower is better).
+ * similarity lists. The mutual rank score is the inverse of the sum of these rankings (higher is better).
  *
  * For example, if node A ranks node B as its 2nd most similar, and B ranks A as its 3rd most
- * similar, their mutual rank score would be 2 * 3 = 6.
+ * similar, their mutual rank score would be 1 / (2 + 3) = 0.2.
+ *
+ * This score is then adjusted by the clarity score of each node, if provided.
  *
  * @param nodes - Array of nodes with embeddings to analyze
  * @param k - Number of edges per node to generate (default 2)
