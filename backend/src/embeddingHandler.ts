@@ -36,7 +36,7 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
     for (let j = i + 1; j < nodeCount; j++) { // Only process each pair once
       const rankAtoB = similarityRankings[i].findIndex(r => r.targetIndex === j) + 1;
       const rankBtoA = similarityRankings[j].findIndex(r => r.targetIndex === i) + 1;
-      const mutualRankScore = rankAtoB + rankBtoA;
+      const mutualRankScore = 1 / (rankAtoB + rankBtoA);
 
       // Order links lexicographically for deterministic results that are easier to filter
       const id1 = nodes[i].id;
@@ -49,8 +49,8 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
     }
   }
 
-  // Sort connections by mutual rank score (lower is better)
-  potentialEdges.sort((a, b) => a.mutualRankScore - b.mutualRankScore);
+  // Sort connections by mutual rank score (higher is better)
+  potentialEdges.sort((a, b) => b.mutualRankScore - a.mutualRankScore);
 
   // Select top n*k connections
   const topConnections = potentialEdges.slice(0, nodeCount * k);
