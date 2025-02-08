@@ -100,7 +100,7 @@ const ArgumentInfoMedium: React.FC<ArgumentInfoMediumProps> = ({
                 Consensus: {argument.score.consensus !== null && argument.score.consensus !== undefined ? Math.round(argument.score.consensus * 100) + "%" : "More data needed"}
               </span>
               <span className="text-xs text-stone-500">
-                Fragmentation: {argument.score.fragmentation !== null && argument.score.fragmentation !== undefined ? Math.round(argument.score.fragmentation * 100) + "%" : "Error in calculation"}
+                Fragmentation: {argument.score.fragmentation !== null && argument.score.fragmentation !== undefined ? Math.round(argument.score.fragmentation * 100) + "%" : "More data needed"}
               </span>
               <span className="text-xs text-stone-500">Clarity: {Math.round(argument.score.clarity * 100)}%</span>
             </>
