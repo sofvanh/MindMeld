@@ -62,15 +62,18 @@ function getFragmentationScore(argumentIndex: number,
     row[argumentIndex] !== 0 ? i : null).filter(i => i !== null) as number[];
 
   // Users are automatically in their own ingroup, so no need to filter
-  const usersWithIngroup = usersWhoVoted;
+
+  if (usersWhoVoted.length === 0) {
+    return null;
+  }
 
   // Compute individual user scores (to be aggregated as the final argument score later)
-  const userFragmentationScores = new Array(usersWithIngroup.length).fill(0);
+  const userFragmentationScores = new Array(usersWhoVoted.length).fill(0);
 
-  for (let i = 0; i < usersWithIngroup.length; i++) {
-    const vote = votingMatrix[usersWithIngroup[i]][argumentIndex];
-    const sumIngroupAgree = sum_pos_pos[usersWithIngroup[i]][argumentIndex];
-    const sumIngroupDisagree = sum_pos_neg[usersWithIngroup[i]][argumentIndex];
+  for (let i = 0; i < usersWhoVoted.length; i++) {
+    const vote = votingMatrix[usersWhoVoted[i]][argumentIndex];
+    const sumIngroupAgree = sum_pos_pos[usersWhoVoted[i]][argumentIndex];
+    const sumIngroupDisagree = sum_pos_neg[usersWhoVoted[i]][argumentIndex];
     const sumDisalignedIngroup = vote === -1 ? sumIngroupAgree : sumIngroupDisagree;
 
     userFragmentationScores[i] = sumDisalignedIngroup / (sumIngroupAgree + sumIngroupDisagree);
@@ -79,8 +82,8 @@ function getFragmentationScore(argumentIndex: number,
   // Average of user scores, weighted by uniqueness
   let fragmentationSum = 0;
   let uniquenessSum = 0;
-  for (let i = 0; i < usersWithIngroup.length; i++) {
-    let uniqueness = uniquenessMatrix[usersWithIngroup[i]][argumentIndex];
+  for (let i = 0; i < usersWhoVoted.length; i++) {
+    let uniqueness = uniquenessMatrix[usersWhoVoted[i]][argumentIndex];
 
     fragmentationSum += userFragmentationScores[i] * uniqueness;
     uniquenessSum += uniqueness;
