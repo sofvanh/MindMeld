@@ -86,7 +86,13 @@ function getFragmentationScore(argumentIndex: number,
     uniquenessSum += uniqueness;
   }
 
-  return 2 * fragmentationSum / uniquenessSum;
+  const fragmentationScore = 2 * fragmentationSum / uniquenessSum;
+
+  if (!isFinite(fragmentationScore)) {
+    throw new Error("Fragmentation score is not a finite number");
+  }
+
+  return fragmentationScore;
 }
 
 function getClarityScore(argumentIndex: number,
@@ -135,10 +141,9 @@ export async function getArgumentScores(graphId: string): Promise<Map<string, Sc
     const fragmentation = getFragmentationScore(argumentIndex, votingMatrix, sum_pos_pos, sum_pos_neg, uniquenessMatrix);
     const clarity = getClarityScore(argumentIndex, votingMatrix, unclearMatrix, uniquenessMatrix);
 
-
     argumentScores.set(argumentId, {
       consensus: consensus === null ? undefined : consensus,
-      fragmentation: fragmentation === null ? undefined : fragmentation,
+      fragmentation: fragmentation,
       clarity
     });
   });
