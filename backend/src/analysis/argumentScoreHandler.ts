@@ -61,14 +61,8 @@ function getFragmentationScore(argumentIndex: number,
   const usersWhoVoted = votingMatrix.map((row, i) =>
     row[argumentIndex] !== 0 ? i : null).filter(i => i !== null) as number[];
 
-  // Filter for users with an ingroup
-  const usersWithIngroup = usersWhoVoted.filter(i =>
-    sum_pos_pos[i][argumentIndex] + sum_pos_neg[i][argumentIndex] > 0);
-
-  // If no users have an ingroup, can't calculate fragmentation
-  if (usersWithIngroup.length === 0) {
-    return null;
-  }
+  // Users are automatically in their own ingroup, so no need to filter
+  const usersWithIngroup = usersWhoVoted;
 
   // Compute individual user scores (to be aggregated as the final argument score later)
   const userFragmentationScores = new Array(usersWithIngroup.length).fill(0);
@@ -103,7 +97,7 @@ function getClarityScore(argumentIndex: number,
    * One minus average number of unclear votes
    */
 
-  //Identify all users who reacted on this argument 
+  //Identify all users who reacted on this argument
   const usersWhoReacted = votingMatrix.map((row, i) =>
     (row[argumentIndex] !== 0 || unclearMatrix[i][argumentIndex] !== 0) ? i : null
   ).filter(i => i !== null) as number[];
