@@ -144,9 +144,10 @@ export async function getArgumentScores(graphId: string): Promise<Map<string, Sc
     const fragmentation = getFragmentationScore(argumentIndex, votingMatrix, sum_pos_pos, sum_pos_neg, uniquenessMatrix);
     const clarity = getClarityScore(argumentIndex, votingMatrix, unclearMatrix, uniquenessMatrix);
 
+
     argumentScores.set(argumentId, {
       consensus: consensus === null ? undefined : consensus,
-      fragmentation: fragmentation == null ? undefined : fragmentation,
+      fragmentation: fragmentation === null ? undefined : fragmentation,
       clarity
     });
   });
