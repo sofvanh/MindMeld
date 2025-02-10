@@ -11,14 +11,35 @@ export async function getEdges(graphIds: string[]): Promise<DbEdge[]> {
   );
 }
 
+export interface EdgesForAnalysis {
+  edges: {
+    sourceId: string,
+    targetId: string
+  }[];
+}
+
+export async function getEdgesForAnalysis(graphId: string): Promise<EdgesForAnalysis> {
+  const result = await query(
+    'SELECT source_id, target_id FROM edges WHERE graph_id = $1',
+    [graphId]
+  );
+
+  return {
+    edges: result.rows.map(row => ({
+      sourceId: row.source_id,
+      targetId: row.target_id
+    }))
+  }
+}
+
 // TODO Rewrite updateGraphEdges so that it can handle many graphs at once
 /**
  * Updates the edges of a graph in the database.
- * 
+ *
  * Retrieves current edges, compares with new edges,
  * removes redundant edges, and adds new ones.
  * Uses efficient bulk operations.
- * 
+ *
  * @param graphId - The ID of the graph to update.
  * @param newEdges - Array of {sourceId, targetId} objects.
  * @returns Array of DbEdge objects representing the new edges in the graph.
