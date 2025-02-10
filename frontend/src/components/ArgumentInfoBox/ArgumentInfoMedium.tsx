@@ -75,7 +75,7 @@ const ArgumentInfoMedium: React.FC<ArgumentInfoMediumProps> = ({
               <span className="text-xs w-4 inline-block text-center">{reactionCounts?.disagree || 0}</span>
             </button>
             <button
-              data-tooltip={user ? "Unclear" : "Unclear (sign in to contribute)"}
+              data-tooltip={user ? "Low quality" : "Low quality (sign in to contribute)"}
               onClick={() => user && handleReaction('unclear')}
               disabled={!user}
               className={`${tooltipClasses} !p-1 w-auto gap-0.5 ${userReactions.unclear ? buttonStyles.icon.amber : buttonStyles.icon.default} ${!user && 'opacity-50'}`}
@@ -102,7 +102,7 @@ const ArgumentInfoMedium: React.FC<ArgumentInfoMediumProps> = ({
               <span className="text-xs text-stone-500">
                 Divergence: {argument.score.fragmentation !== null && argument.score.fragmentation !== undefined ? Math.round(argument.score.fragmentation * 100) + "%" : "More data needed"}
               </span>
-              <span className="text-xs text-stone-500">Clarity: {Math.round(argument.score.clarity * 100)}%</span>
+              <span className="text-xs text-stone-500">Quality: {Math.round(argument.score.clarity * 100)}%</span>
             </>
           ) : (
             <span className="text-xs text-stone-500">More user feedback is required to generate scores.</span>

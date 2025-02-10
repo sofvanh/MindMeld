@@ -15,7 +15,7 @@ export default function ScoresView() {
       details: [
         'High when many users agree, especially users who often disagree with each other',
         'Low when there is typical or less agreement than expected',
-        'Not affected by "Unclear" reactions'
+        'Not affected by "Low quality" reactions'
       ]
     },
     {
@@ -25,18 +25,18 @@ export default function ScoresView() {
       details: [
         'High when users are unexpectedly divided on this argument',
         'Low when users agree as much as they typically do',
-        'Not affected by "Unclear" reactions'
+        'Not affected by "Low quality" reactions'
       ]
     },
     {
-      name: 'Clarity Score',
+      name: 'Quality Score',
       color: null,
-      description: 'Measures how clear and understandable the argument is to users.',
+      description: 'Measures how well the argument contributes to the conversation.',
       details: [
-        'High when few users mark the argument as unclear',
-        'Low when many users find the argument confusing',
-        'Shown through opacity - less clear arguments appear more transparent',
-        'Based only on "Unclear" reactions'
+        'Starts at 100% and goes down with each "Low quality" reaction',
+        'Low when many users find the argument poor quality, unclear, or not helpful',
+        'Shown through opacity - lower quality arguments appear more transparent',
+        'Based only on "Low quality" reactions'
       ]
     }
   ];
@@ -70,7 +70,7 @@ export default function ScoresView() {
                 }}
               />
             )}
-            {name === 'Clarity Score' && (
+            {name === 'Quality Score' && (
               <div className="flex gap-1">
                 {clarityExamples.map(({ opacity }) => (
                   <div

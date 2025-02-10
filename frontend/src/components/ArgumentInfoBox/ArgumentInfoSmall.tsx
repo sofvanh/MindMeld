@@ -56,7 +56,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.disagree || 0}</span>
         </button>
         <button
-          data-tooltip={user ? "Unclear" : "Unclear (sign in to contribute)"}
+          data-tooltip={user ? "Low quality" : "Low quality (sign in to contribute)"}
           onClick={() => user && handleReaction('unclear')}
           disabled={!user}
           className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${userReactions.unclear ? buttonStyles.icon.amber : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11`}

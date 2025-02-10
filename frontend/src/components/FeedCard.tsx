@@ -74,11 +74,11 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
         <div className="block sm:hidden"></div>
         <button
           className={`${buttonStyles.icon.default} ${tooltipClasses} min-h-11 w-full ${userReaction.unclear ? '!bg-amber-100' : ''}`}
-          data-tooltip="Unclear or poor quality"
-          aria-label="Unclear"
+          data-tooltip="Contributes poorly to the conversation"
+          aria-label="Low quality"
           onClick={() => handleReactionClick('unclear')}
         >
-          <MdOutlineQuestionMark className={`${iconClasses} max-w-4 mr-2`} /> Unclear
+          <MdOutlineQuestionMark className={`${iconClasses} max-w-4 mr-2`} /> Low quality
         </button>
       </div>
     </div >
