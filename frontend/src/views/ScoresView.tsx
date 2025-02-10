@@ -106,7 +106,7 @@ export default function ScoresView() {
           <p className="m-0">Highlighted in yellow</p>
         </div>
         <p>
-          Arguments with both high consensus and high fragmentation scores are marked as important.
+          Arguments with both high consensus and high divergence scores are marked as important.
           These arguments tend to reveal interesting differences in how users think about the topic.
         </p>
       </div>
