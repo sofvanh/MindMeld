@@ -5,8 +5,8 @@ import React from 'react';
 export default function Legend() {
   const legendItems = [
     { color: CONSENSUS_COLOR, label: 'High consensus score', description: 'Surprising agreement' },
-    { color: FRAGMENTATION_COLOR, label: 'High fragmentation score', description: 'Surprising disagreement' },
-    { color: IMPORTANCE_COLOR, label: 'Important', description: 'Both consensus and fragmentation are high. This node seems important!' },
+    { color: FRAGMENTATION_COLOR, label: 'High divergence score', description: 'Surprising disagreement' },
+    { color: IMPORTANCE_COLOR, label: 'Important', description: 'Both consensus and divergence are high. This node seems important!' },
   ];
 
   return (

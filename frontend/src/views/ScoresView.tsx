@@ -19,7 +19,7 @@ export default function ScoresView() {
       ]
     },
     {
-      name: 'Fragmentation Score',
+      name: 'Divergence Score',
       color: FRAGMENTATION_COLOR,
       description: 'Measures how surprisingly high the disagreement is among users who have rated this argument.',
       details: [
