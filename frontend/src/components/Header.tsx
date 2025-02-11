@@ -23,7 +23,7 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-2 sm:gap-4">
           <Link to="/" className="flex items-center gap-2 sm:gap-4">
             <h3 className="text-xl sm:text-2xl font-bold text-stone-900 hover:text-stone-700 m-0" style={{ fontFamily: 'Bricolage Grotesque' }}>
-              MindMeld
+              Nexus
             </h3>
             <span className="hidden sm:inline text-sm text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
               Work in progress

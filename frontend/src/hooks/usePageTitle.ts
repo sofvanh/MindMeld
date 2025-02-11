@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const DEFAULT_TITLE = 'MindMeld';
+const DEFAULT_TITLE = 'Nexus';
 
 export function usePageTitle(title?: string) {
   useEffect(() => {

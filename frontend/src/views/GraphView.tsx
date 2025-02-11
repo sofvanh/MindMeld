@@ -38,8 +38,8 @@ const GraphView: React.FC = () => {
   }, [selectedNodeId, graph]);
 
   useEffect(() => {
-    document.title = graph?.name ? `${graph.name} - MindMeld` : 'Loading... - MindMeld';
-    return () => { document.title = 'MindMeld'; };
+    document.title = graph?.name ? `${graph.name} - Nexus` : 'Loading... - Nexus';
+    return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
 
   const handleAddArgument = (statement: string) => {

@@ -54,7 +54,7 @@ export default function ScoresView() {
       <h1>Understanding Argument Scores</h1>
 
       <p className="mb-8">
-        MindMeld uses three different scores to help identify interesting and important arguments.
+        Nexus uses three different scores to help identify interesting and important arguments.
         Each score ranges from 0% to 100% and is calculated based on user reactions.
       </p>
 

@@ -52,8 +52,8 @@ export const FeedView: React.FC = () => {
   }
 
   useEffect(() => {
-    document.title = graph?.name ? `${graph.name} - feed - MindMeld` : 'Loading feed... - MindMeld';
-    return () => { document.title = 'MindMeld'; };
+    document.title = graph?.name ? `${graph.name} - feed - Nexus` : 'Loading feed... - Nexus';
+    return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
 
   return (
