@@ -52,7 +52,7 @@ export const FeedView: React.FC = () => {
   }
 
   useEffect(() => {
-    document.title = graph?.name ? `${graph.name} - feed - Nexus` : 'Loading feed... - Nexus';
+    document.title = graph?.name ? `${graph.name} - Feed - Nexus` : 'Loading feed... - Nexus';
     return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
 
