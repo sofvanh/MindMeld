@@ -14,8 +14,9 @@ const DesignSystemView = () => {
           <h1>Heading One</h1>
           <h2>Heading Two</h2>
           <h3>Heading Three</h3>
+          <h4>Heading Four</h4>
           <p>Regular paragraph text</p>
-          <p className="text-sm">Small paragraph text</p>
+          <small>Small paragraph text</small>
         </div>
       </section>
 

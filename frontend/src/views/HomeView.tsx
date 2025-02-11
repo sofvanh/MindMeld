@@ -34,9 +34,9 @@ const HomeView: React.FC = () => {
     <div className="px-4 max-w-screen-md mx-auto">
       <div className="my-16">
         <h1>Welcome to Nexus</h1>
-        <p className="text-lg text-stone-500 mb-8 font-semibold">
+        <h4 className="text-stone-500 mb-8">
           Group deliberation, empowered.
-        </p>
+        </h4>
         <p>
           Nexus is an experimental platform for group deliberation. Our aim is to use large language models to help groups understand each other better and surface insights and solutions that wouldn't have been found otherwise.
         </p>

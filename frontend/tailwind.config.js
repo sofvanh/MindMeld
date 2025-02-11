@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'bricolage': ['"Bricolage Grotesque"', 'sans-serif'],
+        'bitter': ['Bitter', 'serif'],
         'system': [
           '-apple-system',
           'BlinkMacSystemFont',

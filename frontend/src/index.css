@@ -7,20 +7,24 @@
         @apply font-system text-stone-900;
     }
 
+    h1, h2, h3, h4 {
+        @apply font-bitter text-stone-700;
+    }
+
     h1 {
-        @apply font-bricolage mb-4 text-4xl font-bold text-stone-700;
+        @apply mb-4 text-4xl font-bold;
     }
 
     h2 {
-        @apply font-system mb-4 text-2xl font-semibold text-stone-700;
+        @apply mb-4 text-2xl font-bold;
     }
 
     h3 {
-        @apply font-system mb-4 text-xl font-semibold;
+        @apply mb-4 text-xl font-bold;
     }
 
     h4 {
-        @apply font-system mb-4 text-lg font-medium;
+        @apply mb-4 text-lg font-semibold;
     }
 
     a {
