@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { buttonStyles, iconClasses, tooltipClasses } from '../../styles/defaultStyles';
-import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
-import { MdOutlineQuestionMark } from "react-icons/md";
+import { IoIosThumbsUp, IoIosThumbsDown, IoIosWarning } from 'react-icons/io';
 import { Argument } from '../../shared/types';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -43,7 +42,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           disabled={!user}
           className={`${tooltipClasses} !p-1 gap-0.5 ${userReactions.agree ? buttonStyles.icon.green : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11 !w-11`}
         >
-          <IoIosThumbsUp className={`${iconClasses} max-w-4`} />
+          <IoIosThumbsUp className={`${iconClasses} max-w-5`} />
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.agree || 0}</span>
         </button>
         <button
@@ -52,7 +51,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           disabled={!user}
           className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${userReactions.disagree ? buttonStyles.icon.red : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11`}
         >
-          <IoIosThumbsDown className={`${iconClasses} max-w-4`} />
+          <IoIosThumbsDown className={`${iconClasses} max-w-5`} />
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.disagree || 0}</span>
         </button>
         <button
@@ -61,7 +60,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           disabled={!user}
           className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${userReactions.unclear ? buttonStyles.icon.amber : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11`}
         >
-          <MdOutlineQuestionMark className={`${iconClasses} max-w-4`} />
+          <IoIosWarning className={`${iconClasses} max-w-5`} />
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.unclear || 0}</span>
         </button>
       </div >
