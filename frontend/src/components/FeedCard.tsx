@@ -1,6 +1,5 @@
 import { buttonStyles, iconClasses, tooltipClasses } from '../styles/defaultStyles';
-import { IoIosThumbsUp, IoIosThumbsDown } from 'react-icons/io';
-import { MdOutlineQuestionMark } from "react-icons/md";
+import { IoIosThumbsUp, IoIosThumbsDown, IoIosWarning } from 'react-icons/io';
 import { Argument, ReactionAction, UserReaction } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useState } from 'react';
@@ -61,7 +60,7 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
           aria-label="Agree"
           onClick={() => handleReactionClick('agree')}
         >
-          <IoIosThumbsUp className={`${iconClasses} max-w-4 mr-2`} /> Agree
+          <IoIosThumbsUp className={`${iconClasses} max-w-5 mr-2`} /> Agree
         </button>
         <button
           className={`${buttonStyles.icon.red} ${tooltipClasses} min-h-11 w-full border-[0.5px] border-red-500 ${userReaction.disagree ? '!bg-red-200' : ''}`}
@@ -69,7 +68,7 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
           aria-label="Disagree"
           onClick={() => handleReactionClick('disagree')}
         >
-          <IoIosThumbsDown className={`${iconClasses} max-w-4 mr-2`} /> Disagree
+          <IoIosThumbsDown className={`${iconClasses} max-w-5 mr-2`} /> Disagree
         </button>
         <div className="block sm:hidden"></div>
         <button
@@ -78,7 +77,7 @@ export const FeedCard = ({ argument }: FeedCardProps) => {
           aria-label="Low quality"
           onClick={() => handleReactionClick('unclear')}
         >
-          <MdOutlineQuestionMark className={`${iconClasses} max-w-4 mr-2`} /> Low quality
+          <IoIosWarning className={`${iconClasses} max-w-5 mr-2`} /> Low quality
         </button>
       </div>
     </div >
