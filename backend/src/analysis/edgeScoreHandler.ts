@@ -47,8 +47,16 @@ export async function getEdgeScores(graphId: string): Promise<Map<Edge, number>>
     const sourceVector = weightedVotingMatrix.map(row => row[sourceIndex]);
     const targetVector = weightedVotingMatrix.map(row => row[targetIndex]);
 
+    // Calculate cosine similarity
+    let similarity = cosineSimilarity(sourceVector, targetVector);
+
+    // Check for division by zero if one of the vectors is empty
+    if (!isFinite(similarity)) {
+      similarity = 0;
+    }
+
     // 0 means the vectors are fully similar, 1 means they are orthogonal
-    const edgeScore = 1 - Math.abs(cosineSimilarity(sourceVector, targetVector));
+    const edgeScore = 1 - Math.abs(similarity);
 
     return [edge, edgeScore] as [Edge, number];
   }));
