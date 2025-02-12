@@ -30,8 +30,9 @@ export async function getAllGraphs(): Promise<DbGraph[]> {
 export async function getFeaturedGraphs(userId?: string): Promise<GraphData[]> {
   const FEATURED_GRAPH_IDS = [
     "gra_m47bz12vUA7fMZ",
-    "gra_m4a9lakjDPG7vU",
-    "gra_m4abp2spuJ9yW5"
+    "gra_m70qer53Jq5Emj",
+    "gra_m70qp33sYzJjAh",
+    "gra_m70qyyo5brMidW"
   ]
   return await getGraphData(FEATURED_GRAPH_IDS, userId);
 }
