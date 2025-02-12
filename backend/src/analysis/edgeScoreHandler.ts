@@ -3,6 +3,22 @@ import { Edge } from "../.shared/types";
 import { cosineSimilarity } from "../utils/math";
 import { getEdgesForAnalysis } from "../db/operations/edgeOperations";
 
+export async function getDissonanceScores(graphId: string): Promise<Map<string, number>> {
+  /**
+   * Calculate the dissonance score for each argument in the graph
+   * Dissonance is the maximum of the edge scores of the edges connected to the argument
+   */
+  const edgeScores: Map<Edge, number> = await getEdgeScores(graphId);
+
+  const dissonanceScores = new Map<string, number>();
+  for (const [edge, score] of edgeScores) {
+    dissonanceScores.set(edge.sourceId, Math.max(dissonanceScores.get(edge.sourceId) || 0, score));
+    dissonanceScores.set(edge.targetId, Math.max(dissonanceScores.get(edge.targetId) || 0, score));
+  }
+
+  return dissonanceScores;
+}
+
 export async function getEdgeScores(graphId: string): Promise<Map<Edge, number>> {
   /**
    * Calculate differences between vote profiles of two arguments connected by an edge
