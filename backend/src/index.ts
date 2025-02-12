@@ -18,7 +18,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: config.frontendUrl,
+    origin: config.frontendUrls,
     methods: ["GET", "POST"]
   }
 });
@@ -100,5 +100,5 @@ io.on('connection', (socket) => {
 server.listen(config.port, () => {
   console.log(`Server running at ${config.backendUrl}:${config.port}`);
   console.log(`Environment: ${config.nodeEnv}`);
-  console.log(`Allowing CORS for origin: ${config.frontendUrl}`);
+  console.log(`Allowing CORS for origins: ${config.frontendUrls.join(', ')}`);
 });

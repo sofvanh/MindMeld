@@ -2,7 +2,7 @@ interface Config {
   nodeEnv: string;
   port: number;
   backendUrl: string;
-  frontendUrl: string;
+  frontendUrls: string[];
   openAIKey: string;
   googleClientId: string;
   db: {
@@ -33,7 +33,7 @@ const config: Config = {
   nodeEnv: environment,
   port: parseInt(process.env.PORT || '3001', 10),
   backendUrl: process.env.BACKEND_URL || 'http://localhost',
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrls: (process.env.FRONTEND_URLS || 'http://localhost:3000').split(',').map(url => url.trim()),
   openAIKey: process.env.OPENAI_API_KEY || '',
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   db: {
