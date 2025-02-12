@@ -1,6 +1,8 @@
-# MindMeld
+# Nexus (formerly MindMeld)
 
-MindMeld is a full-stack application designed to facilitate group deliberation using AI. It draws inspiration from platforms like [Polis](https://pol.is/home) and [Community Notes by X](https://www.lesswrong.com/posts/sx9wTyCp5kgy8xGac/community-notes-by-x). You can access the work-in-progress deployment [here](https://mindmeldtool.netlify.app/).
+> **Note**: We're in the process of renaming the project from MindMeld to Nexus. Some parts of the codebase and documentation still use the old name.
+
+Nexus is a full-stack application designed to facilitate group deliberation using AI. It draws inspiration from platforms like [Polis](https://pol.is/home) and [Community Notes by X](https://www.lesswrong.com/posts/sx9wTyCp5kgy8xGac/community-notes-by-x). You can access the deployment [here](https://nexus-tool.com).
 
 ## Development Setup
 
@@ -31,7 +33,7 @@ For detailed commands related to individual frontend or backend tasks, refer to 
 
 ## Design
 
-The branding and design system documentation can be found at `/design`. You can view it live [here](https://mindmeldtool.netlify.app/design).
+The branding and design system documentation can be found at `/design`. You can view it live [here](https://nexus-tool.com/design).
 
 ## Deployment
 
