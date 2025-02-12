@@ -1,5 +1,6 @@
 import { Score } from "../.shared/types";
 import { analyzeReactions } from "./reactionAnalyzer";
+import { getDissonanceScores } from "./edgeScoreHandler";
 
 function getConsensusScore(argumentIndex: number,
   votingMatrix: number[][],
@@ -136,6 +137,9 @@ export async function getArgumentScores(graphId: string): Promise<Map<string, Sc
     sum_neg_neg,
   } = await analyzeReactions(graphId);
 
+  // Get dissonance scores from edge score handler
+  const dissonanceScores: Map<string, number> = await getDissonanceScores(graphId);
+
   // Calculate the argument scores for each argument
   const argumentScores: Map<string, Score> = new Map();
 
@@ -144,11 +148,13 @@ export async function getArgumentScores(graphId: string): Promise<Map<string, Sc
     const fragmentation = getFragmentationScore(argumentIndex, votingMatrix, sum_pos_pos, sum_pos_neg, uniquenessMatrix);
     const clarity = getClarityScore(argumentIndex, votingMatrix, unclearMatrix, uniquenessMatrix);
 
+    const dissonance = dissonanceScores.get(argumentId) || 0;
 
     argumentScores.set(argumentId, {
       consensus: consensus === null ? undefined : consensus,
       fragmentation: fragmentation === null ? undefined : fragmentation,
-      clarity
+      clarity,
+      dissonance
     });
   });
   return argumentScores;

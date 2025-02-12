@@ -53,6 +53,7 @@ export interface Score {
   consensus?: number;
   fragmentation?: number;
   clarity: number;
+  dissonance: number
 }
 
 export interface Edge {
