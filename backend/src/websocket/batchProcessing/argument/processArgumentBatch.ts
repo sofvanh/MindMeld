@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 import { BatchableAction } from '../batchableAction';
 import { getGraphs } from '../../../db/operations/graphOperations';
@@ -7,8 +6,9 @@ import { addArguments, getArguments } from '../../../db/operations/argumentOpera
 import { updateGraphEdges } from '../../../db/operations/edgeOperations';
 import { sendNewArgumentsUpdate } from '../../updateHandler';
 import { Server } from 'socket.io';
-import { DbArgument, DbEdge } from '../../../db/dbTypes';
+import { DbArgument, DbEdge, DbGraph } from '../../../db/dbTypes';
 import { Argument, Edge } from '../../../.shared/types';
+import { getArgumentScores } from '../../../analysis/argumentScoreHandler';
 
 
 export async function processArgumentBatch(
@@ -41,16 +41,28 @@ export async function processArgumentBatch(
   const newArgumentObjects = await addArguments(newArguments);
   const graphIds = [...new Set(actions.map(action => action.data.graphId))];
 
-  const [graphs, args] = await Promise.all([
+  const [graphs, args, scores] = await Promise.all([
     getGraphs(graphIds),
-    getArguments(graphIds)
+    getArguments(graphIds),
+    Promise.all(graphIds.map(graphId => getArgumentScores(graphId)))
   ]);
+
+  const argScores = new Map(scores.flatMap(scores =>
+    Array.from(scores.entries())
+  ));
 
   const allNewEdges: { graphId: string, edges: { sourceId: string, targetId: string }[] }[] = []
 
   for (const graph of graphs) {
     const graphArgs = args.filter(arg => arg.graph_id == graph.id);
-    const nodes: { id: string, embedding: number[] }[] = graphArgs.map(arg => ({ id: arg.id, embedding: arg.embedding }));
+    const nodes: { id: string, embedding: number[], clarity: number }[] = graphArgs.map(arg => ({
+      id: arg.id,
+      embedding: arg.embedding,
+      clarity: argScores.get(arg.id)?.clarity || 1
+    }));
+    graphArgs.forEach(arg => {
+      console.log(argScores.get(arg.id))
+    })
     const newEdges = generateTopKSimilarEdges(nodes);
     allNewEdges.push({ graphId: graph.id, edges: newEdges })
   }
