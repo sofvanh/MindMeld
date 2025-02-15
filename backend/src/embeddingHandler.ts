@@ -18,7 +18,7 @@ import config from './config';
  * @param k - Number of edges per node to generate (default 2)
  * @returns Array of edges connecting the most similar node pairs
  */
-export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[], clarity?: number }[], k = 2): { sourceId: string, targetId: string }[] {
+export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[], clarity: number }[], k = 2): { sourceId: string, targetId: string }[] {
   const nodeCount = nodes.length;
   const potentialEdges: { sourceId: string, targetId: string, edgePriority: number }[] = [];
 
@@ -58,7 +58,7 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
   potentialEdges.sort((a, b) => b.edgePriority - a.edgePriority);
 
   // Normalize nodeCount to account for clarity scores
-  const normalizedNodeCount = nodes.reduce((sum, node) => sum + (node.clarity ?? 1), 0);
+  const normalizedNodeCount = nodes.reduce((sum, node) => sum + node.clarity, 0);
 
   // Select top n*k connections
   const topConnections = potentialEdges.slice(0, normalizedNodeCount * k);
