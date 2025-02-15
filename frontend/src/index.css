@@ -4,7 +4,7 @@
 
 @layer base {
     body {
-        @apply font-system text-stone-900;
+        @apply font-system text-stone-900 transition-colors duration-200;
     }
 
     h1, h2, h3, h4 {
@@ -28,7 +28,7 @@
     }
 
     a {
-        @apply text-sky-500 rounded hover:text-sky-700 transition-colors duration-200;
+        @apply text-sky-500 rounded hover:text-sky-700;
     }
 
     p {
