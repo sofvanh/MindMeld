@@ -2,20 +2,25 @@ import { buttonStyles, iconClasses, tooltipClasses } from '../styles/defaultStyl
 import { IoIosThumbsUp, IoIosThumbsDown, IoIosWarning } from 'react-icons/io';
 import { Argument, ReactionAction, UserReaction } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { applyReactionToUserReaction } from '../shared/reactionHelper';
 
 interface FeedCardProps {
   argument: Argument;
+  onUserReactionChange?: (reaction: UserReaction) => void;
 }
 
 const reactionCache: Record<string, UserReaction> = {};
 
-export const FeedCard = ({ argument }: FeedCardProps) => {
+export const FeedCard = ({ argument, onUserReactionChange }: FeedCardProps) => {
   const { socket } = useWebSocket();
   const [userReaction, setUserReaction] = useState<UserReaction>(() =>
     reactionCache[argument.id] || {}
   );
+
+  useEffect(() => {
+    onUserReactionChange?.(userReaction);
+  }, [userReaction, onUserReactionChange]);
 
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
     if (!socket) {
