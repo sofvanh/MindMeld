@@ -10,7 +10,7 @@ interface ViewSelectorProps {
 
 const ViewSelector: React.FC<ViewSelectorProps> = ({ graphId, currentView }) => {
   return (
-    <div className="flex h-10 border-t border-stone-200">
+    <div className="flex border-t border-stone-200">
       <TabButton
         label="Feed"
         icon={PiCardsThree}

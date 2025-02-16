@@ -13,8 +13,8 @@ const TabButton = ({ label, icon: Icon, to, color = 'text-stone-700' }: TabButto
   return (
     <Link
       to={to}
-      className={`flex-grow h-full flex items-center justify-center gap-2 px-4 py-2
-        border-b-[1px] ${borderColor}
+      className={`flex-grow flex items-center justify-center gap-2 px-4 py-3
+        border-b-[4px] ${borderColor}
         rounded-none`
       }
     >
