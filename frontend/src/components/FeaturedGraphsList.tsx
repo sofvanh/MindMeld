@@ -11,7 +11,12 @@ export const FeaturedGraphsList = () => {
   useEffect(() => {
     socket?.emit('get featured graphs', {}, (response: any) => {
       if (response.success) {
-        setGraphs(response.data.graphs);
+        const sortedGraphs = [...response.data.graphs].sort((a, b) => {
+          if (a.name === "Nexus Feedback") return 1;
+          if (b.name === "Nexus Feedback") return -1;
+          return 0;
+        });
+        setGraphs(sortedGraphs);
       }
     });
   }, [socket]);
@@ -20,7 +25,7 @@ export const FeaturedGraphsList = () => {
     <div className="flex flex-col mx-auto my-4">
       <h2>Featured graphs</h2>
       <small className="block mb-8">
-        Selected graphs from the Nexus community
+        Selected graphs for exploring Nexus. Contribute to the conversation and help us improve by leaving your feedback.
       </small>
       <GraphsList graphs={graphs} />
     </div>
