@@ -19,6 +19,9 @@ export const FeaturedGraphsList = () => {
   return (
     <div className="flex flex-col mx-auto my-4">
       <h2>Featured graphs</h2>
+      <small className="block mb-8">
+        Selected graphs from the Nexus community
+      </small>
       <GraphsList graphs={graphs} />
     </div>
   );

@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { FeaturedGraphsList } from '../components/FeaturedGraphsList';
 import { MyGraphsList } from '../components/MyGraphsList';
+import SignInOutButton from '../components/SignInOutButton';
 
 
 const HomeView: React.FC = () => {
@@ -44,14 +45,14 @@ const HomeView: React.FC = () => {
           Nexus is being built by <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">a small research team</a> working on applying AI to group reasoning problems.
         </p>
       </div>
-      <FeaturedGraphsList />
+      <div className="my-24">
+        <FeaturedGraphsList />
+      </div>
       {user ? (
         <>
-          <div className="my-8">
-            <MyGraphsList />
-          </div>
-          <div>
-            <h3>Create new graph</h3>
+          <div className="my-24 bg-stone-100 p-6">
+            <h2 className="mb-2">Create new graph</h2>
+            <small className="block mb-8">Graphs you create will appear under "My Graphs" below. Anyone with a link to the graph will be able to view and contribute to it.</small>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <form onSubmit={handleCreateGraph} className="mb-4">
               <div className="flex flex-row">
@@ -72,9 +73,17 @@ const HomeView: React.FC = () => {
               </div>
             </form>
           </div>
+          <div className="my-24">
+            <MyGraphsList />
+          </div>
         </>
       ) : (
-        <p>Sign in to create your own graphs, contribute to existing graphs, and more!</p>
+        <div className="flex flex-col items-center text-center mt-14 mb-20 bg-stone-100 p-6">
+          <h4>
+            Sign in to create your own graphs, contribute to existing graphs, and more!
+          </h4>
+          <SignInOutButton />
+        </div>
       )}
     </div >
   );
