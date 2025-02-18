@@ -10,7 +10,7 @@ export default function Legend() {
   ];
 
   return (
-    <details className="bg-white/80 rounded-lg shadow-sm flex flex-col">
+    <details open className="bg-white/80 rounded-lg shadow-sm flex flex-col">
       <summary className="py-3 p-2 cursor-pointer text-sm text-stone-700 font-semibold min-h-10 items-center justify-center">
         Legend
       </summary>

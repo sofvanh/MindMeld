@@ -6,6 +6,9 @@ interface GraphsListProps {
   graphs: GraphData[];
 }
 
+// TODO This should be paginated
+// TODO This should be sorted by most recent
+// TODO If the list of graphs is empty, show a message
 export const GraphsList = ({ graphs }: GraphsListProps) => {
   return (
     <div className="flex flex-col mx-auto w-full">

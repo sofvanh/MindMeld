@@ -9,7 +9,7 @@ export const GraphInfoBox = ({ id, name, argumentCount, lastActivity }: GraphDat
         <h4 className="m-0 text-base">{name}</h4>
         <div className="text-sm text-stone-500 flex justify-between">
           <span>
-            {argumentCount} argument{argumentCount !== 1 ? 's' : ''}
+            {argumentCount} statement{argumentCount !== 1 ? 's' : ''}
           </span>
           <span>
             Last activity: {lastActivity ? formatDate(lastActivity) : 'never'}

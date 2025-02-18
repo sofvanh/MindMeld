@@ -20,7 +20,7 @@ const ArgumentForm: React.FC<ArgumentFormProps> = ({ onSubmit }) => {
     <form className="flex gap-2 w-full" onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Enter new argument"
+        placeholder="Enter new statement"
         className="flex-1 shadow-md"
         onChange={(e) => setNewArgument(e.target.value)}
         value={newArgument}

@@ -19,29 +19,51 @@ function App() {
     <WebSocketProvider>
       <AuthProvider>
         <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<HomeView />} />
-              <Route path="/docs/getting-started" element={<GettingStartedView />} />
-              <Route path="/docs/core-features" element={<CoreFeaturesView />} />
-              <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
-              <Route path="/docs/philosophy" element={<PhilosophyView />} />
-              <Route path="/graph/:graphId" element={
+          <Routes>
+            <Route path="/" element={
+              <Layout>
+                <HomeView />
+              </Layout>
+            } />
+            <Route path="/docs/getting-started" element={<GettingStartedView />} />
+            <Route path="/docs/core-features" element={<CoreFeaturesView />} />
+            <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
+            <Route path="/docs/philosophy" element={<PhilosophyView />} />
+            <Route path="/graph/:graphId" element={
+              <Layout hideFooter>
                 <GraphLayout>
                   <GraphView />
                 </GraphLayout>
-              } />
-              <Route path="/feed/:graphId" element={
+              </Layout>
+            } />
+            <Route path="/feed/:graphId" element={
+              <Layout hideFooter>
                 <GraphLayout>
                   <FeedView />
                 </GraphLayout>
-              } />
-              <Route path="/graphs" element={<GraphListView />} />
-              <Route path="/design" element={<DesignSystemView />} />
-              <Route path="/scores" element={<ScoresView />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
+              </Layout>
+            } />
+            <Route path="/graphs" element={
+              <Layout>
+                <GraphListView />
+              </Layout>
+            } />
+            <Route path="/design" element={
+              <Layout>
+                <DesignSystemView />
+              </Layout>
+            } />
+            <Route path="/scores" element={
+              <Layout>
+                <ScoresView />
+              </Layout>
+            } />
+            <Route path="*" element={
+              <Layout>
+                <Navigate to="/" replace />
+              </Layout>
+            } />
+          </Routes>
         </Router>
       </AuthProvider>
     </WebSocketProvider>

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useGraph } from '../hooks/useGraph';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { buttonStyles } from '../styles/defaultStyles';
+import { buttonStyles, tooltipClasses } from '../styles/defaultStyles';
 import { FeedCard } from '../components/FeedCard';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
-import { Argument } from '../shared/types';
+import { Argument, UserReaction } from '../shared/types';
 import SignInOutButton from '../components/SignInOutButton';
 
 
@@ -24,6 +24,11 @@ export const FeedView: React.FC = () => {
   const [currentArgument, setCurrentArgument] = useState<Argument | null>(() =>
     graphId && feedCache[graphId] ? feedCache[graphId][0] : null
   );
+  const [currentUserReaction, setCurrentUserReaction] = useState<UserReaction>({});
+
+  const hasActiveReaction = useMemo(() => {
+    return Object.values(currentUserReaction).some(value => value === true);
+  }, [currentUserReaction]);
 
   useEffect(() => {
     if (socket && user && graphId) {
@@ -82,12 +87,32 @@ export const FeedView: React.FC = () => {
               <FeedCard
                 key={currentArgument.id}
                 argument={currentArgument}
+                onUserReactionChange={setCurrentUserReaction}
               />
             </div>
             <button
               onClick={handleNext}
-              className={`${buttonStyles.secondary} mt-4`}>
-              Next <span className="font-normal text-stone-500 text-sm">({feedArguments?.length ? feedArguments.length - 1 : 0} left)</span>
+              data-tooltip={hasActiveReaction
+                ? "Move to next statement"
+                : "This card will return to your feed later"}
+              className={`
+                mt-4
+                ${buttonStyles.secondary}
+                ${tooltipClasses}
+                ${hasActiveReaction
+                  ? '!bg-emerald-500 !text-white hover:!bg-emerald-600'
+                  : 'hover:bg-stone-100'
+                }
+                `}>
+              {hasActiveReaction ? 'Next ' : 'Skip '}
+              <small className={`
+                font-normal
+                ${hasActiveReaction
+                  ? 'text-white/90'
+                  : 'text-stone-500'}
+                `}>
+                ({feedArguments?.length ? feedArguments.length - 1 : 0} left)
+              </small>
             </button>
           </div>
         )}
