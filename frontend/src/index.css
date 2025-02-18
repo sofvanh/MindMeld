@@ -36,7 +36,7 @@
     }
 
     small {
-        @apply text-stone-500;
+        @apply text-stone-500 text-xs;
     }
 
     .card {

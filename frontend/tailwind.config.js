@@ -18,6 +18,9 @@ module.exports = {
           'sans-serif'
         ],
       },
+      fontSize: {
+        'xs': '0.8rem',
+      },
     },
   },
   plugins: [],
