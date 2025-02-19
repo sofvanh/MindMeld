@@ -1,6 +1,5 @@
 import React from 'react';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import DocsDocNavigation from './DocsDocNavigation';
 import DocsLayout from './DocsLayout';
 
 const TechnicalDetailsView: React.FC = () => {

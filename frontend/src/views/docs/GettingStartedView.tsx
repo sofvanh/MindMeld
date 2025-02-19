@@ -1,6 +1,5 @@
 import React from 'react';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import DocsDocNavigation from './DocsDocNavigation';
 import { Link } from 'react-router-dom';
 import DocsLayout from './DocsLayout';
 
