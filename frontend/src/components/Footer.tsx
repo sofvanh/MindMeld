@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-stone-200 px-4 flex text-sm text-stone-400">
-      <div className="flex flex-col sm:flex-row items-center text-center sm:items-start sm:text-left justify-between w-full my-16 gap-4 sm:px-4">
+      <div className="flex flex-col sm:flex-row items-center text-center sm:items-start sm:text-left justify-between w-full max-w-screen-md mx-auto my-16 gap-4 sm:px-4">
         <div className="flex flex-col">
           <div>
             <Link to="/" className="nexus-logo text-2xl">Nexus</Link>
@@ -16,7 +16,7 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <div className="text-stone-400 font-semibold py-2">LINKS</div>
+          <div className="text-stone-400 font-semibold pb-2">LINKS</div>
           <div className="flex flex-col text-stone-400">
             <Link to="/">Home</Link>
             <Link to="/docs">Docs</Link>
@@ -26,7 +26,7 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <div className="text-stone-400 font-semibold py-2">ABOUT</div>
+          <div className="text-stone-400 font-semibold pb-2">ABOUT</div>
           <div className="flex flex-col text-stone-400">
             <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">Mosaic Labs</a>
             <a href="mailto:hello@mosaic-labs.org">Get in touch</a>
