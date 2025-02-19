@@ -62,6 +62,10 @@
 }
 
 @layer components {
+    .nexus-logo {
+        @apply font-bitter font-bold tracking-wide bg-gradient-to-r from-sky-500 to-emerald-500 bg-clip-text text-transparent hover:!opacity-75 hover:!text-transparent transition-opacity duration-200;
+    }
+
     .styled-list {
         @apply list-disc ml-6 space-y-2;
     }

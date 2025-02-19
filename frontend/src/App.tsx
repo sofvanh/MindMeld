@@ -25,6 +25,7 @@ function App() {
               </Layout>
             } />
             <Route path="/docs/getting-started" element={<GettingStartedView />} />
+            <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
             <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
             <Route path="/docs/philosophy" element={<PhilosophyView />} />
             <Route path="/graph/:graphId" element={
