@@ -9,7 +9,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import DesignSystemView from './views/DesignSystemView';
 import ScoresView from './views/ScoresView';
 import GraphLayout from './components/graph/GraphLayout';
-
+import GettingStartedView from './views/docs/GettingStartedView';
+import TechnicalDetailsView from './views/docs/TechnicalDetailsView';
+import PhilosophyView from './views/docs/PhilosophyView';
 
 function App() {
   return (
@@ -22,6 +24,9 @@ function App() {
                 <HomeView />
               </Layout>
             } />
+            <Route path="/docs/getting-started" element={<GettingStartedView />} />
+            <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
+            <Route path="/docs/philosophy" element={<PhilosophyView />} />
             <Route path="/graph/:graphId" element={
               <Layout hideFooter>
                 <GraphLayout>

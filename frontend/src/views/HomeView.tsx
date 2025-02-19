@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { buttonStyles } from '../styles/defaultStyles';
 import { useAuth } from '../contexts/AuthContext';
@@ -43,6 +43,9 @@ const HomeView: React.FC = () => {
         </p>
         <p>
           Nexus is being built by <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">a small research team</a> working on applying AI to group reasoning problems.
+        </p>
+        <p>
+          New to Nexus? Check out our <Link to="/docs/getting-started">documentation</Link> to get started.
         </p>
       </div>
       <div className="my-24">
