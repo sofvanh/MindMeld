@@ -18,8 +18,8 @@ const GettingStartedView: React.FC = () => {
           <h2 id="core-features">Core Features</h2>
           <p>There are two main things you can do:</p>
           <ol>
-            <li>Write statements</li>
-            <li>React to statements</li>
+            <li><b>Write statements</b></li>
+            <li><b>React to statements</b></li>
           </ol>
           <p>All statements and reactions are recorded and organized into a 2d graph, showing the state of the discussion so far.</p>
 
