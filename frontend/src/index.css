@@ -55,4 +55,18 @@
     button {
         @apply font-sans font-semibold rounded transition-colors duration-200 ease-in-out whitespace-normal break-words;
     }
+
+    .prose ol {
+        @apply list-decimal list-inside ml-4 space-y-2;
+    }
+}
+
+@layer components {
+    .styled-list {
+        @apply list-disc ml-6 space-y-2;
+    }
+
+    .styled-list li {
+        @apply pl-2;
+    }
 }
