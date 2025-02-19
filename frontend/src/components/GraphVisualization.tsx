@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
+import { forceCollide } from 'd3-force';
 import { Graph, ForceGraphData } from '../shared/types';
 import { getColor } from '../utils/colors';
 
@@ -16,6 +17,14 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   selectedNodeId,
   onNodeClick
 }) => {
+  const fgRef = useRef<any>();
+
+  useEffect(() => {
+    fgRef.current?.d3Force('charge')?.strength(-60);
+    fgRef.current?.d3Force('collision', forceCollide(15));
+    fgRef.current?.d3Force('link')?.distance(40);
+  }, []);
+
   const nodeColors = useMemo(() => {
     return new Map(graph?.arguments?.map(arg => [arg.id, getColor(arg)]) || []);
   }, [graph?.arguments]);
@@ -38,6 +47,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
 
   return (
     <ForceGraph2D
+      ref={fgRef}
       width={window.innerWidth}
       height={window.innerHeight - 162}
       graphData={layoutData}
