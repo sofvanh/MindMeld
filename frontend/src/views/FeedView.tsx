@@ -117,6 +117,9 @@ export const FeedView: React.FC = () => {
           </div>
         )}
       </div>
+      <small className="absolute bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2 flex justify-center w-full text-stone-400 text-center">
+        Your feed shows statements you haven't reacted to yet, prioritizing those where your vote would be most valuable. You can leave multiple reactions on each statement.
+      </small>
     </div>
   );
 };
