@@ -47,7 +47,7 @@ export async function getArgumentPriorities(graphId: string, userId: string): Pr
   // Get priority for arguments with scores (consensus, fragmentation, clarity)
   for (const [argumentId, score] of argumentScores) {
     const uniquenessScore = uniquenessScores.get(argumentId) ?? 1;
-    const priority = (1 + 20 * (score.consensus ?? 0) + 20 * (score.fragmentation ?? 0)) * (score.clarity + uniquenessScore) ** 2;
+    const priority = uniquenessScore * (1 + score.clarity + (score.consensus ?? 0) + (score.fragmentation ?? 0));
     argumentPriorityMap.set(argumentId, priority);
   }
 
