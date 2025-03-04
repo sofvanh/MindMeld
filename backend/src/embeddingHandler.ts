@@ -41,7 +41,9 @@ export function generateTopKSimilarEdges(nodes: { id: string, embedding: number[
       const mutualRankScore = 1 / (rankAtoB + rankBtoA);
 
       // Adjust priority based on clarity scores
-      const edgePriority = mutualRankScore * (nodes[i].clarity ?? 1) * (nodes[j].clarity ?? 1);
+      const clarityA = nodes[i].clarity != null ? nodes[i].clarity : 1;
+      const clarityB = nodes[j].clarity != null ? nodes[j].clarity : 1;
+      const edgePriority = mutualRankScore * clarityA * clarityB;
 
       // Order links lexicographically for deterministic results that are easier to filter
       const id1 = nodes[i].id;
