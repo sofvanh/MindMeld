@@ -85,7 +85,7 @@ export async function getReactionsForAnalysis(
       WHERE a.graph_id = $1
         AND r.type IN ('agree', 'disagree')
       GROUP BY user_id
-      HAVING COUNT(*) >= 3
+      HAVING COUNT(*) >= 7
     ),
     reaction_matrices AS (
       SELECT
