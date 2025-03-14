@@ -31,7 +31,7 @@ export const FeedView: React.FC = () => {
   }, [currentUserReaction]);
 
   useEffect(() => {
-    if (socket && user && graphId) {
+    if (socket && graphId) {
       // If we have cached data, use it immediately
       if (feedCache[graphId]) {
         setFeedArguments(feedCache[graphId]);
@@ -40,6 +40,10 @@ export const FeedView: React.FC = () => {
       }
 
       socket.emit('get feed', { graphId }, (response: any) => {
+        if (!response.success) {
+          console.error('Failed to get feed:', response.error);
+          return;
+        }
         const args = response.data.arguments;
         feedCache[graphId] = args;
         setFeedArguments(args);
@@ -64,12 +68,7 @@ export const FeedView: React.FC = () => {
   return (
     <div className="w-full relative flex flex-col flex-grow">
       <div className="flex flex-col items-center justify-center flex-1">
-        {!userLoading && !user ? (
-          <div className="text-center flex flex-col items-center justify-center">
-            <h2 className="text-xl mb-2">Please log in to see the feed</h2>
-            <SignInOutButton />
-          </div>
-        ) : feedArguments?.length === 0 ? (
+        {feedArguments?.length === 0 ? (
           <div className="text-center px-4">
             <h2 className="text-xl mb-2">No statements to show</h2>
             <p><small>Statements that you haven't reacted to yet will appear here.</small></p>

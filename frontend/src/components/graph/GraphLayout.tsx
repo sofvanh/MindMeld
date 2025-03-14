@@ -16,8 +16,8 @@ const GraphLayout = ({ children }: { children: React.ReactNode }) => {
         ←
       </Link>
       <h3 className="m-0 flex-none text-center border-b border-stone-200 py-2">{graph?.name || "Loading..."}</h3>
-      {children}
       <ViewSelector graphId={graphId || ""} currentView={currentView} />
+      {children}
     </div>
   );
 };

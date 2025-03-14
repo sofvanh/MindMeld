@@ -4,6 +4,8 @@ import { Argument, ReactionAction, UserReaction } from '../shared/types';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useState, useEffect } from 'react';
 import { applyReactionToUserReaction } from '../shared/reactionHelper';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface FeedCardProps {
   argument: Argument;
@@ -14,6 +16,9 @@ const reactionCache: Record<string, UserReaction> = {};
 
 export const FeedCard = ({ argument, onUserReactionChange }: FeedCardProps) => {
   const { socket } = useWebSocket();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [userReaction, setUserReaction] = useState<UserReaction>(() =>
     reactionCache[argument.id] || {}
   );
@@ -23,6 +28,12 @@ export const FeedCard = ({ argument, onUserReactionChange }: FeedCardProps) => {
   }, [userReaction, onUserReactionChange]);
 
   const handleReactionClick = (type: 'agree' | 'disagree' | 'unclear') => {
+    if (!user) {
+      // Redirect to login page with current location for redirect back after login
+      navigate('/login', { state: { from: location } });
+      return;
+    }
+
     if (!socket) {
       console.error('No socket found');
       return;

@@ -2,6 +2,7 @@ import { Argument } from "../../.shared/types";
 import { getArgumentPriorities } from "../../analysis/argumentPriorityHandler";
 import { SocketHandler } from "../../backendTypes";
 import { DbArgument } from "../../db/dbTypes";
+import { getArgumentsByGraphId } from "../../db/operations/argumentOperations";
 
 interface getFeedData {
   graphId: string;
@@ -13,17 +14,15 @@ interface getFeedResponse {
 
 export const handleGetFeed: SocketHandler<getFeedData, getFeedResponse> = async (socket, io, { graphId }) => {
   console.time('getFeed');
+  let argumentsForFeed: DbArgument[] = [];
   if (!socket.data.user) {
-    return {
-      success: false,
-      error: 'Authentication required'
-    }
+    argumentsForFeed = await getArgumentsByGraphId(graphId);
+  } else {
+    const argumentPriorities: Map<DbArgument, number> = await getArgumentPriorities(graphId, socket.data.user.id);
+    argumentsForFeed = Array.from(argumentPriorities)
+      .filter(([_, priority]) => priority > 0)
+      .map(([argument]) => argument);
   }
-
-  const argumentPriorities: Map<DbArgument, number> = await getArgumentPriorities(graphId, socket.data.user.id);
-  const argumentsForFeed = Array.from(argumentPriorities)
-    .filter(([_, priority]) => priority > 0)
-    .map(([argument]) => argument);
 
   const argumentObjects: Argument[] = argumentsForFeed.map(argument => ({
     id: argument.id,

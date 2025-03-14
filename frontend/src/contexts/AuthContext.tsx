@@ -5,11 +5,12 @@ import { User } from '../shared/types';
 
 const OAUTH_CLIENT_ID = process.env.REACT_APP_OAUTH_CLIENT_ID || '';
 const TOKEN_STORAGE_KEY = 'mindmeld_auth_token';
+const REDIRECT_PATH_KEY = 'mindmeld_redirect_path';
 
 interface AuthContextType {
   loading: boolean;
   user: User | null;
-  signIn: (response: CredentialResponse) => void;
+  signIn: (response: CredentialResponse, redirectPath?: string) => void;
   signOut: () => void;
 }
 
@@ -38,6 +39,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       socket.emit('authenticate', { token: storedToken }, (response: any) => {
         if (response.success) {
           setUser(response.data.user);
+
+          // Check if we need to redirect after authentication
+          const redirectPath = localStorage.getItem(REDIRECT_PATH_KEY);
+          if (redirectPath) {
+            localStorage.removeItem(REDIRECT_PATH_KEY);
+            window.location.href = redirectPath;
+          }
         } else {
           console.error('Authentication failed:', response.error);
           localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -48,8 +56,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [socket]);
 
-  const signIn = (response: CredentialResponse) => {
+  const signIn = (response: CredentialResponse, redirectPath?: string) => {
     localStorage.setItem(TOKEN_STORAGE_KEY, response.credential!);
+
+    // Store redirect path if provided
+    if (redirectPath) {
+      localStorage.setItem(REDIRECT_PATH_KEY, redirectPath);
+    }
+
     window.location.reload();
   }
 
