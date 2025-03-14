@@ -7,14 +7,13 @@ import { FeedCard } from '../components/FeedCard';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Argument, UserReaction } from '../shared/types';
-import SignInOutButton from '../components/SignInOutButton';
 
 
 const feedCache: Record<string, Argument[]> = {};
 
 export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
-  const { loading: userLoading, user } = useAuth();
+  const { loading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
   const { graph } = useGraph(graphId!);
 
@@ -31,6 +30,8 @@ export const FeedView: React.FC = () => {
   }, [currentUserReaction]);
 
   useEffect(() => {
+    if (loading) return;
+
     if (socket && graphId) {
       // If we have cached data, use it immediately
       if (feedCache[graphId]) {
@@ -50,7 +51,7 @@ export const FeedView: React.FC = () => {
         setCurrentArgument(args[0]);
       });
     }
-  }, [socket, user, graphId]);
+  }, [loading, socket, user, graphId]);
 
   const handleNext = () => {
     if (!feedArguments || !currentArgument || !graphId) return;
