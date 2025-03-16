@@ -8,6 +8,8 @@ class InMemoryCache {
   private cache: Record<string, CacheEntry<any>> = {};
   private maxEntries: number = 1000;
   private ttl: number = 60 * 60 * 1000;
+  private hits: number = 0;
+  private misses: number = 0;
 
   /**
    * Get an item from the cache
@@ -19,6 +21,7 @@ class InMemoryCache {
     const now = Date.now();
 
     if (entry && now - entry.timestamp < entry.ttl) {
+      this.hits++;
       return entry.data as T;
     }
 
@@ -26,6 +29,7 @@ class InMemoryCache {
       delete this.cache[key];
     }
 
+    this.misses++;
     return null;
   }
 
@@ -109,6 +113,19 @@ class InMemoryCache {
       delete this.cache[key];
     });
   }
+
+  /**
+   * Get cache statistics
+   */
+  getStats() {
+    return {
+      size: this.size(),
+      hits: this.hits,
+      misses: this.misses,
+      hitRate: this.hits / (this.hits + this.misses || 1),
+      keys: Object.keys(this.cache)
+    };
+  }
 }
 
 // Export a singleton instance
@@ -129,17 +146,11 @@ export async function withCache<T>(
   // Try to get from cache first
   const cachedData = memoryCache.get<T>(key);
   if (cachedData !== null) {
-    console.log(`Cache hit for ${key}`);
     return cachedData;
   }
 
-  // Cache miss - fetch fresh data
   const freshData = await fetchFn();
-
-  // Store in cache for next time
   memoryCache.set(key, freshData, ttl);
-
-  console.log(`Cache miss for ${key}`);
 
   return freshData;
 }

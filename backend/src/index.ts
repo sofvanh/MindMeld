@@ -13,6 +13,7 @@ import { handleLeaveGraph } from './websocket/graph/leaveGraph';
 import { handleGetMyGraphs } from './websocket/graph/getMyGraphs';
 import batchManager from './websocket/batchProcessing/batchManager';
 import { handleGetFeed } from './websocket/feed/getFeed';
+import { memoryCache } from './services/cacheService';
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,26 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the MindMeld backend!' });
 });
+
+if (config.nodeEnv === 'development') {
+  app.get('/api/cache-stats', (req, res) => {
+    res.json({
+      ...memoryCache.getStats(),
+      environment: config.nodeEnv
+    });
+  });
+
+  app.post('/api/cache-clear', (req, res) => {
+    memoryCache.clear();
+    res.json({
+      success: true,
+      message: 'Cache cleared successfully',
+      stats: memoryCache.getStats()
+    });
+  });
+} else {
+  console.log('Current environment:', config.nodeEnv);
+}
 
 io.on('connection', (socket) => {
   console.log('A user connected, socket ID:', socket.id);
