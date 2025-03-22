@@ -8,21 +8,14 @@ import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Argument, UserReaction } from '../shared/types';
 
-
-const feedCache: Record<string, Argument[]> = {};
-
 export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
   const { loading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
   const { graph } = useGraph(graphId!);
 
-  const [feedArguments, setFeedArguments] = useState<Argument[] | null>(() =>
-    graphId ? feedCache[graphId] || null : null
-  );
-  const [currentArgument, setCurrentArgument] = useState<Argument | null>(() =>
-    graphId && feedCache[graphId] ? feedCache[graphId][0] : null
-  );
+  const [feedArguments, setFeedArguments] = useState<Argument[] | null>(null);
+  const [currentArgument, setCurrentArgument] = useState<Argument | null>(null);
   const [currentUserReaction, setCurrentUserReaction] = useState<UserReaction>({});
 
   const hasActiveReaction = useMemo(() => {
@@ -30,33 +23,22 @@ export const FeedView: React.FC = () => {
   }, [currentUserReaction]);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || !socket || !graphId) return;
 
-    if (socket && graphId) {
-      // If we have cached data, use it immediately
-      if (feedCache[graphId]) {
-        setFeedArguments(feedCache[graphId]);
-        setCurrentArgument(feedCache[graphId][0]);
+    socket.emit('get feed', { graphId }, (response: any) => {
+      if (!response.success) {
+        console.error('Failed to get feed:', response.error);
         return;
       }
-
-      socket.emit('get feed', { graphId }, (response: any) => {
-        if (!response.success) {
-          console.error('Failed to get feed:', response.error);
-          return;
-        }
-        const args = response.data.arguments;
-        feedCache[graphId] = args;
-        setFeedArguments(args);
-        setCurrentArgument(args[0]);
-      });
-    }
+      const args = response.data.arguments;
+      setFeedArguments(args);
+      setCurrentArgument(args[0]);
+    });
   }, [loading, socket, user, graphId]);
 
   const handleNext = () => {
-    if (!feedArguments || !currentArgument || !graphId) return;
+    if (!feedArguments || !currentArgument) return;
     const newFeedArguments = feedArguments.filter(arg => arg.id !== currentArgument.id);
-    feedCache[graphId] = newFeedArguments;
     setFeedArguments(newFeedArguments);
     setCurrentArgument(newFeedArguments[0]);
   }
