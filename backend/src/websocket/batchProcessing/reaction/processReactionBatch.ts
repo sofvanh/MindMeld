@@ -3,19 +3,21 @@ import { addAndRemoveReactions, getSpecificUserArgumentReactions } from "../../.
 import { ReactionBatchableAction } from "../batchableAction";
 import { sendUserReactionsUpdate, sendGraphReactionsAndScoresUpdate } from "../../updateHandler";
 import { UserReaction } from "../../../.shared/types";
+import { memoryCache } from "../../../services/cacheService";
 
 
 /**
  * Processes a batch of reaction actions by efficiently handling database updates.
- * 
+ *
  * The function:
  * 1. Retrieves current reactions for all relevant user-argument pairs
  * 2. Groups and processes actions by user and argument to determine state changes
  * 3. Calculates the difference between current and new reaction states
  * 4. Generates lists of reactions to add and remove
  * 5. Executes a single database transaction for all changes
- * 6. Emits updates to connected clients
- * 
+ * 6. Invalidates the cache for the affected graphs
+ * 7. Emits updates to connected clients
+ *
  * Note: Score recalculation may be deferred until argument batch processing completes
  */
 export async function processReactionBatch(
@@ -52,6 +54,7 @@ export async function processReactionBatch(
 
   const { reactionsToRemove, reactionsToAdd, newUserReactions } = getReactionIdsToRemoveAndReactionsToAdd(currentReactions, actionsByUserAndArgument)
   await addAndRemoveReactions(reactionsToAdd, reactionsToRemove.map(reaction => reaction.id));
+  invalidateCache([...new Set(actions.map(action => action.data.graphId))]);
   await emitUpdates(actions, newUserReactions);
   console.timeEnd("processReactionBatch")
 }
@@ -129,6 +132,12 @@ function getReactionIdsToRemoveAndReactionsToAdd(
   }
 
   return { reactionsToRemove, reactionsToAdd, newUserReactions };
+}
+
+function invalidateCache(graphIds: string[]) {
+  const pattern = `graph:(${graphIds.join('|')})`;
+  const count = memoryCache.deletePattern(pattern);
+  console.log("Invalidated cache for graphs", graphIds, `(${count} entries removed)`);
 }
 
 async function emitUpdates(actions: Array<ReactionBatchableAction>, newUserReactions: Map<string, Map<string, UserReaction>>) {

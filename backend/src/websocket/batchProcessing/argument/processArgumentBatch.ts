@@ -9,8 +9,20 @@ import { Server } from 'socket.io';
 import { DbArgument, DbEdge, DbGraph } from '../../../db/dbTypes';
 import { Argument, Edge } from '../../../.shared/types';
 import { getArgumentScores } from '../../../analysis/argumentScoreHandler';
+import { memoryCache } from '../../../services/cacheService';
 
-
+/**
+ * Processes a batch of argument actions by efficiently handling database updates and generating embeddings.
+ *
+ * The function:
+ * 1. Generates embeddings for all new argument statements
+ * 2. Adds the new arguments to the database with their embeddings
+ * 3. Retrieves all relevant graphs, arguments, and scores
+ * 4. Generates new edges between arguments based on semantic similarity
+ * 5. Updates the graph edges in the database
+ * 6. Invalidates the cache for the affected graphs
+ * 7. Emits updates to connected clients with new arguments and edges
+ */
 export async function processArgumentBatch(
   actions: Array<BatchableAction & { type: 'add argument' }>
 ) {
@@ -69,8 +81,15 @@ export async function processArgumentBatch(
 
   const newEdgeObjects = (await Promise.all(allNewEdges.map(({ graphId, edges }) => updateGraphEdges(graphId, edges)))).flat();
 
+  invalidateCache(graphIds);
   await emitUpdates(actions[0].io, graphIds, newArgumentObjects, newEdgeObjects);
   console.timeEnd("processArgumentBatch")
+}
+
+function invalidateCache(graphIds: string[]) {
+  const pattern = `graph:(${graphIds.join('|')})`;
+  const count = memoryCache.deletePattern(pattern);
+  console.log("Invalidated cache for graphs", graphIds, `(${count} entries removed)`);
 }
 
 async function emitUpdates(io: Server, graphIds: string[], args: DbArgument[], edges: DbEdge[]) {
