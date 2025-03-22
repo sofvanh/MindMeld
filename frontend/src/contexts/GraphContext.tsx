@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Graph, ForceGraphData, NodeData, LinkData, Score, UserReaction, ReactionCounts, Argument, Edge, ReactionAction } from '../shared/types';
-import { useWebSocket } from '../contexts/WebSocketContext';
-import { useAuth } from '../contexts/AuthContext';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Graph, ForceGraphData, NodeData, LinkData, ReactionAction, UserReaction, ReactionCounts, Argument, Edge, Score } from '../shared/types';
+import { useWebSocket } from './WebSocketContext';
+import { useAuth } from './AuthContext';
 import { applyReactionActions } from '../shared/reactionHelper';
 
-export interface UseGraphResult {
+interface GraphContextType {
   graph: Graph | null;
   layoutData: ForceGraphData;
   loading: boolean;
@@ -12,7 +12,22 @@ export interface UseGraphResult {
   removePendingReaction: (reaction: ReactionAction) => void;
 }
 
-export function useGraph(graphId: string) {
+const GraphContext = createContext<GraphContextType | null>(null);
+
+export const useGraphContext = () => {
+  const context = useContext(GraphContext);
+  if (!context) {
+    throw new Error('useGraphContext must be used within a GraphProvider');
+  }
+  return context;
+};
+
+interface GraphProviderProps {
+  children: React.ReactNode;
+  graphId: string;
+}
+
+export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId }) => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const [serverGraph, setServerGraph] = useState<Graph | null>(null);
@@ -22,7 +37,7 @@ export function useGraph(graphId: string) {
 
   const addPendingReaction = (reaction: ReactionAction) => {
     setPendingReactions(prev => [...prev, reaction]);
-  }
+  };
 
   const removePendingReaction = (reaction: ReactionAction) => {
     setPendingReactions(prev => {
@@ -34,7 +49,7 @@ export function useGraph(graphId: string) {
       if (index === -1) return prev;
       return [...prev.slice(0, index), ...prev.slice(index + 1)];
     });
-  }
+  };
 
   const applyPendingReactions = (argument: Argument, reactions: ReactionAction[]) => {
     const oldReactionCounts: ReactionCounts = argument.reactionCounts || { agree: 0, disagree: 0, unclear: 0 };
@@ -44,8 +59,8 @@ export function useGraph(graphId: string) {
       ...argument,
       reactionCounts,
       userReaction
-    }
-  }
+    };
+  };
 
   useEffect(() => {
     if (!serverGraph || Object.keys(pendingReactions).length === 0) {
@@ -121,7 +136,7 @@ export function useGraph(graphId: string) {
       socket.off('arguments added');
       socket.off('user reactions update');
       socket.off('graph reactions and scores update');
-    }
+    };
   }, [socket, graphId, user]);
 
   useEffect(() => {
@@ -139,11 +154,17 @@ export function useGraph(graphId: string) {
     }
   }, [graph, layoutData.nodes, layoutData.links]);
 
-  return {
+  const value = {
     graph,
     layoutData,
     loading: !graph,
     addPendingReaction,
     removePendingReaction
   };
-}
+
+  return (
+    <GraphContext.Provider value={value}>
+      {children}
+    </GraphContext.Provider>
+  );
+};

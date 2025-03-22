@@ -1,12 +1,12 @@
 import React from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
-import { useGraph } from "../../hooks/useGraph";
 import { buttonStyles } from "../../styles/defaultStyles";
 import ViewSelector from "../ViewSelector";
+import { GraphProvider, useGraphContext } from "../../contexts/GraphContext";
 
-const GraphLayout = ({ children }: { children: React.ReactNode }) => {
+const GraphLayoutContent = ({ children }: { children: React.ReactNode }) => {
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph } = useGraph(graphId!);
+  const { graph } = useGraphContext();
   const location = useLocation();
   const currentView = location.pathname.startsWith("/feed/") ? "feed" : "graph";
 
@@ -19,6 +19,16 @@ const GraphLayout = ({ children }: { children: React.ReactNode }) => {
       <ViewSelector graphId={graphId || ""} currentView={currentView} />
       {children}
     </div>
+  );
+};
+
+const GraphLayout = ({ children }: { children: React.ReactNode }) => {
+  const { graphId } = useParams<{ graphId: string }>();
+
+  return (
+    <GraphProvider graphId={graphId!}>
+      <GraphLayoutContent>{children}</GraphLayoutContent>
+    </GraphProvider>
   );
 };
 

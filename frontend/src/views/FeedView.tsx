@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useGraph } from '../hooks/useGraph';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { buttonStyles, tooltipClasses } from '../styles/defaultStyles';
 import { FeedCard } from '../components/FeedCard';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Argument, UserReaction } from '../shared/types';
+import { useGraphContext } from '../contexts/GraphContext';
 
 export const FeedView: React.FC = () => {
   const { socket } = useWebSocket();
   const { loading, user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph } = useGraph(graphId!);
+  const { graph } = useGraphContext();
 
   const [feedArguments, setFeedArguments] = useState<Argument[] | null>(null);
   const [currentArgument, setCurrentArgument] = useState<Argument | null>(null);
