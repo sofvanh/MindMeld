@@ -30,6 +30,7 @@ function App() {
             <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
             <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
             <Route path="/docs/philosophy" element={<PhilosophyView />} />
+            {/* TODO We could merge the two routes below, letting GraphLayout decide which view to show */}
             <Route path="/graph/:graphId" element={
               <Layout hideFooter>
                 <GraphLayout>

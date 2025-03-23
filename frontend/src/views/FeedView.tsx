@@ -26,6 +26,7 @@ export const FeedView: React.FC = () => {
     if (loading || !socket || !graphId) return;
 
     socket.emit('get feed', { graphId }, (response: any) => {
+      // TODO Maybe this should be in GraphContext as well
       if (!response.success) {
         console.error('Failed to get feed:', response.error);
         return;
