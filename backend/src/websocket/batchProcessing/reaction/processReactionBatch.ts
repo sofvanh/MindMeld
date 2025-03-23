@@ -1,9 +1,8 @@
 import { DbReaction } from "../../../db/dbTypes";
-import { addAndRemoveReactions, getSpecificUserArgumentReactions } from "../../../db/operations/reactionOperations";
+import { addAndRemoveReactions, getSpecificUserArgumentReactionsFromDb } from "../../../db/operations/reactionOperations";
 import { ReactionBatchableAction } from "../batchableAction";
 import { sendUserReactionsUpdate, sendGraphReactionsAndScoresUpdate } from "../../updateHandler";
 import { UserReaction } from "../../../.shared/types";
-import { memoryCache } from "../../../services/cacheService";
 
 
 /**
@@ -15,8 +14,7 @@ import { memoryCache } from "../../../services/cacheService";
  * 3. Calculates the difference between current and new reaction states
  * 4. Generates lists of reactions to add and remove
  * 5. Executes a single database transaction for all changes
- * 6. Invalidates the cache for the affected graphs
- * 7. Emits updates to connected clients
+ * 6. Emits updates to connected clients
  *
  * Note: Score recalculation may be deferred until argument batch processing completes
  */
@@ -35,7 +33,7 @@ export async function processReactionBatch(
   const uniquePairs: Array<{ userId: string, argumentId: string }> = Array.from(new Set(actions.map(action =>
     JSON.stringify({ userId: action.socket.data.user.id, argumentId: action.data.argumentId })
   ))).map(str => JSON.parse(str));
-  const currentReactions: DbReaction[] = await getSpecificUserArgumentReactions(uniquePairs);
+  const currentReactions: DbReaction[] = await getSpecificUserArgumentReactionsFromDb(uniquePairs);
 
   // Group actions by user and argument
   const actionsByUserAndArgument = new Map<string, Map<string, ReactionBatchableAction[]>>();
@@ -52,9 +50,9 @@ export async function processReactionBatch(
     userActions.get(argumentId)!.push(action);
   }
 
-  const { reactionsToRemove, reactionsToAdd, newUserReactions } = getReactionIdsToRemoveAndReactionsToAdd(currentReactions, actionsByUserAndArgument)
-  await addAndRemoveReactions(reactionsToAdd, reactionsToRemove.map(reaction => reaction.id));
-  invalidateCache([...new Set(actions.map(action => action.data.graphId))]);
+  const { reactionsToRemove, reactionsToAdd, newUserReactions } = getReactionIdsToRemoveAndReactionsToAdd(currentReactions, actionsByUserAndArgument);
+  const graphIds = [...new Set(actions.map(action => action.data.graphId))];
+  await addAndRemoveReactions(reactionsToAdd, reactionsToRemove.map(reaction => reaction.id), graphIds);
   await emitUpdates(actions, newUserReactions);
   console.timeEnd("processReactionBatch")
 }
@@ -132,12 +130,6 @@ function getReactionIdsToRemoveAndReactionsToAdd(
   }
 
   return { reactionsToRemove, reactionsToAdd, newUserReactions };
-}
-
-function invalidateCache(graphIds: string[]) {
-  const pattern = `graph:(${graphIds.join('|')})`;
-  const count = memoryCache.deletePattern(pattern);
-  console.log("Invalidated cache for graphs", graphIds, `(${count} entries removed)`);
 }
 
 async function emitUpdates(actions: Array<ReactionBatchableAction>, newUserReactions: Map<string, Map<string, UserReaction>>) {

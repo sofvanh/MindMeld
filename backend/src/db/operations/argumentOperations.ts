@@ -1,21 +1,37 @@
-import { Argument } from "../../.shared/types";
 import { query, queryMany } from "../db";
 import { DbArgument } from "../dbTypes";
 import { generateArgumentId } from "../idGenerator";
-import { getReactionCountsForArgument } from "./reactionOperations";
+import { memoryCache, withCache } from "../../services/cacheService";
 
-export async function addArgument(
-  graphId: string,
-  statement: string,
-  embedding: number[],
-  authorId: string
-): Promise<string> {
-  const id = generateArgumentId();
-  await query(
-    'INSERT INTO arguments (id, graph_id, statement, embedding, author_id) VALUES ($1, $2, $3, $4, $5)',
-    [id, graphId, statement, embedding, authorId]
+
+/*
+  Cached functions
+*/
+
+export async function getArgumentsByGraphId(graphId: string): Promise<DbArgument[]> {
+  const cacheKey = `graph:${graphId}:arguments`;
+
+  return withCache(
+    cacheKey,
+    60 * 60 * 1000, // 1 hour cache
+    async () => {
+      return queryMany<DbArgument>(
+        'SELECT * FROM arguments WHERE graph_id = $1',
+        [graphId]
+      );
+    }
   );
-  return id;
+}
+
+/*
+  Heavy functions, meant to be used from cached or rarely used functions
+*/
+
+export async function getArgumentsForGraphsFromDb(graphIds: string[]): Promise<DbArgument[]> {
+  return await queryMany<DbArgument>(
+    `SELECT * FROM arguments WHERE graph_id = ANY($1)`,
+    [graphIds]
+  );
 }
 
 export async function addArguments(
@@ -48,37 +64,9 @@ export async function addArguments(
     flatParams
   );
 
+  const graphIds = [...new Set(args.map(arg => arg.graphId))];
+  const cacheKeyPattern = `graph:(${graphIds.join('|')}):arguments`;
+  memoryCache.deletePattern(cacheKeyPattern);
+
   return dbArguments;
-}
-
-export async function getArgument(
-  argumentId: string
-): Promise<Argument | null> {
-  const result = await query('SELECT * FROM arguments WHERE id = $1', [argumentId]);
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  const reactionCounts = await getReactionCountsForArgument(argumentId);
-
-  const row = result.rows[0];
-  return {
-    id: row.id,
-    graphId: row.graph_id,
-    statement: row.statement,
-    embedding: row.embedding,
-    authorId: row.author_id,
-    reactionCounts: reactionCounts
-  };
-}
-
-export async function getArguments(graphIds: string[]): Promise<DbArgument[]> {
-  return await queryMany<DbArgument>(
-    `SELECT * FROM arguments WHERE graph_id = ANY($1)`,
-    [graphIds]
-  );
-}
-
-export async function getArgumentsByGraphId(graphId: string): Promise<DbArgument[]> {
-  return await queryMany<DbArgument>('SELECT * FROM arguments WHERE graph_id = $1', [graphId]);
 }

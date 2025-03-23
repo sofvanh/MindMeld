@@ -1,9 +1,10 @@
 import { query, queryMany } from '../db';
 import { generateEdgeId } from '../idGenerator';
 import { DbEdge } from '../dbTypes';
+import { memoryCache } from '../../services/cacheService';
 
 
-export async function getEdges(graphIds: string[]): Promise<DbEdge[]> {
+async function getEdgesFromDb(graphIds: string[]): Promise<DbEdge[]> {
   const placeholders = graphIds.map((_, i) => `$${i + 1}`).join(',');
   return await queryMany<DbEdge>(
     `SELECT * FROM edges WHERE graph_id IN (${placeholders})`,
@@ -14,11 +15,12 @@ export async function getEdges(graphIds: string[]): Promise<DbEdge[]> {
 // TODO Rewrite updateGraphEdges so that it can handle many graphs at once
 /**
  * Updates the edges of a graph in the database.
- * 
+ *
  * Retrieves current edges, compares with new edges,
  * removes redundant edges, and adds new ones.
  * Uses efficient bulk operations.
- * 
+ * Invalidate cache for the entire graph.
+ *
  * @param graphId - The ID of the graph to update.
  * @param newEdges - Array of {sourceId, targetId} objects.
  * @returns Array of DbEdge objects representing the new edges in the graph.
@@ -26,7 +28,7 @@ export async function getEdges(graphIds: string[]): Promise<DbEdge[]> {
  */
 export async function updateGraphEdges(graphId: string, newEdges: { sourceId: string, targetId: string }[]): Promise<DbEdge[]> {
   // Get current edges from the database
-  const currentEdges = await getEdges([graphId]);
+  const currentEdges = await getEdgesFromDb([graphId]);
   const currentEdgesSet = new Set(currentEdges.map(edge => `${edge.source_id}-${edge.target_id}`));
 
   // Identify edges to be added and removed
@@ -72,6 +74,9 @@ export async function updateGraphEdges(graphId: string, newEdges: { sourceId: st
       target_id: edge.targetId
     })));
   }
+
+  const cacheKeyPattern = `graph:${graphId}`;
+  memoryCache.deletePattern(cacheKeyPattern);
 
   // Return all edges in the graph after the update
   const remainingEdges = currentEdges
