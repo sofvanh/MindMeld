@@ -97,4 +97,5 @@ export interface Analysis {
   reactionCount: number;
   contributorCount: number;
   createdAt: string;
+  topStatements: Argument[];
 }
