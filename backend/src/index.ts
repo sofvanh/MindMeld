@@ -14,6 +14,7 @@ import { handleGetMyGraphs } from './websocket/graph/getMyGraphs';
 import batchManager from './websocket/batchProcessing/batchManager';
 import { handleGetFeed } from './websocket/feed/getFeed';
 import { memoryCache } from './services/cacheService';
+import { handleGetAnalysis } from './websocket/analysis/getAnalysis';
 
 const app = express();
 const server = http.createServer(app);
@@ -84,6 +85,7 @@ io.on('connection', (socket) => {
   socket.on('get featured graphs', wrapHandler(handleGetFeaturedGraphs));
   socket.on('get my graphs', wrapHandler(handleGetMyGraphs));
   socket.on('get feed', wrapHandler(handleGetFeed));
+  socket.on('get analysis', wrapHandler(handleGetAnalysis));
   socket.on('create graph', wrapHandler(handleCreateGraph));
   socket.on('join graph', wrapHandler(handleJoinGraph));
   socket.on('leave graph', wrapHandler(handleLeaveGraph));

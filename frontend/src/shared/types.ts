@@ -91,3 +91,9 @@ export interface ReactionAction {
   argumentId: string;
   reactionType: ReactionType;
 }
+
+export interface Analysis {
+  statementCount: number;
+  reactionCount: number;
+  contributorCount: number;
+}

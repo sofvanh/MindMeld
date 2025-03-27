@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Graph, ForceGraphData, NodeData, LinkData, ReactionAction, UserReaction, ReactionCounts, Argument, Edge, Score } from '../shared/types';
+import { Graph, ForceGraphData, NodeData, LinkData, ReactionAction, UserReaction, ReactionCounts, Argument, Edge, Score, Analysis } from '../shared/types';
 import { useWebSocket } from './WebSocketContext';
 import { useAuth } from './AuthContext';
 import { applyReactionActions } from '../shared/reactionHelper';
@@ -7,6 +7,7 @@ import { applyReactionActions } from '../shared/reactionHelper';
 interface GraphContextType {
   graph: Graph | null;
   layoutData: ForceGraphData;
+  analysis: Analysis | null;
   loading: boolean;
   addPendingReaction: (reaction: ReactionAction) => void;
   removePendingReaction: (reaction: ReactionAction) => void;
@@ -34,6 +35,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   const [pendingReactions, setPendingReactions] = useState<ReactionAction[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
 
   const addPendingReaction = (reaction: ReactionAction) => {
     setPendingReactions(prev => [...prev, reaction]);
@@ -97,6 +99,14 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
       }
     });
 
+    socket.emit('get analysis', { graphId }, (response: any) => {
+      if (response.success) {
+        setAnalysis(response.data.analysis);
+      } else {
+        console.error('Failed to get analysis:', response.error);
+      }
+    });
+
     socket.on('graph update', setServerGraph);
     socket.on('arguments added', ({ newArguments, allGraphEdges }: { newArguments: Argument[], allGraphEdges: Edge[] }) => {
       setServerGraph(prevGraph => {
@@ -157,7 +167,8 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   const value = {
     graph,
     layoutData,
-    loading: !graph,
+    analysis,
+    loading: !graph || !analysis,
     addPendingReaction,
     removePendingReaction
   };

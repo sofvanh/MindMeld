@@ -8,7 +8,10 @@ const GraphLayoutContent = ({ children }: { children: React.ReactNode }) => {
   const { graphId } = useParams<{ graphId: string }>();
   const { graph } = useGraphContext();
   const location = useLocation();
-  const currentView = location.pathname.startsWith("/feed/") ? "feed" : "graph";
+
+  const currentView = location.pathname.includes('/feed/') ? 'feed'
+    : location.pathname.includes('/analysis/') ? 'analysis'
+      : 'graph';
 
   return (
     <div className="relative flex flex-col flex-grow">
@@ -16,7 +19,7 @@ const GraphLayoutContent = ({ children }: { children: React.ReactNode }) => {
         ←
       </Link>
       <h3 className="m-0 flex-none text-center border-b border-stone-200 py-2">{graph?.name || "Loading..."}</h3>
-      <ViewSelector graphId={graphId || ""} currentView={currentView} />
+      <ViewSelector graphId={graphId || ""} currentView={currentView as "feed" | "graph" | "analysis"} />
       {children}
     </div>
   );

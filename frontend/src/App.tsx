@@ -13,6 +13,7 @@ import GettingStartedView from './views/docs/GettingStartedView';
 import TechnicalDetailsView from './views/docs/TechnicalDetailsView';
 import PhilosophyView from './views/docs/PhilosophyView';
 import LoginView from './views/LoginView';
+import { AnalysisView } from './views/AnalysisView';
 
 function App() {
   return (
@@ -42,6 +43,13 @@ function App() {
               <Layout hideFooter>
                 <GraphLayout>
                   <FeedView />
+                </GraphLayout>
+              </Layout>
+            } />
+            <Route path="/analysis/:graphId" element={
+              <Layout hideFooter>
+                <GraphLayout>
+                  <AnalysisView />
                 </GraphLayout>
               </Layout>
             } />
