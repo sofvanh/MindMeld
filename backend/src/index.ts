@@ -30,14 +30,14 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the MindMeld backend!' });
 });
 
-if (config.nodeEnv === 'development') {
-  app.get('/api/cache-stats', (req, res) => {
-    res.json({
-      ...memoryCache.getStats(),
-      environment: config.nodeEnv
-    });
+app.get('/api/cache-stats', (req, res) => {
+  res.json({
+    ...memoryCache.getStats(),
+    environment: config.nodeEnv
   });
+});
 
+if (config.nodeEnv === 'development') {
   app.post('/api/cache-clear', (req, res) => {
     memoryCache.clear();
     res.json({
