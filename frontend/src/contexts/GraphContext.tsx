@@ -7,10 +7,12 @@ import { applyReactionActions } from '../shared/reactionHelper';
 interface GraphContextType {
   graph: Graph | null;
   layoutData: ForceGraphData;
+  feed: Argument[] | null;
   analysis: Analysis | null;
   loading: boolean;
   addPendingReaction: (reaction: ReactionAction) => void;
   removePendingReaction: (reaction: ReactionAction) => void;
+  onNextFeedArgument: () => void;
 }
 
 const GraphContext = createContext<GraphContextType | null>(null);
@@ -35,6 +37,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   const [pendingReactions, setPendingReactions] = useState<ReactionAction[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
+  const [feed, setFeed] = useState<Argument[] | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
 
   const addPendingReaction = (reaction: ReactionAction) => {
@@ -63,6 +66,12 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
       userReaction
     };
   };
+
+  const onNextFeedArgument = () => {
+    if (!feed || feed.length === 0) return;
+    const newFeedArguments = feed.slice(1);
+    setFeed(newFeedArguments);
+  }
 
   useEffect(() => {
     if (!serverGraph || Object.keys(pendingReactions).length === 0) {
@@ -96,6 +105,15 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
         setServerGraph(response.data.graph);
       } else {
         console.error('Failed to join graph:', response.error);
+      }
+    });
+
+    // TODO Getting feed and analysis should happen within join graph
+    socket.emit('get feed', { graphId }, (response: any) => {
+      if (response.success) {
+        setFeed(response.data.arguments);
+      } else {
+        console.error('Failed to get feed:', response.error);
       }
     });
 
@@ -167,10 +185,12 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   const value = {
     graph,
     layoutData,
+    feed,
     analysis,
-    loading: !graph || !analysis,
+    loading: !graph || !analysis || !feed,
     addPendingReaction,
-    removePendingReaction
+    removePendingReaction,
+    onNextFeedArgument
   };
 
   return (
