@@ -7,6 +7,13 @@ const generateCustomId = (prefix: string): string => {
   return `${prefix}_${timestamp}${randomPart}`;
 };
 
+export const parseCustomId = (id: string): { prefix: string, timestamp: string, randomPart: string } => {
+  const [prefix, rest] = id.split('_');
+  const timestamp = new Date(parseInt(rest.slice(0, -6), 36)).toISOString();
+  const randomPart = rest.slice(-6);
+  return { prefix, timestamp, randomPart };
+};
+
 export const generateUserId = (): string => generateCustomId('usr');
 export const generateGraphId = (): string => generateCustomId('gra');
 export const generateArgumentId = (): string => generateCustomId('arg');

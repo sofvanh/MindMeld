@@ -3,7 +3,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { useGraphContext } from '../contexts/GraphContext';
 import { ScoreTrendsGraph } from '../components/analysis/ScoreTrendsGraph';
 import { PiWarningDuotone } from "react-icons/pi";
-
+import { GraphInfo } from '../components/analysis/GraphInfo';
 
 export const AnalysisView: React.FC = () => {
   const { graph, analysis, loading } = useGraphContext();
@@ -35,25 +35,9 @@ export const AnalysisView: React.FC = () => {
 
   return (
     <div className="w-full relative flex flex-col flex-grow p-6">
-      <div className="max-w-screen-lg mx-auto w-full">
+      <div className="max-w-screen-lg mx-auto w-full flex flex-col gap-8">
         <h2 className="text-2xl font-bold mb-6">Graph Analysis</h2>
-
-        <div className="bg-white rounded-lg shadow-sm border border-stone-200 p-4 mb-4">
-          <div className="flex gap-4">
-            <div className="text-center">
-              <p className="text-sm text-stone-500">Statements</p>
-              <p className="text-xl font-bold">{analysis?.statementCount}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-stone-500">Contributors</p>
-              <p className="text-xl font-bold">{analysis?.contributorCount}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-stone-500">Reactions</p>
-              <p className="text-xl font-bold">{analysis?.reactionCount}</p>
-            </div>
-          </div>
-        </div>
+        <GraphInfo />
         <ScoreTrendsGraph />
       </div>
     </div>

@@ -96,4 +96,5 @@ export interface Analysis {
   statementCount: number;
   reactionCount: number;
   contributorCount: number;
+  createdAt: string;
 }
