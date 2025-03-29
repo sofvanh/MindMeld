@@ -4,7 +4,7 @@ import { GraphData } from '../shared/types';
 import { GraphsList } from './GraphsList';
 
 
-export const MyGraphsList = () => {
+export const MyDiscussionsList = () => {
   const { socket } = useWebSocket();
   const [graphs, setGraphs] = useState<GraphData[]>([]);
 
@@ -18,9 +18,9 @@ export const MyGraphsList = () => {
 
   return (
     <div className="flex flex-col mx-auto mt-4">
-      <h2>My graphs</h2>
+      <h2>My discussions</h2>
       <small className="block mb-8">
-        Graphs you've created or contributed to
+        Discussions you've created or contributed to
       </small>
       <GraphsList graphs={graphs} />
     </div>

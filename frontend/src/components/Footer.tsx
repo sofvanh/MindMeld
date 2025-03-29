@@ -12,10 +12,13 @@ export default function Footer() {
             An open-source project by <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">Mosaic Labs</a>
           </div>
           <div className="text-stone-400">
+            Built with support from <a href="https://lightspeedgrants.org/" target="_blank" rel="noopener noreferrer">Lightspeed Grants</a>
+          </div>
+          <div className="text-stone-400">
             © {new Date().getFullYear()}
           </div>
         </div>
-        <div>
+        <div className="sm:text-right">
           <div className="text-stone-400 font-semibold pb-2">LINKS</div>
           <div className="flex flex-col text-stone-400">
             <Link to="/">Home</Link>
@@ -25,7 +28,7 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        <div>
+        <div className="sm:text-right">
           <div className="text-stone-400 font-semibold pb-2">ABOUT</div>
           <div className="flex flex-col text-stone-400">
             <a href="https://mosaic-labs.org" target="_blank" rel="noopener noreferrer">Mosaic Labs</a>

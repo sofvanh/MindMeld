@@ -1,11 +1,10 @@
 import React from 'react';
 import TabButton from './TabButton';
-import { PiCardsThree } from "react-icons/pi";
-import { PiGraphDuotone } from "react-icons/pi";
+import { PiCardsThree, PiGraphDuotone, PiChartBarDuotone } from "react-icons/pi";
 
 interface ViewSelectorProps {
   graphId: string;
-  currentView: 'feed' | 'graph';
+  currentView: 'feed' | 'graph' | 'analysis';
 }
 
 const ViewSelector: React.FC<ViewSelectorProps> = ({ graphId, currentView }) => {
@@ -22,6 +21,12 @@ const ViewSelector: React.FC<ViewSelectorProps> = ({ graphId, currentView }) => 
         icon={PiGraphDuotone}
         to={`/graph/${graphId}`}
         color={currentView === 'graph' ? 'text-emerald-500' : 'text-stone-700'}
+      />
+      <TabButton
+        label="Analysis"
+        icon={PiChartBarDuotone}
+        to={`/analysis/${graphId}`}
+        color={currentView === 'analysis' ? 'text-emerald-500' : 'text-stone-700'}
       />
     </div>
   );

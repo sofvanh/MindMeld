@@ -2,6 +2,8 @@ import { BatchableAction, ReactionBatchableAction } from './batchableAction';
 import { processArgumentBatch } from './argument/processArgumentBatch';
 import { processReactionBatch } from './reaction/processReactionBatch';
 
+// TODO Need to test how this handles overlapping batches
+
 class BatchManager {
   private pendingActions: BatchableAction[] = [];
   private batchTimeout: NodeJS.Timeout | null = null;

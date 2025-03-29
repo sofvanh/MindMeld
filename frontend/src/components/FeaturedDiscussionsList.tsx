@@ -4,7 +4,7 @@ import { GraphData } from '../shared/types';
 import { GraphsList } from './GraphsList';
 
 
-export const FeaturedGraphsList = () => {
+export const FeaturedDiscussionsList = () => {
   const { socket } = useWebSocket();
   const [graphs, setGraphs] = useState<GraphData[]>([]);
 
@@ -23,9 +23,9 @@ export const FeaturedGraphsList = () => {
 
   return (
     <div className="flex flex-col mx-auto my-4">
-      <h2>Featured graphs</h2>
+      <h2>Featured discussions</h2>
       <small className="block mb-8">
-        Selected graphs for exploring Nexus. Contribute to the conversation and help us improve by leaving your feedback.
+        Selected discussions for exploring Nexus. Contribute to the conversation and help us improve by leaving your feedback.
       </small>
       <GraphsList graphs={graphs} />
     </div>
