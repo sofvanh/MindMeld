@@ -68,7 +68,7 @@ export async function processArgumentBatch(
     const nodes: { id: string, embedding: number[], clarity: number }[] = graphArgs.map(arg => ({
       id: arg.id,
       embedding: arg.embedding,
-      clarity: argScores.get(arg.id)?.clarity || 1
+      clarity: argScores.get(arg.id)?.clarity ?? 1
     }));
     graphArgs.forEach(arg => {
       console.log(argScores.get(arg.id))
