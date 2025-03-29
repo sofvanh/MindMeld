@@ -1,6 +1,6 @@
 import { analyzeReactions } from "./reactionAnalyzer";
 import { getArgumentScores } from "./argumentScoreHandler";
-import { getReactionsForGraph } from "../db/operations/reactionOperations";
+import { getReactionsByGraphId } from "../db/operations/reactionOperations";
 import { getArgumentsByGraphId } from "../db/operations/argumentOperations";
 import { DbArgument } from "../db/dbTypes";
 
@@ -34,14 +34,14 @@ export async function getArgumentPriorities(graphId: string, userId: string): Pr
     uniquenessScores
   ] = await Promise.all([
     getArgumentsByGraphId(graphId),
-    getReactionsForGraph(graphId),
+    getReactionsByGraphId(graphId),
     getArgumentScores(graphId),
     getUniquenessScores(userId, graphId)
   ]);
 
   const argumentPriorityMap = new Map<string, number>();
   const userReactedMap = new Map<string, boolean>(
-    reactions.filter(reaction => reaction.userId === userId).map(reaction => [reaction.argumentId, true])
+    reactions.filter(reaction => reaction.user_id === userId).map(reaction => [reaction.argument_id, true])
   );
 
   // Get priority for arguments with scores (consensus, fragmentation, clarity)

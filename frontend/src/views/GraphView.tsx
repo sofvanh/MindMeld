@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWebSocket } from '../contexts/WebSocketContext';
-import { useGraph } from '../hooks/useGraph';
+import { useGraphContext } from '../contexts/GraphContext';
 import { useNodeNavigation } from '../hooks/useNodeNavigation';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ArgumentInfoBox from '../components/ArgumentInfoBox/ArgumentInfoBox';
@@ -15,7 +15,7 @@ const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, layoutData, loading, addPendingReaction, removePendingReaction } = useGraph(graphId!);
+  const { graph, layoutData, loading, addPendingReaction, removePendingReaction } = useGraphContext();
   const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
   const [argumentsInQueue, setArgumentsInQueue] = useState<number>(0);
 

@@ -1,16 +1,26 @@
 import _ from 'lodash';
 import { BatchableAction } from '../batchableAction';
-import { getGraphs } from '../../../db/operations/graphOperations';
+import { getGraphsFromDb } from '../../../db/operations/graphOperations';
 import { embedText, generateTopKSimilarEdges } from '../../../embeddingHandler';
-import { addArguments, getArguments } from '../../../db/operations/argumentOperations';
+import { addArguments, getArgumentsForGraphsFromDb } from '../../../db/operations/argumentOperations';
 import { updateGraphEdges } from '../../../db/operations/edgeOperations';
 import { sendNewArgumentsUpdate } from '../../updateHandler';
 import { Server } from 'socket.io';
-import { DbArgument, DbEdge, DbGraph } from '../../../db/dbTypes';
+import { DbArgument, DbEdge } from '../../../db/dbTypes';
 import { Argument, Edge } from '../../../.shared/types';
 import { getArgumentScores } from '../../../analysis/argumentScoreHandler';
 
-
+/**
+ * Processes a batch of argument actions by efficiently handling database updates and generating embeddings.
+ *
+ * The function:
+ * 1. Generates embeddings for all new argument statements
+ * 2. Adds the new arguments to the database with their embeddings
+ * 3. Retrieves all relevant graphs, arguments, and scores
+ * 4. Generates new edges between arguments based on semantic similarity
+ * 5. Updates the graph edges in the database
+ * 6. Emits updates to connected clients with new arguments and edges
+ */
 export async function processArgumentBatch(
   actions: Array<BatchableAction & { type: 'add argument' }>
 ) {
@@ -42,8 +52,8 @@ export async function processArgumentBatch(
   const graphIds = [...new Set(actions.map(action => action.data.graphId))];
 
   const [graphs, args, scores] = await Promise.all([
-    getGraphs(graphIds),
-    getArguments(graphIds),
+    getGraphsFromDb(graphIds),
+    getArgumentsForGraphsFromDb(graphIds),
     Promise.all(graphIds.map(graphId => getArgumentScores(graphId)))
   ]);
 

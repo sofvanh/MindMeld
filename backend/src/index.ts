@@ -13,6 +13,8 @@ import { handleLeaveGraph } from './websocket/graph/leaveGraph';
 import { handleGetMyGraphs } from './websocket/graph/getMyGraphs';
 import batchManager from './websocket/batchProcessing/batchManager';
 import { handleGetFeed } from './websocket/feed/getFeed';
+import { memoryCache } from './services/cacheService';
+import { handleGetAnalysis } from './websocket/analysis/getAnalysis';
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +30,26 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the MindMeld backend!' });
 });
+
+app.get('/api/cache-stats', (req, res) => {
+  res.json({
+    ...memoryCache.getStats(),
+    environment: config.nodeEnv
+  });
+});
+
+if (config.nodeEnv === 'development') {
+  app.post('/api/cache-clear', (req, res) => {
+    memoryCache.clear();
+    res.json({
+      success: true,
+      message: 'Cache cleared successfully',
+      stats: memoryCache.getStats()
+    });
+  });
+} else {
+  console.log('Current environment:', config.nodeEnv);
+}
 
 io.on('connection', (socket) => {
   console.log('A user connected, socket ID:', socket.id);
@@ -63,6 +85,7 @@ io.on('connection', (socket) => {
   socket.on('get featured graphs', wrapHandler(handleGetFeaturedGraphs));
   socket.on('get my graphs', wrapHandler(handleGetMyGraphs));
   socket.on('get feed', wrapHandler(handleGetFeed));
+  socket.on('get analysis', wrapHandler(handleGetAnalysis));
   socket.on('create graph', wrapHandler(handleCreateGraph));
   socket.on('join graph', wrapHandler(handleJoinGraph));
   socket.on('leave graph', wrapHandler(handleLeaveGraph));

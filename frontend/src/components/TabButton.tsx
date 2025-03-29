@@ -13,13 +13,13 @@ const TabButton = ({ label, icon: Icon, to, color = 'text-stone-700' }: TabButto
   return (
     <Link
       to={to}
-      className={`flex-grow flex items-center justify-center gap-2 px-4 py-3
+      className={`flex items-center justify-center gap-2 px-4 py-3
         border-b-[4px] ${borderColor}
-        rounded-none`
-      }
+        rounded-none flex-grow`}
+      title={label}
     >
       <Icon className={`w-5 h-5 ${color}`} />
-      <span className={`${color} font-semibold`}>{label}</span>
+      <span className={`${color} font-semibold hidden sm:inline`}>{label}</span>
     </Link>
   );
 };

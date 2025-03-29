@@ -12,6 +12,8 @@ import GraphLayout from './components/graph/GraphLayout';
 import GettingStartedView from './views/docs/GettingStartedView';
 import TechnicalDetailsView from './views/docs/TechnicalDetailsView';
 import PhilosophyView from './views/docs/PhilosophyView';
+import LoginView from './views/LoginView';
+import { AnalysisView } from './views/AnalysisView';
 
 function App() {
   return (
@@ -24,10 +26,12 @@ function App() {
                 <HomeView />
               </Layout>
             } />
+            <Route path="/login" element={<LoginView />} />
             <Route path="/docs/getting-started" element={<GettingStartedView />} />
             <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
             <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
             <Route path="/docs/philosophy" element={<PhilosophyView />} />
+            {/* TODO We could merge the two routes below, letting GraphLayout decide which view to show */}
             <Route path="/graph/:graphId" element={
               <Layout hideFooter>
                 <GraphLayout>
@@ -39,6 +43,13 @@ function App() {
               <Layout hideFooter>
                 <GraphLayout>
                   <FeedView />
+                </GraphLayout>
+              </Layout>
+            } />
+            <Route path="/analysis/:graphId" element={
+              <Layout hideFooter>
+                <GraphLayout>
+                  <AnalysisView />
                 </GraphLayout>
               </Layout>
             } />

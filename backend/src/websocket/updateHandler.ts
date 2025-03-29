@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { getArgumentScores } from "../analysis/argumentScoreHandler";
-import { getReactionCounts } from "../db/operations/reactionOperations";
+import { getReactionCountsFromDb } from "../db/operations/reactionOperations";
 import { Argument, Edge, ReactionCounts, Score, UserReaction } from "../.shared/types";
 
 export const sendNewArgumentsUpdate = async (
@@ -24,7 +24,7 @@ export const sendGraphReactionsAndScoresUpdate = async (
   io: Server,
   graphId: string
 ) => {
-  const reactionCounts: Map<string, ReactionCounts> = await getReactionCounts(graphId);
+  const reactionCounts: Map<string, ReactionCounts> = await getReactionCountsFromDb(graphId);
   const argumentScores: Map<string, Score> = await getArgumentScores(graphId);
   const graphReactionsRecord = Object.fromEntries(reactionCounts);
   const argumentScoresRecord = Object.fromEntries(argumentScores);
