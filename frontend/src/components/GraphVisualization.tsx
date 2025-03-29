@@ -58,6 +58,7 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       nodeCanvasObjectMode={() => 'replace'}
       nodeRelSize={15}
       autoPauseRedraw={true}
+      d3AlphaDecay={0.01}
     />
   );
 };
