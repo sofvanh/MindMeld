@@ -43,7 +43,7 @@ const LoginView: React.FC = () => {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-stone-800 mb-2">Welcome to MindMeld</h1>
+          <h1 className="text-3xl font-bold text-stone-800 mb-2">Welcome to Nexus</h1>
           <p className="text-stone-600">Sign in to continue</p>
         </div>
 
