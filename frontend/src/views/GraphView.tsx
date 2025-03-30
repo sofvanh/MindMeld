@@ -10,6 +10,7 @@ import GraphVisualization from '../components/GraphVisualization';
 import ArgumentForm from '../components/ArgumentForm';
 import { Argument } from '../shared/types';
 import Legend from '../components/Legend';
+import { PiWarningDuotone } from 'react-icons/pi';
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
@@ -54,25 +55,37 @@ const GraphView: React.FC = () => {
     }
   };
 
+  if (loading && !graph) {
+    return (
+      <div className="flex-grow flex items-center justify-center h-full mt-8">
+        <LoadingSpinner size="large" />
+      </div>
+    )
+  }
+
+  if (!graph) {
+    return (
+      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
+        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
+        <h3 className="mb-0">Graph Not Available</h3>
+        <p><small>Failed to load graph. Please try again later.</small></p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full relative flex flex-col flex-grow">
       <div className="absolute top-4 left-4 z-10 ">
         <Legend />
       </div>
-      {loading || !graph ? (
-        <div className="flex-grow flex items-center justify-center h-full mt-8">
-          <LoadingSpinner size="large" />
-        </div>
-      ) : (
-        <div className="flex-grow">
-          <GraphVisualization
-            graph={graph}
-            layoutData={layoutData}
-            selectedNodeId={selectedNodeId}
-            onNodeClick={handleNodeClick}
-          />
-        </div>
-      )}
+      <div className="flex-grow">
+        <GraphVisualization
+          graph={graph}
+          layoutData={layoutData}
+          selectedNodeId={selectedNodeId}
+          onNodeClick={handleNodeClick}
+        />
+      </div>
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-full max-w-[600px] px-2">
         {selectedArgument ? (
           <ArgumentInfoBox
