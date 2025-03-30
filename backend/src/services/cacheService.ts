@@ -10,6 +10,7 @@ class InMemoryCache {
   private ttl: number = 60 * 60 * 1000;
   private hits: number = 0;
   private misses: number = 0;
+  public pendingRequests: Record<string, Promise<any>> = {};
 
   /**
    * Get an item from the cache
@@ -123,8 +124,30 @@ class InMemoryCache {
       hits: this.hits,
       misses: this.misses,
       hitRate: this.hits / (this.hits + this.misses || 1),
-      keys: Object.keys(this.cache)
+      keys: Object.keys(this.cache),
+      pendingRequests: Object.keys(this.pendingRequests).length
     };
+  }
+
+  /**
+   * Get a pending request for a key
+   */
+  getPendingRequest(key: string): Promise<any> | undefined {
+    return this.pendingRequests[key];
+  }
+
+  /**
+   * Set a pending request for a key
+   */
+  setPendingRequest(key: string, promise: Promise<any>): void {
+    this.pendingRequests[key] = promise;
+  }
+
+  /**
+   * Remove a pending request for a key
+   */
+  removePendingRequest(key: string): void {
+    delete this.pendingRequests[key];
   }
 }
 
@@ -149,8 +172,24 @@ export async function withCache<T>(
     return cachedData;
   }
 
-  const freshData = await fetchFn();
-  memoryCache.set(key, freshData, ttl);
+  // If there's already a pending request for this key, wait for it
+  const pendingRequest = memoryCache.getPendingRequest(key);
+  if (pendingRequest) {
+    return pendingRequest;
+  }
 
-  return freshData;
+  // Start a new request and store it in pending requests
+  const requestPromise = fetchFn()
+    .then(freshData => {
+      memoryCache.set(key, freshData, ttl);
+      return freshData;
+    })
+    .finally(() => {
+      // Clean up the pending request when done (success or failure)
+      memoryCache.removePendingRequest(key);
+    });
+
+  memoryCache.setPendingRequest(key, requestPromise);
+
+  return requestPromise;
 }
