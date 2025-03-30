@@ -4,7 +4,7 @@ import { DbEdge } from '../dbTypes';
 import { memoryCache } from '../../services/cacheService';
 
 
-async function getEdgesFromDb(graphIds: string[]): Promise<DbEdge[]> {
+export async function getEdgesFromDb(graphIds: string[]): Promise<DbEdge[]> {
   const placeholders = graphIds.map((_, i) => `$${i + 1}`).join(',');
   return await queryMany<DbEdge>(
     `SELECT * FROM edges WHERE graph_id IN (${placeholders})`,

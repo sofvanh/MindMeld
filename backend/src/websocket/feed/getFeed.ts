@@ -13,8 +13,6 @@ interface getFeedResponse {
 }
 
 export const handleGetFeed: SocketHandler<getFeedData, getFeedResponse> = async (socket, io, { graphId }) => {
-  console.time('getFeed');
-
   let argumentsForFeed: DbArgument[] = [];
   if (!socket.data.user) {
     argumentsForFeed = await getArgumentsByGraphId(graphId);
@@ -32,8 +30,6 @@ export const handleGetFeed: SocketHandler<getFeedData, getFeedResponse> = async 
     embedding: argument.embedding,
     authorId: argument.author_id,
   }));
-
-  console.timeEnd('getFeed');
 
   return {
     success: true,

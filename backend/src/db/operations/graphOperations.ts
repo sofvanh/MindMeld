@@ -6,7 +6,8 @@ import { getTimestamp } from '../getTimestamp';
 import { DbArgument, DbEdge, DbGraph, DbReaction } from '../dbTypes';
 import { query, queryMany, queryOne } from '../db';
 import { memoryCache, withCache } from '../../services/cacheService';
-
+import { getArgumentsByGraphId } from './argumentOperations';
+import { getEdgesFromDb } from './edgeOperations';
 
 /*
   Cached functions
@@ -59,7 +60,6 @@ export async function getUserGraphs(userId: string): Promise<GraphData[]> {
 
 export async function getFullGraph(graphId: string, userId?: string): Promise<Graph> {
   const cacheKey = `graph:${graphId}${userId ? `:${userId}` : ''}`;
-  console.log('cacheKey', cacheKey);
 
   return withCache(
     cacheKey,
@@ -73,6 +73,9 @@ export async function getFullGraph(graphId: string, userId?: string): Promise<Gr
 */
 
 async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Graph> {
+  console.log(`Loading graph into cache: ${graphId}`);
+  const startTime = performance.now();
+
   const [
     { rows: [{ name }] },
     argumentsResult,
@@ -82,8 +85,8 @@ async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Gra
     userReactionsResult
   ] = await Promise.all([
     query('SELECT name FROM graphs WHERE id = $1', [graphId]),
-    queryMany<DbArgument>('SELECT * FROM arguments WHERE graph_id = $1', [graphId]),
-    queryMany<DbEdge>('SELECT * FROM edges WHERE graph_id = $1', [graphId]),
+    getArgumentsByGraphId(graphId),
+    getEdgesFromDb([graphId]),
     getReactionCountsFromDb(graphId),
     getArgumentScores(graphId),
     userId ? queryMany<DbReaction>(
@@ -93,8 +96,6 @@ async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Gra
       [userId, graphId]
     ) : Promise.resolve([])
   ]);
-
-  console.log('Finished queries');
 
   if (!name) {
     throw new Error('Graph not found');
@@ -129,6 +130,10 @@ async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Gra
     sourceId: row.source_id,
     targetId: row.target_id
   }));
+
+  const endTime = performance.now();
+  const duration = ((endTime - startTime) / 1000).toFixed(2);
+  console.log(`Loaded graph "${name}" (${graphId}) in ${duration}s`);
 
   return {
     id: graphId,
