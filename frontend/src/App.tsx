@@ -5,6 +5,7 @@ import { WebSocketProvider } from './contexts/WebSocketContext';
 import { AuthProvider } from './contexts/AuthContext';
 import GraphLayout from './components/graph/GraphLayout';
 import LoginView from './views/LoginView';
+import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy load components
 const HomeView = lazy(() => import('./views/HomeView'));
@@ -19,7 +20,7 @@ const PhilosophyView = lazy(() => import('./views/docs/PhilosophyView'));
 const AnalysisView = lazy(() => import('./views/AnalysisView').then(module => ({ default: module.AnalysisView })));
 
 // Loading fallback
-const LoadingFallback = () => <div className="loading-spinner">Loading...</div>;
+const LoadingFallback = () => <LoadingSpinner />;
 
 function App() {
   return (
