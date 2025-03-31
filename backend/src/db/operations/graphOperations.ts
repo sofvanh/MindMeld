@@ -1,13 +1,13 @@
 import { generateGraphId } from '../idGenerator';
 import { Argument, Edge, Graph, GraphData } from '../../.shared/types';
 import { getArgumentScores } from '../../analysis/argumentScoreHandler';
-import { getReactionCountsFromDb } from './reactionOperations';
+import { getReactionCounts, getUserReactionsByGraphId } from './reactionOperations';
 import { getTimestamp } from '../getTimestamp';
-import { DbArgument, DbEdge, DbGraph, DbReaction } from '../dbTypes';
+import { DbGraph } from '../dbTypes';
 import { query, queryMany, queryOne } from '../db';
 import { memoryCache, withCache } from '../../services/cacheService';
 import { getArgumentsByGraphId } from './argumentOperations';
-import { getEdgesFromDb } from './edgeOperations';
+import { getEdgesByGraphId } from './edgeOperations';
 
 /*
   Cached functions
@@ -57,44 +57,37 @@ export async function getUserGraphs(userId: string): Promise<GraphData[]> {
   );
 }
 
-
-export async function getFullGraph(graphId: string, userId?: string): Promise<Graph> {
-  const cacheKey = `graph:${graphId}${userId ? `:${userId}` : ''}`;
+export async function getGraphName(graphId: string): Promise<string> {
+  const cacheKey = `graph-name:${graphId}`;
 
   return withCache(
     cacheKey,
     60 * 60 * 1000, // 1 hour cache
-    () => getFullGraphFromDb(graphId, userId)
+    async () => {
+      const result = await query('SELECT name FROM graphs WHERE id = $1', [graphId]);
+      return result.rows[0].name;
+    }
   );
 }
 
-/*
-  Heavy functions, meant to be used from cached or rarely used functions
-*/
-
-async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Graph> {
-  console.log(`Loading graph into cache: ${graphId}`);
+export async function getFullGraph(graphId: string, userId?: string): Promise<Graph> {
+  console.log(`Getting full graph ${graphId} for user ${userId}`);
   const startTime = performance.now();
 
   const [
-    { rows: [{ name }] },
+    name,
     argumentsResult,
     edgesResult,
     reactionCounts,
     argumentScores,
     userReactionsResult
   ] = await Promise.all([
-    query('SELECT name FROM graphs WHERE id = $1', [graphId]),
+    getGraphName(graphId),
     getArgumentsByGraphId(graphId),
-    getEdgesFromDb([graphId]),
-    getReactionCountsFromDb(graphId),
+    getEdgesByGraphId(graphId),
+    getReactionCounts(graphId),
     getArgumentScores(graphId),
-    userId ? queryMany<DbReaction>(
-      `SELECT *
-      FROM reactions
-      WHERE user_id = $1 AND argument_id IN (SELECT id FROM arguments WHERE graph_id = $2)`,
-      [userId, graphId]
-    ) : Promise.resolve([])
+    userId ? getUserReactionsByGraphId(userId, graphId) : Promise.resolve([])
   ]);
 
   if (!name) {
@@ -133,7 +126,7 @@ async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Gra
 
   const endTime = performance.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
-  console.log(`Loaded graph "${name}" (${graphId}) in ${duration}s`);
+  console.log(`Loaded graph "${name}" (${graphId}) for user ${userId || 'anonymous'} in ${duration}s`);
 
   return {
     id: graphId,
@@ -142,6 +135,10 @@ async function getFullGraphFromDb(graphId: string, userId?: string): Promise<Gra
     edges
   } as Graph;
 }
+
+/*
+  Heavy functions, meant to be used from cached or rarely used functions
+*/
 
 async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
   const placeholders = graphIds.map((_, i) => `$${i + 1}`).join(',');

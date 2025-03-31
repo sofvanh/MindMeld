@@ -27,6 +27,56 @@ export async function getReactionsByGraphId(
   );
 }
 
+export async function getUserReactionsByGraphId(
+  userId: string,
+  graphId: string
+): Promise<DbReaction[]> {
+  const cacheKey = `user:${userId}:graph:${graphId}:reactions`;
+
+  return withCache(
+    cacheKey,
+    60 * 60 * 1000, // 1 hour cache
+    async () => {
+      return queryMany<DbReaction>(
+        `SELECT *
+        FROM reactions
+        WHERE user_id = $1 AND argument_id IN (SELECT id FROM arguments WHERE graph_id = $2)`,
+        [userId, graphId]
+      );
+    }
+  );
+}
+
+export async function getReactionCounts(
+  graphId: string
+): Promise<Map<string, ReactionCounts>> {
+  const cacheKey = `graph:${graphId}:reactions:counts`;
+
+  return withCache(
+    cacheKey,
+    60 * 60 * 1000, // 1 hour cache
+    async () => {
+      const reactionCountsResult = await query(
+        `SELECT argument_id, type, COUNT(*) as count
+         FROM reactions
+         WHERE argument_id IN (SELECT id FROM arguments WHERE graph_id = $1)
+         GROUP BY argument_id, type`,
+        [graphId]
+      );
+
+      const reactionCountsMap = new Map();
+      reactionCountsResult.rows.forEach((row: any) => {
+        if (!reactionCountsMap.has(row.argument_id)) {
+          reactionCountsMap.set(row.argument_id, { agree: 0, disagree: 0, unclear: 0 });
+        }
+        reactionCountsMap.get(row.argument_id)[row.type] = parseInt(row.count);
+      });
+
+      return reactionCountsMap;
+    }
+  );
+}
+
 export interface ReactionForAnalysis {
   reactions: {
     userId: string;
@@ -95,28 +145,6 @@ export async function getReactionsForAnalysis(
 /*
   Heavy functions, meant to be used from cached or rarely used functions
 */
-
-export async function getReactionCountsFromDb(
-  graphId: string
-): Promise<Map<string, ReactionCounts>> {
-  const reactionCountsResult = await query(
-    `SELECT argument_id, type, COUNT(*) as count
-     FROM reactions
-     WHERE argument_id IN (SELECT id FROM arguments WHERE graph_id = $1)
-     GROUP BY argument_id, type`,
-    [graphId]
-  );
-
-  const reactionCountsMap = new Map();
-  reactionCountsResult.rows.forEach((row: any) => {
-    if (!reactionCountsMap.has(row.argument_id)) {
-      reactionCountsMap.set(row.argument_id, { agree: 0, disagree: 0, unclear: 0 });
-    }
-    reactionCountsMap.get(row.argument_id)[row.type] = parseInt(row.count);
-  });
-
-  return reactionCountsMap;
-}
 
 export async function getSpecificUserArgumentReactionsFromDb(
   userArgumentPairs: { userId: string; argumentId: string }[]

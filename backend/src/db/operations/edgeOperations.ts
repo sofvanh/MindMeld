@@ -1,7 +1,36 @@
 import { query, queryMany } from '../db';
 import { generateEdgeId } from '../idGenerator';
 import { DbEdge } from '../dbTypes';
-import { memoryCache } from '../../services/cacheService';
+import { memoryCache, withCache } from '../../services/cacheService';
+
+
+/*
+  Cached functions
+*/
+
+/**
+ * Gets edges for a single graph with caching.
+ *
+ * @param graphId - The ID of the graph to get edges for.
+ * @returns Promise resolving to an array of DbEdge objects.
+ */
+export async function getEdgesByGraphId(
+  graphId: string
+): Promise<DbEdge[]> {
+  const cacheKey = `graph:${graphId}:edges`;
+
+  return withCache(
+    cacheKey,
+    60 * 60 * 1000, // 1 hour cache
+    async () => {
+      return queryMany<DbEdge>(
+        'SELECT * FROM edges WHERE graph_id = $1',
+        [graphId]
+      );
+    }
+  );
+}
+
 
 
 export async function getEdgesFromDb(graphIds: string[]): Promise<DbEdge[]> {
@@ -75,7 +104,7 @@ export async function updateGraphEdges(graphId: string, newEdges: { sourceId: st
     })));
   }
 
-  const cacheKeyPattern = `graph:${graphId}`;
+  const cacheKeyPattern = `graph:${graphId}:edges`;
   memoryCache.deletePattern(cacheKeyPattern);
 
   // Return all edges in the graph after the update
