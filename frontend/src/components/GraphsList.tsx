@@ -11,13 +11,11 @@ interface GraphsListProps {
 // TODO If the list of graphs is empty, show a message
 export const GraphsList = ({ graphs }: GraphsListProps) => {
   return (
-    <div className="flex flex-col mx-auto w-full">
+    <div className="flex flex-col mx-auto w-full gap-4">
       {graphs.length > 0 ? (
-        <div className="border-b border-stone-200">
-          {graphs.map(graph => (
-            <GraphInfoBox key={graph.id} {...graph} />
-          ))}
-        </div>
+        graphs.map(graph => (
+          <GraphInfoBox key={graph.id} {...graph} />
+        ))
       ) : (
         <LoadingSpinner className="mt-4" />
       )}

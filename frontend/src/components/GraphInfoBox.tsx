@@ -1,19 +1,34 @@
 import { Link } from 'react-router-dom';
 import { GraphData } from '../shared/types';
 import { formatDate } from '../utils/time';
+import { PiArrowRight } from 'react-icons/pi';
 
 export const GraphInfoBox = ({ id, name, argumentCount, lastActivity }: GraphData) => {
   return (
     <Link to={`/feed/${id}`} className="block">
-      <div className="py-4 bg-white hover:bg-stone-50 transition-colors duration-100 text-stone-700 border-t border-stone-200">
-        <h4 className="m-0 text-base">{name}</h4>
-        <div className="text-sm text-stone-500 flex justify-between">
-          <span>
-            {argumentCount} statement{argumentCount !== 1 ? 's' : ''}
-          </span>
-          <span>
-            Last activity: {lastActivity ? formatDate(lastActivity) : 'never'}
-          </span>
+      <div className="
+      p-4 bg-white
+      border border-stone-200 rounded-lg shadow-sm
+      hover:bg-[rgba(16,185,129,0.02)]
+      hover:border-emerald-500
+      hover:shadow-md
+      transition-all duration-150 group
+      ">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <h4 className="m-0 text-stone-800  transition-colors duration-150">{name}</h4>
+            <div className="justify-between mt-2 flex flex-wrap">
+              <small className="mr-2">
+                <span className="font-bold">{argumentCount}</span> statement{argumentCount !== 1 ? 's' : ''}
+              </small>
+              <small>
+                Last activity: <span className="font-bold">{lastActivity ? formatDate(lastActivity) : 'never'}</span>
+              </small>
+            </div>
+          </div>
+          <div className="text-stone-400 group-hover:text-emerald-700 transition-colors duration-150">
+            <PiArrowRight className="w-5 h-5" />
+          </div>
         </div>
       </div>
     </Link>
