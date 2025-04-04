@@ -36,14 +36,23 @@ export const handleGetAnalysis: SocketHandler<getAnalysisData, getAnalysisRespon
   const { timestamp } = parseCustomId(graph.id);
 
   const topStatements = graph.arguments
-    .map(arg => ({
-      ...arg,
-      combinedScore: (arg.score?.consensus ?? 0) * (arg.score?.fragmentation ?? 0)
-    }))
-    .filter(arg => arg.combinedScore > 0.1 && (arg.score?.clarity ?? 0) >= 0.5)
-    .sort((a, b) => b.combinedScore - a.combinedScore)
+    .map(arg => {
+      const reactionCount = reactions.filter(reaction => reaction.argument_id === arg.id).length;
+      const consensus = arg.score?.consensus ?? 0;
+      const fragmentation = arg.score?.fragmentation ?? 0;
+      const clarity = arg.score?.clarity ?? 1;
+      const logReactionCount = Math.log(Math.max(1, reactionCount));
+      const importance = (consensus + 1) * (fragmentation + 1) * clarity * logReactionCount;
+
+      return {
+        ...arg,
+        importance
+      };
+    })
+    .filter(arg => arg.importance > 0.1)
+    .sort((a, b) => b.importance - a.importance)
     .slice(0, 5)
-    .map(({ combinedScore, ...arg }) => arg); // Remove the combinedScore before returning
+    .map(({ importance, ...arg }) => arg); // Remove the importance before returning
 
   const analysis: Analysis = {
     statementCount,
