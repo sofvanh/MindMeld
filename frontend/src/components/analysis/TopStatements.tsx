@@ -1,12 +1,20 @@
 import { useGraphContext } from "../../contexts/GraphContext";
 import { StatementCard } from "./StatementCard";
+import { useState } from "react";
 
 export const TopStatements = () => {
   const { analysis } = useGraphContext();
+  const [showAll, setShowAll] = useState(false);
 
   if (!analysis) {
     return null;
   }
+
+  const displayedStatements = showAll
+    ? analysis.topStatements
+    : analysis.topStatements.slice(0, 5);
+
+  const hasMoreStatements = analysis.topStatements.length > 5;
 
   return (
     <div className="bg-white rounded-lg sm:shadow-sm sm:border sm:border-stone-200 sm:p-4">
@@ -21,13 +29,35 @@ export const TopStatements = () => {
             </p>
           </div>
         )}
-        {analysis.topStatements.map((statement, index) => (
+        {displayedStatements.map((statement, index) => (
           <StatementCard
             key={statement.id}
             statement={statement}
             index={index}
           />
         ))}
+        {hasMoreStatements && (
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="mt-2 text-sm text-stone-500 hover:text-stone-700 transition-colors duration-200 flex items-center justify-center gap-1"
+          >
+            {showAll ? (
+              <>
+                <span>Show Less</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+              </>
+            ) : (
+              <>
+                <span>Show More</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

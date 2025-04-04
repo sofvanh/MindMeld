@@ -51,7 +51,7 @@ export const handleGetAnalysis: SocketHandler<getAnalysisData, getAnalysisRespon
     })
     .filter(arg => arg.importance > 0.1)
     .sort((a, b) => b.importance - a.importance)
-    .slice(0, 5)
+    .slice(0, 20)
     .map(({ importance, ...arg }) => arg); // Remove the importance before returning
 
   const analysis: Analysis = {
