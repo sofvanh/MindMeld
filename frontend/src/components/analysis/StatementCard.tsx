@@ -10,7 +10,7 @@ interface StatementCardProps {
 export const StatementCard = ({ statement, index }: StatementCardProps) => {
   return (
     <div
-      className="p-4 rounded-lg border border-stone-200"
+      className="p-4 rounded-lg border border-stone-200 animate-fade-in-up"
       style={{ borderLeftColor: getColor(statement), borderLeftWidth: '6px' }}
     >
       <div className="flex items-start gap-3">
