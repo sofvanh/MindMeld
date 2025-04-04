@@ -19,70 +19,103 @@ const TechnicalDetailsView = lazy(() => import('./views/docs/TechnicalDetailsVie
 const PhilosophyView = lazy(() => import('./views/docs/PhilosophyView'));
 const AnalysisView = lazy(() => import('./views/AnalysisView').then(module => ({ default: module.AnalysisView })));
 
-// Loading fallback
-const LoadingFallback = () => <LoadingSpinner />;
+
+const LoadingFallback = () => (
+  <div className="flex-grow flex items-center justify-center h-full">
+    <LoadingSpinner />
+  </div>
+);
+
+const LazyView = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<LoadingFallback />}>
+    {children}
+  </Suspense>
+);
 
 function App() {
   return (
     <WebSocketProvider>
       <AuthProvider>
         <Router>
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={
-                <Layout>
+          <Routes>
+            <Route path="/" element={
+              <Layout>
+                <LazyView>
                   <HomeView />
-                </Layout>
-              } />
-              <Route path="/login" element={<LoginView />} />
-              <Route path="/docs/getting-started" element={<GettingStartedView />} />
-              <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
-              <Route path="/docs/technical-details" element={<TechnicalDetailsView />} />
-              <Route path="/docs/philosophy" element={<PhilosophyView />} />
-              {/* TODO We could merge the two routes below, letting GraphLayout decide which view to show */}
-              <Route path="/graph/:graphId" element={
-                <Layout hideFooter>
-                  <GraphLayout>
+                </LazyView>
+              </Layout>
+            } />
+            <Route path="/login" element={<LoginView />} />
+            <Route path="/docs/getting-started" element={
+              <LazyView>
+                <GettingStartedView />
+              </LazyView>
+            } />
+            <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
+            <Route path="/docs/technical-details" element={
+              <LazyView>
+                <TechnicalDetailsView />
+              </LazyView>
+            } />
+            <Route path="/docs/philosophy" element={
+              <LazyView>
+                <PhilosophyView />
+              </LazyView>
+            } />
+            <Route path="/graph/:graphId" element={
+              <Layout hideFooter>
+                <GraphLayout>
+                  <LazyView>
                     <GraphView />
-                  </GraphLayout>
-                </Layout>
-              } />
-              <Route path="/feed/:graphId" element={
-                <Layout hideFooter>
-                  <GraphLayout>
+                  </LazyView>
+                </GraphLayout>
+              </Layout>
+            } />
+            <Route path="/feed/:graphId" element={
+              <Layout hideFooter>
+                <GraphLayout>
+                  <LazyView>
                     <FeedView />
-                  </GraphLayout>
-                </Layout>
-              } />
-              <Route path="/analysis/:graphId" element={
-                <Layout hideFooter>
-                  <GraphLayout>
+                  </LazyView>
+                </GraphLayout>
+              </Layout>
+            } />
+            <Route path="/analysis/:graphId" element={
+              <Layout hideFooter>
+                <GraphLayout>
+                  <LazyView>
                     <AnalysisView />
-                  </GraphLayout>
-                </Layout>
-              } />
-              <Route path="/graphs" element={
-                <Layout>
+                  </LazyView>
+                </GraphLayout>
+              </Layout>
+            } />
+            <Route path="/graphs" element={
+              <Layout>
+                <LazyView>
                   <GraphListView />
-                </Layout>
-              } />
-              <Route path="/design" element={
-                <Layout>
+                </LazyView>
+              </Layout>
+            } />
+            <Route path="/design" element={
+              <Layout>
+                <LazyView>
                   <DesignSystemView />
-                </Layout>
-              } />
-              <Route path="/scores" element={
-                <Layout>
+                </LazyView>
+              </Layout>
+            } />
+            <Route path="/scores" element={
+              <Layout>
+                <LazyView>
                   <ScoresView />
-                </Layout>
-              } />
-              <Route path="*" element={
-                <Layout>
-                  <Navigate to="/" replace />
-                </Layout>
-              } />
-            </Routes>
-          </Suspense>
+                </LazyView>
+              </Layout>
+            } />
+            <Route path="*" element={
+              <Layout>
+                <Navigate to="/" replace />
+              </Layout>
+            } />
+          </Routes>
         </Router>
       </AuthProvider>
     </WebSocketProvider>
