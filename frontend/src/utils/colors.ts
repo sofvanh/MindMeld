@@ -11,6 +11,7 @@ const STONE_400: RGBColor = { r: 168, g: 162, b: 158 };
 const EMERALD_500: RGBColor = { r: 16, g: 185, b: 129 };
 const ORANGE_500: RGBColor = { r: 249, g: 115, b: 22 };
 const YELLOW_400: RGBColor = { r: 250, g: 204, b: 21 };
+const AMBER_500: RGBColor = { r: 245, g: 158, b: 11 };
 
 export const BASE_COLOR = STONE_400;
 export const CONSENSUS_COLOR = EMERALD_500;
@@ -48,3 +49,21 @@ export function getColor(arg: Argument): string {
 
   return `rgba(${finalColor.r}, ${finalColor.g}, ${finalColor.b}, ${alpha})`;
 }
+
+export function getActivityColor(lastActivity: string | number | null | undefined): string {
+  if (!lastActivity) return `rgb(${STONE_400.r}, ${STONE_400.g}, ${STONE_400.b})`;
+
+  const activityDate = new Date(lastActivity);
+  const now = new Date();
+  const diffDays = (now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24);
+
+  // Fresh: amber -> stone over 30 days
+  if (diffDays <= 30) {
+    const ratio = 1 - (diffDays / 30);
+    const color = blendColors(AMBER_500, STONE_400, ratio);
+    return `rgb(${color.r}, ${color.g}, ${color.b})`;
+  }
+
+  return `rgb(${STONE_400.r}, ${STONE_400.g}, ${STONE_400.b})`;
+}
+

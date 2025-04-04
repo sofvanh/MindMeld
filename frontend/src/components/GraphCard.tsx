@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { GraphData } from '../shared/types';
 import { formatDate } from '../utils/time';
 import { PiArrowRight } from 'react-icons/pi';
+import { getActivityColor } from '../utils/colors';
 
 export const GraphCard = ({ id, name, argumentCount, lastActivity }: GraphData) => {
   return (
@@ -16,13 +17,15 @@ export const GraphCard = ({ id, name, argumentCount, lastActivity }: GraphData) 
       ">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h4 className="m-0 text-stone-800  transition-colors duration-150">{name}</h4>
+            <h4 className="m-0 text-stone-800 transition-colors duration-150">{name}</h4>
             <div className="justify-between mt-2 flex flex-wrap">
               <small className="mr-2">
                 <span className="font-bold">{argumentCount}</span> statement{argumentCount !== 1 ? 's' : ''}
               </small>
               <small>
-                Last activity: <span className="font-bold">{lastActivity ? formatDate(lastActivity) : 'never'}</span>
+                Last activity: <span style={{ color: getActivityColor(lastActivity) }} className="font-bold">
+                  {lastActivity ? formatDate(lastActivity) : 'never'}
+                </span>
               </small>
             </div>
           </div>
