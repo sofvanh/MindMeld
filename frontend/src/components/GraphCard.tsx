@@ -3,7 +3,7 @@ import { GraphData } from '../shared/types';
 import { formatDate } from '../utils/time';
 import { PiArrowRight } from 'react-icons/pi';
 
-export const GraphInfoBox = ({ id, name, argumentCount, lastActivity }: GraphData) => {
+export const GraphCard = ({ id, name, argumentCount, lastActivity }: GraphData) => {
   return (
     <Link to={`/feed/${id}`} className="block">
       <div className="

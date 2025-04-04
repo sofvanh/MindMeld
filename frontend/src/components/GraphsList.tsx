@@ -1,5 +1,5 @@
 import { GraphData } from '../shared/types';
-import { GraphInfoBox } from './GraphInfoBox';
+import { GraphCard } from './GraphCard';
 import LoadingSpinner from './LoadingSpinner';
 
 interface GraphsListProps {
@@ -14,7 +14,7 @@ export const GraphsList = ({ graphs }: GraphsListProps) => {
     <div className="flex flex-col mx-auto w-full gap-4">
       {graphs.length > 0 ? (
         graphs.map(graph => (
-          <GraphInfoBox key={graph.id} {...graph} />
+          <GraphCard key={graph.id} {...graph} />
         ))
       ) : (
         <LoadingSpinner className="mt-4" />
