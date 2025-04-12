@@ -11,12 +11,7 @@ export const FeaturedDiscussionsList = () => {
   useEffect(() => {
     socket?.emit('get featured graphs', {}, (response: any) => {
       if (response.success) {
-        const sortedGraphs = [...response.data.graphs].sort((a, b) => {
-          if (a.name === "Nexus Feedback") return 1;
-          if (b.name === "Nexus Feedback") return -1;
-          return 0;
-        });
-        setGraphs(sortedGraphs);
+        setGraphs(response.data.graphs);
       }
     });
   }, [socket]);

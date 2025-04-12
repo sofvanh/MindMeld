@@ -4,7 +4,7 @@ import { formatDate } from '../utils/time';
 import { PiArrowRight } from 'react-icons/pi';
 import { getActivityColor } from '../utils/colors';
 
-export const GraphCard = ({ id, name, argumentCount, lastActivity }: GraphData) => {
+export const GraphCard = ({ id, name, argumentCount, reactionCount, lastActivity }: GraphData) => {
   return (
     <Link to={`/feed/${id}`} className="block">
       <div className="
@@ -18,10 +18,14 @@ export const GraphCard = ({ id, name, argumentCount, lastActivity }: GraphData) 
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h4 className="m-0 text-stone-800 transition-colors duration-150">{name}</h4>
-            <div className="justify-between mt-2 flex flex-wrap">
+            <div className="mt-2 flex flex-wrap">
               <small className="mr-2">
                 <span className="font-bold">{argumentCount}</span> statement{argumentCount !== 1 ? 's' : ''}
               </small>
+              <small className="mr-2">
+                <span className="font-bold">{reactionCount}</span> reaction{argumentCount !== 1 ? 's' : ''}
+              </small>
+              <div className="flex-grow"></div>
               <small>
                 Last activity: <span style={{ color: getActivityColor(lastActivity) }} className="font-bold">
                   {lastActivity ? formatDate(lastActivity) : 'never'}

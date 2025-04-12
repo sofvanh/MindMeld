@@ -7,7 +7,6 @@ interface GraphsListProps {
 }
 
 // TODO This should be paginated
-// TODO This should be sorted by most recent
 // TODO If the list of graphs is empty, show a message
 export const GraphsList = ({ graphs }: GraphsListProps) => {
   return (

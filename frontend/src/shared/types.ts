@@ -66,6 +66,7 @@ export interface GraphData {
   id: string;
   name: string;
   argumentCount: number;
+  reactionCount: number;
   lastActivity: number | undefined;
 }
 

@@ -144,12 +144,15 @@ async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
   const placeholders = graphIds.map((_, i) => `$${i + 1}`).join(',');
   const result = await query(
     `SELECT g.id, g.name,
-      COUNT(a.id) as argument_count,
-      MAX(a.id) as latest_argument_id
+      COUNT(DISTINCT a.id) as argument_count,
+      COUNT(r.id) as reaction_count,
+      GREATEST(MAX(a.id), MAX(r.id)) as latest_activity
      FROM graphs g
      LEFT JOIN arguments a ON g.id = a.graph_id
+     LEFT JOIN reactions r ON a.id = r.argument_id
      WHERE g.id IN (${placeholders})
-     GROUP BY g.id, g.name`,
+     GROUP BY g.id, g.name
+     ORDER BY GREATEST(MAX(a.id), MAX(r.id)) DESC NULLS FIRST`,
     graphIds
   );
 
@@ -157,11 +160,12 @@ async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
     throw new Error('Graphs not found');
   }
 
-  return result.rows.map(row => ({
+  return result.rows.map((row): GraphData => ({
     id: row.id,
     name: row.name,
-    argumentCount: parseInt(row.argument_count),
-    lastActivity: row.latest_argument_id ? getTimestamp(row.latest_argument_id) : undefined
+    argumentCount: parseInt(row.argument_count, 10),
+    reactionCount: parseInt(row.reaction_count, 10),
+    lastActivity: row.latest_activity ? getTimestamp(row.latest_activity) : undefined
   }));
 }
 
