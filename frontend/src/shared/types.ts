@@ -68,6 +68,7 @@ export interface GraphData {
   argumentCount: number;
   reactionCount: number;
   lastActivity: number | undefined;
+  isPrivate?: boolean;
 }
 
 export interface Graph {

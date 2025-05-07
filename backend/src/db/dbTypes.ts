@@ -42,3 +42,8 @@ export interface DbReactionCount {
   type: string;
   count: string; // PostgreSQL COUNT returns string
 }
+
+export interface DbPrivateGraph {
+  graph_id: string;
+  whitelisted_emails: string[];
+}
