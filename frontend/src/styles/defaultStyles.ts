@@ -24,23 +24,34 @@ export const buttonStyles = {
 export const iconClasses = "w-full h-full";
 
 export const tooltipClasses = `
-relative
-before:content-[attr(data-tooltip)]
-before:absolute
-before:top-[-35px]
-before:left-1/2
-before:-translate-x-1/2
-before:bg-stone-700
-before:text-white
-before:px-2
-before:py-1
-before:rounded
-before:text-xs
-before:whitespace-nowrap
-before:opacity-0
-hover:before:opacity-100
-before:transition-opacity
-before:pointer-events-none
+  relative
+  before:z-10
+  before:leading-tight
+  before:content-[attr(data-tooltip)]
+  before:absolute
+  before:top-[100%]
+  before:left-1/2
+  before:-translate-x-1/2
+  before:mt-1
+  before:bg-stone-700
+  before:text-white
+  before:px-2
+  before:py-1
+  before:rounded
+  before:text-xs
+  before:text-center
+  before:font-normal
+  before:normal-case
+  before:tracking-normal
+  before:font-sans
+  before:whitespace-normal
+  before:max-w-[30vw]
+  before:w-max
+  before:break-words
+  before:opacity-0
+  hover:before:opacity-90
+  before:transition-opacity
+  before:pointer-events-none
 `;
 
 const interactiveCardClasses = `

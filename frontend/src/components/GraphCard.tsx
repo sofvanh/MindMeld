@@ -3,8 +3,9 @@ import { GraphData } from '../shared/types';
 import { formatDate } from '../utils/time';
 import { PiArrowRight } from 'react-icons/pi';
 import { getActivityColor } from '../utils/colors';
+import { PrivateTag } from './PrivateTag';
 
-export const GraphCard = ({ id, name, argumentCount, reactionCount, lastActivity }: GraphData) => {
+export const GraphCard = ({ id, name, argumentCount, reactionCount, lastActivity, isPrivate }: GraphData) => {
   return (
     <Link to={`/feed/${id}`} className="block">
       <div className="
@@ -17,7 +18,10 @@ export const GraphCard = ({ id, name, argumentCount, reactionCount, lastActivity
       ">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h4 className="m-0 text-stone-800 transition-colors duration-150">{name}</h4>
+            <h4 className="m-0 text-stone-800 transition-colors duration-150">
+              {name}
+              {isPrivate && <PrivateTag className="ml-2" />}
+            </h4>
             <div className="mt-2 flex flex-wrap">
               <small className="mr-2">
                 <span className="font-bold">{argumentCount}</span> statement{argumentCount !== 1 ? 's' : ''}

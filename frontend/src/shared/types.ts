@@ -77,6 +77,7 @@ export interface Graph {
   authorId?: string;
   arguments: Argument[];
   edges: Edge[];
+  isPrivate: boolean;
 }
 
 export type ReactionType = 'agree' | 'disagree' | 'unclear';

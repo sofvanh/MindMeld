@@ -145,7 +145,8 @@ export async function getFullGraph(graphId: string, userId?: string, userEmail?:
     id: graphId,
     name,
     arguments: args,
-    edges
+    edges,
+    isPrivate
   } as Graph;
 }
 
