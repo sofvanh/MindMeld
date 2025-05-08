@@ -8,12 +8,22 @@ import { TopStatements } from '../components/analysis/TopStatements';
 
 
 export const AnalysisView: React.FC = () => {
-  const { graph, analysis, loading } = useGraphContext();
+  const { graph, analysis, loading, error } = useGraphContext();
 
   useEffect(() => {
     document.title = graph?.name ? `${graph.name} - Analysis - Nexus` : 'Loading analysis... - Nexus';
     return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
+
+  if (error) {
+    return (
+      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
+        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
+        <h3 className="mb-0">Something went wrong</h3>
+        <p><small>{error}</small></p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -20,7 +20,7 @@ export const handleGetAnalysis: SocketHandler<getAnalysisData, getAnalysisRespon
     statements,
     reactions
   ] = await Promise.all([
-    getFullGraph(graphId),
+    getFullGraph(graphId, socket.data.user?.id, socket.data.user?.email),
     getArgumentsByGraphId(graphId),
     getReactionsByGraphId(graphId)
   ])

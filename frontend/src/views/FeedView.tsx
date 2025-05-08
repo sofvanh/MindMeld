@@ -8,7 +8,7 @@ import { PiWarningDuotone } from "react-icons/pi";
 
 
 export const FeedView: React.FC = () => {
-  const { graph, feed, loading, onNextFeedArgument } = useGraphContext();
+  const { graph, feed, loading, error, onNextFeedArgument } = useGraphContext();
   const [currentUserReaction, setCurrentUserReaction] = useState<UserReaction>({});
 
   const hasActiveReaction = useMemo(() => {
@@ -19,6 +19,16 @@ export const FeedView: React.FC = () => {
     document.title = graph?.name ? `${graph.name} - Feed - Nexus` : 'Loading feed... - Nexus';
     return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
+
+  if (error) {
+    return (
+      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
+        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
+        <h3 className="mb-0">Something went wrong</h3>
+        <p><small>{error}</small></p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

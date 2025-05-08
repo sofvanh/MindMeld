@@ -8,6 +8,7 @@ import { query, queryMany, queryOne } from '../db';
 import { memoryCache, withCache } from '../../services/cacheService';
 import { getArgumentsByGraphId } from './argumentOperations';
 import { getEdgesByGraphId } from './edgeOperations';
+import { isGraphPrivate, isEmailWhitelisted } from './privateGraphOperations';
 
 /*
   Cached functions
@@ -65,14 +66,26 @@ export async function getGraphName(graphId: string): Promise<string> {
     60 * 60 * 1000, // 1 hour cache
     async () => {
       const result = await query('SELECT name FROM graphs WHERE id = $1', [graphId]);
-      return result.rows[0].name;
+      return result.rows[0]?.name;
     }
   );
 }
 
-export async function getFullGraph(graphId: string, userId?: string): Promise<Graph> {
+export async function getFullGraph(graphId: string, userId?: string, userEmail?: string): Promise<Graph> {
   console.log(`Getting full graph ${graphId} for user ${userId}`);
   const startTime = performance.now();
+
+  // Check if graph is private
+  const isPrivate = await isGraphPrivate(graphId);
+  if (isPrivate) {
+    if (!userEmail) {
+      throw new Error('Authentication required to access private graph');
+    }
+    const isWhitelisted = await isEmailWhitelisted(graphId, userEmail);
+    if (!isWhitelisted) {
+      throw new Error('Access denied to private graph');
+    }
+  }
 
   const [
     name,
@@ -146,12 +159,14 @@ async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
     `SELECT g.id, g.name,
       COUNT(DISTINCT a.id) as argument_count,
       COUNT(r.id) as reaction_count,
-      GREATEST(MAX(a.id), MAX(r.id)) as latest_activity
+      GREATEST(MAX(a.id), MAX(r.id)) as latest_activity,
+      CASE WHEN pg.graph_id IS NOT NULL THEN true ELSE false END as is_private
      FROM graphs g
      LEFT JOIN arguments a ON g.id = a.graph_id
      LEFT JOIN reactions r ON a.id = r.argument_id
+     LEFT JOIN private_graphs pg ON g.id = pg.graph_id
      WHERE g.id IN (${placeholders})
-     GROUP BY g.id, g.name
+     GROUP BY g.id, g.name, pg.graph_id
      ORDER BY GREATEST(MAX(a.id), MAX(r.id)) DESC NULLS FIRST`,
     graphIds
   );
@@ -165,7 +180,8 @@ async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
     name: row.name,
     argumentCount: parseInt(row.argument_count, 10),
     reactionCount: parseInt(row.reaction_count, 10),
-    lastActivity: row.latest_activity ? getTimestamp(row.latest_activity) : undefined
+    lastActivity: row.latest_activity ? getTimestamp(row.latest_activity) : undefined,
+    isPrivate: row.is_private
   }));
 }
 

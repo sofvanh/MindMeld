@@ -16,7 +16,7 @@ const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, layoutData, loading, addPendingReaction, removePendingReaction } = useGraphContext();
+  const { graph, layoutData, loading, error, addPendingReaction, removePendingReaction } = useGraphContext();
   const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
   const [argumentsInQueue, setArgumentsInQueue] = useState<number>(0);
 
@@ -54,6 +54,16 @@ const GraphView: React.FC = () => {
       });
     }
   };
+
+  if (error) {
+    return (
+      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
+        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
+        <h3 className="mb-0">Something went wrong</h3>
+        <p><small>{error}</small></p>
+      </div>
+    );
+  }
 
   if (loading && !graph) {
     return (
