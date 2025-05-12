@@ -67,3 +67,17 @@ export const cardStyles = {
   interactive: interactiveCardClasses,
   subtle: subtleCardClasses
 };
+
+const tagClasses = `
+  inline-flex items-center gap-1.5
+  text-[11px] font-medium font-bitter
+  tracking-wide uppercase
+  border rounded-full px-2 h-6
+  whitespace-nowrap
+`;
+
+export const tagStyles = {
+  amber: `${tagClasses} text-amber-700 bg-amber-50 border-amber-200`,
+  indigo: `${tagClasses} text-indigo-700 bg-indigo-50 border-indigo-200`,
+  sky: `${tagClasses} text-sky-700 bg-sky-50 border-sky-200`
+}

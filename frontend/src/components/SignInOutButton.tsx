@@ -20,7 +20,7 @@ const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => 
     return (
       <button
         onClick={signOut}
-        className={`${buttonStyles.secondary} ${className}`}
+        className={`${buttonStyles.secondary} ${className} whitespace-nowrap`}
       >
         Sign out
       </button>
@@ -30,7 +30,7 @@ const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => 
   return (
     <button
       onClick={() => navigate('/login')}
-      className={`${buttonStyles.primary} ${className}`}
+      className={`${buttonStyles.primary} ${className} whitespace-nowrap`}
     >
       Sign in
     </button>

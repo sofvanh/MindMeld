@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import SignInOutButton from "./SignInOutButton";
 import { useAuth } from "../contexts/AuthContext";
 import { useState } from "react";
+import { tagStyles, tooltipClasses } from "../styles/defaultStyles";
 
 const Header: React.FC = () => {
   const { user } = useAuth();
@@ -17,23 +18,22 @@ const Header: React.FC = () => {
   }, [user]);
 
   return (
-    // We need to overflow-x-hidden because the Google Login button, for some reason, makes the header overflow slightly on smaller screens
-    <header className="bg-white border-b border-stone-200 px-2 sm:px-6 h-16 overflow-x-hidden">
+    <header className="flex bg-white border-b border-stone-200 px-2 sm:px-6 py-2 items-center">
       <div className="w-full h-full flex justify-between items-center">
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center flex-wrap justify-start ">
           <Link to="/" className="flex items-center gap-2 sm:gap-4">
             <h1
               className="nexus-logo m-0"
             >
               Nexus
             </h1>
-            <span className="hidden sm:inline text-sm text-stone-500 bg-stone-100 px-2 py-0.5 rounded">
-              Work in progress
-            </span>
           </Link>
+          <span className={`${tagStyles.sky} ${tooltipClasses} ml-2`} data-tooltip="Under active development. Leave feedback or reach out to us to collaborate!">
+            Open Beta
+          </span>
         </div>
         {user && (
-          <div className="flex items-center">
+          <div className="flex items-center flex-wrap justify-end">
             <span className="text-stone-600 mx-2 sm:mx-4 text-sm sm:text-base">
               {nickname}
             </span>
