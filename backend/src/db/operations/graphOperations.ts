@@ -1,5 +1,5 @@
 import { generateGraphId } from '../idGenerator';
-import { Argument, Edge, Graph, GraphData } from '../../.shared/types';
+import { Argument, Edge, Graph, GraphData, User } from '../../.shared/types';
 import { getArgumentScores } from '../../analysis/argumentScoreHandler';
 import { getReactionCounts, getUserReactionsByGraphId } from './reactionOperations';
 import { getTimestamp } from '../getTimestamp';
@@ -71,19 +71,21 @@ export async function getGraphName(graphId: string): Promise<string> {
   );
 }
 
-export async function getFullGraph(graphId: string, userId?: string, userEmail?: string): Promise<Graph> {
-  console.log(`Getting full graph ${graphId} for user ${userId}`);
+export async function getFullGraph(graphId: string, user?: User): Promise<Graph> {
+  console.log(`Getting full graph ${graphId} for user ${user?.id}`);
   const startTime = performance.now();
 
   // Check if graph is private
   const isPrivate = await isGraphPrivate(graphId);
   if (isPrivate) {
-    if (!userEmail) {
+    if (!user?.email) {
       throw new Error('Authentication required to access private graph');
     }
-    const isWhitelisted = await isEmailWhitelisted(graphId, userEmail);
-    if (!isWhitelisted) {
-      throw new Error('Access denied to private graph');
+    if (user?.role !== 'admin') {
+      const isWhitelisted = await isEmailWhitelisted(graphId, user.email);
+      if (!isWhitelisted) {
+        throw new Error('Access denied to private graph');
+      }
     }
   }
 
@@ -100,7 +102,7 @@ export async function getFullGraph(graphId: string, userId?: string, userEmail?:
     getEdgesByGraphId(graphId),
     getReactionCounts(graphId),
     getArgumentScores(graphId),
-    userId ? getUserReactionsByGraphId(userId, graphId) : Promise.resolve([])
+    user?.id ? getUserReactionsByGraphId(user.id, graphId) : Promise.resolve([])
   ]);
 
   if (!name) {
@@ -139,7 +141,7 @@ export async function getFullGraph(graphId: string, userId?: string, userEmail?:
 
   const endTime = performance.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
-  console.log(`Loaded graph "${name}" (${graphId}) for user ${userId || 'anonymous'} in ${duration}s`);
+  console.log(`Loaded graph "${name}" (${graphId}) for user ${user?.id || 'anonymous'} in ${duration}s`);
 
   return {
     id: graphId,

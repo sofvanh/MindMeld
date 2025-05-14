@@ -2,6 +2,7 @@ export interface User {
   id: string;
   googleId: string;
   email: string;
+  role?: string;
 }
 
 // Graph visualization types

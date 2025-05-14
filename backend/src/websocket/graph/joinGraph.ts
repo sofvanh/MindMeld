@@ -13,7 +13,7 @@ interface JoinGraphResponse {
 export const handleJoinGraph: SocketHandler<JoinGraphData, JoinGraphResponse> = async (socket, io, { graphId }) => {
   socket.join(graphId);
   console.log(`Socket ${socket.id} joining graph ${graphId}`);
-  const graph = await getFullGraph(graphId, socket.data.user?.id, socket.data.user?.email);
+  const graph = await getFullGraph(graphId, socket.data.user);
 
   return {
     success: true,
