@@ -1,8 +1,9 @@
 import { SocketHandler } from "../../backendTypes";
-import { getAllGraphsFromDb } from "../../db/operations/graphOperations";
+import { getAllGraphData } from "../../db/operations/graphOperations";
+import { GraphData } from "../../.shared/types";
 
 interface GetGraphsResponse {
-  graphs: { id: string, name: string }[]
+  graphs: GraphData[];
 }
 
 export const handleGetGraphs: SocketHandler<{}, GetGraphsResponse> = async (socket, io, { }) => {
@@ -12,7 +13,8 @@ export const handleGetGraphs: SocketHandler<{}, GetGraphsResponse> = async (sock
       error: 'Admin privileges required'
     };
   }
-  const graphs = await getAllGraphsFromDb();
+  const graphs = await getAllGraphData();
+  graphs.sort((a, b) => (b.lastActivity || 0) - (a.lastActivity || 0));
   return {
     success: true,
     data: { graphs }

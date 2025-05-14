@@ -152,6 +152,19 @@ export async function getFullGraph(graphId: string, user?: User): Promise<Graph>
   } as Graph;
 }
 
+export async function getAllGraphData(): Promise<GraphData[]> {
+  const cacheKey = 'all-graph-data';
+  return withCache(
+    cacheKey,
+    5 * 60 * 1000, // 5 minutes
+    async () => {
+      const dbGraphs = await getAllGraphsFromDb();
+      const graphIds = dbGraphs.map(g => g.id);
+      return getGraphDataFromDb(graphIds);
+    }
+  );
+}
+
 /*
   Heavy functions, meant to be used from cached or rarely used functions
 */
@@ -196,7 +209,7 @@ export async function getGraphsFromDb(graphIds: string[]): Promise<DbGraph[]> {
   );
 }
 
-export async function getAllGraphsFromDb(): Promise<DbGraph[]> {
+async function getAllGraphsFromDb(): Promise<DbGraph[]> {
   return await queryMany<DbGraph>('SELECT * FROM graphs ORDER BY name');
 }
 
