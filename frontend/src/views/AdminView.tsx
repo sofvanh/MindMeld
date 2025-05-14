@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import { useAuth } from '../contexts/AuthContext';
 
 import LoadingSpinner from '../components/LoadingSpinner';
 import { buttonStyles } from '../styles/defaultStyles';
@@ -11,12 +12,14 @@ interface Graph {
   name: string;
 }
 
-const GraphListView: React.FC = () => {
+const AdminView: React.FC = () => {
   const { socket } = useWebSocket();
+  const { user, loading: authLoading } = useAuth();
   const [graphs, setGraphs] = useState<Graph[]>([]);
   usePageTitle('All graphs');
 
   useEffect(() => {
+    if (!user || user.role !== 'admin') return;
     socket?.emit('get graphs', {}, (response: any) => {
       if (response.success) {
         setGraphs(response.data.graphs);
@@ -25,7 +28,15 @@ const GraphListView: React.FC = () => {
         // TODO Don't show loading indicator if this fails
       }
     });
-  }, [socket]);
+  }, [socket, user]);
+
+  if (authLoading) {
+    return <div className="flex flex-col items-center mt-8 h-full"><LoadingSpinner size="large" /></div>;
+  }
+
+  if (!user || user.role !== 'admin') {
+    return <div className="max-w-md mx-auto mt-10 px-4 text-center text-red-600">Not authorized</div>;
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 px-4">
@@ -49,4 +60,4 @@ const GraphListView: React.FC = () => {
   );
 };
 
-export default GraphListView;
+export default AdminView;

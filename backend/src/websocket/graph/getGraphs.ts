@@ -6,6 +6,12 @@ interface GetGraphsResponse {
 }
 
 export const handleGetGraphs: SocketHandler<{}, GetGraphsResponse> = async (socket, io, { }) => {
+  if (!socket.data.user || socket.data.user.role !== 'admin') {
+    return {
+      success: false,
+      error: 'Admin privileges required'
+    };
+  }
   const graphs = await getAllGraphsFromDb();
   return {
     success: true,
