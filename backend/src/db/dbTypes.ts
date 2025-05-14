@@ -2,6 +2,7 @@ export interface DbUser {
   id: string;
   google_id: string;
   email: string;
+  role?: string;
 }
 
 export interface DbGraph {

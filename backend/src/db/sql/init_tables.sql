@@ -1,7 +1,8 @@
 CREATE TABLE users (
     id VARCHAR(20) PRIMARY KEY,
     google_id VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    email VARCHAR(255) NOT NULL,
+    role VARCHAR(20)
 );
 
 CREATE TABLE graphs (
