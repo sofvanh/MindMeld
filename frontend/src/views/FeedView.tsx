@@ -4,7 +4,7 @@ import { buttonStyles, tooltipClasses } from '../styles/defaultStyles';
 import { FeedCard } from '../components/FeedCard';
 import { UserReaction } from '../shared/types';
 import { useGraphContext } from '../contexts/GraphContext';
-import { PiWarningDuotone } from "react-icons/pi";
+import ErrorMessage from '../components/ErrorMessage';
 
 
 export const FeedView: React.FC = () => {
@@ -21,13 +21,7 @@ export const FeedView: React.FC = () => {
   }, [graph?.name]);
 
   if (error) {
-    return (
-      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
-        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
-        <h3 className="mb-0">Something went wrong</h3>
-        <p><small>{error}</small></p>
-      </div>
-    );
+    return <ErrorMessage error={error} />;
   }
 
   if (loading) {
@@ -40,11 +34,10 @@ export const FeedView: React.FC = () => {
 
   if (!feed) {
     return (
-      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
-        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
-        <h3 className="mb-0">Feed Not Available</h3>
-        <p><small>We couldn't load the feed for this graph. Please try again later.</small></p>
-      </div>
+      <ErrorMessage
+        title="Feed Not Available"
+        message="We couldn't load the feed for this graph. Please try again later."
+      />
     );
   }
 

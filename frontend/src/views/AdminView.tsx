@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { buttonStyles } from '../styles/defaultStyles';
 import { usePageTitle } from '../hooks/usePageTitle';
+import ErrorMessage from '../components/ErrorMessage';
 
 interface Graph {
   id: string;
@@ -35,7 +36,7 @@ const AdminView: React.FC = () => {
   }
 
   if (!user || user.role !== 'admin') {
-    return <div className="max-w-md mx-auto mt-10 px-4 text-center text-red-600">Not authorized</div>;
+    return <ErrorMessage title="Not authorized" message="You do not have permission to view this page." />;
   }
 
   return (
