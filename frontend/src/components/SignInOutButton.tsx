@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
 import { buttonStyles } from '../styles/defaultStyles';
@@ -11,6 +11,7 @@ interface SignInOutButtonProps {
 const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => {
   const { loading, user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (loading) {
     return <LoadingSpinner size="small" />;
@@ -29,7 +30,7 @@ const SignInOutButton: React.FC<SignInOutButtonProps> = ({ className = '' }) => 
 
   return (
     <button
-      onClick={() => navigate('/login')}
+      onClick={() => navigate('/login', { state: { from: location } })}
       className={`${buttonStyles.primary} ${className} whitespace-nowrap`}
     >
       Sign in
