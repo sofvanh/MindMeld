@@ -3,6 +3,7 @@ import { Link, useParams, useLocation } from "react-router-dom";
 import { buttonStyles } from "../../styles/defaultStyles";
 import ViewSelector from "../ViewSelector";
 import { GraphProvider, useGraphContext } from "../../contexts/GraphContext";
+import { PrivateTag } from "../PrivateTag";
 
 const GraphLayoutContent = ({ children }: { children: React.ReactNode }) => {
   const { graphId } = useParams<{ graphId: string }>();
@@ -18,7 +19,10 @@ const GraphLayoutContent = ({ children }: { children: React.ReactNode }) => {
       <Link to="/" className={`${buttonStyles.link} h-10 w-10 absolute top-0 left-0`}>
         ←
       </Link>
-      <h3 className="m-0 flex-none text-center border-b border-stone-200 py-2">{graph?.name || "Loading..."}</h3>
+      <h3 className="m-0 flex-none text-center border-b border-stone-200 py-2">
+        {graph?.name || "Loading..."}
+        {graph?.isPrivate && <PrivateTag className="ml-2" />}
+      </h3>
       <ViewSelector graphId={graphId || ""} currentView={currentView as "feed" | "graph" | "analysis"} />
       {children}
     </div>

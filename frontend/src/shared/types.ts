@@ -2,6 +2,7 @@ export interface User {
   id: string;
   googleId: string;
   email: string;
+  role?: string;
 }
 
 // Graph visualization types
@@ -68,6 +69,7 @@ export interface GraphData {
   argumentCount: number;
   reactionCount: number;
   lastActivity: number | undefined;
+  isPrivate?: boolean;
 }
 
 export interface Graph {
@@ -76,6 +78,7 @@ export interface Graph {
   authorId?: string;
   arguments: Argument[];
   edges: Edge[];
+  isPrivate: boolean;
 }
 
 export type ReactionType = 'agree' | 'disagree' | 'unclear';

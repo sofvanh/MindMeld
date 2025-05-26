@@ -2,6 +2,7 @@ export interface DbUser {
   id: string;
   google_id: string;
   email: string;
+  role?: string;
 }
 
 export interface DbGraph {
@@ -41,4 +42,9 @@ export interface DbReactionCount {
   argument_id: string;
   type: string;
   count: string; // PostgreSQL COUNT returns string
+}
+
+export interface DbPrivateGraph {
+  graph_id: string;
+  whitelisted_emails: string[];
 }

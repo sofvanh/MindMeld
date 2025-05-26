@@ -11,13 +11,13 @@ import LoadingSpinner from './components/LoadingSpinner';
 const HomeView = lazy(() => import('./views/HomeView'));
 const GraphView = lazy(() => import('./views/GraphView'));
 const FeedView = lazy(() => import('./views/FeedView').then(module => ({ default: module.FeedView })));
-const GraphListView = lazy(() => import('./views/GraphListView'));
 const DesignSystemView = lazy(() => import('./views/DesignSystemView'));
 const ScoresView = lazy(() => import('./views/ScoresView'));
 const GettingStartedView = lazy(() => import('./views/docs/GettingStartedView'));
 const TechnicalDetailsView = lazy(() => import('./views/docs/TechnicalDetailsView'));
 const PhilosophyView = lazy(() => import('./views/docs/PhilosophyView'));
 const AnalysisView = lazy(() => import('./views/AnalysisView').then(module => ({ default: module.AnalysisView })));
+const AdminView = lazy(() => import('./views/AdminView'));
 
 
 const LoadingFallback = () => (
@@ -89,10 +89,10 @@ function App() {
                 </GraphLayout>
               </Layout>
             } />
-            <Route path="/graphs" element={
+            <Route path="/admin" element={
               <Layout>
                 <LazyView>
-                  <GraphListView />
+                  <AdminView />
                 </LazyView>
               </Layout>
             } />

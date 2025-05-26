@@ -10,6 +10,7 @@ interface GraphContextType {
   feed: Argument[] | null;
   analysis: Analysis | null;
   loading: boolean;
+  error: string | null;
   addPendingReaction: (reaction: ReactionAction) => void;
   removePendingReaction: (reaction: ReactionAction) => void;
   onNextFeedArgument: () => void;
@@ -32,14 +33,14 @@ interface GraphProviderProps {
 
 export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId }) => {
   const { socket } = useWebSocket();
-  const { user } = useAuth();
+  const { user, loading: userLoading } = useAuth();
   const [serverGraph, setServerGraph] = useState<Graph | null>(null);
   const [pendingReactions, setPendingReactions] = useState<ReactionAction[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [feed, setFeed] = useState<Argument[] | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
-
+  const [error, setError] = useState<string | null>(null);
   const addPendingReaction = (reaction: ReactionAction) => {
     setPendingReactions(prev => [...prev, reaction]);
   };
@@ -98,13 +99,14 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   }, [serverGraph, pendingReactions]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || userLoading) return;
 
     socket.emit('join graph', { graphId }, (response: any) => {
       if (response.success) {
         setServerGraph(response.data.graph);
       } else {
         console.error('Failed to join graph:', response.error);
+        setError(response.error);
       }
     });
 
@@ -114,6 +116,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
         setFeed(response.data.arguments);
       } else {
         console.error('Failed to get feed:', response.error);
+        setError(response.error);
       }
     });
 
@@ -122,6 +125,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
         setAnalysis(response.data.analysis);
       } else {
         console.error('Failed to get analysis:', response.error);
+        setError(response.error);
       }
     });
 
@@ -158,6 +162,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
       socket.emit('leave graph', { graphId }, (response: any) => {
         if (!response.success) {
           console.error('Failed to leave graph:', response.error);
+          setError(response.error);
         }
       });
       socket.off('graph update');
@@ -165,7 +170,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
       socket.off('user reactions update');
       socket.off('graph reactions and scores update');
     };
-  }, [socket, graphId, user]);
+  }, [socket, graphId, user, userLoading]);
 
   useEffect(() => {
     if (!graph) return;
@@ -188,6 +193,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
     feed,
     analysis,
     loading: !graph || !analysis || !feed,
+    error,
     addPendingReaction,
     removePendingReaction,
     onNextFeedArgument

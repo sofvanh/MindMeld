@@ -1,5 +1,5 @@
 import { generateGraphId } from '../idGenerator';
-import { Argument, Edge, Graph, GraphData } from '../../.shared/types';
+import { Argument, Edge, Graph, GraphData, User } from '../../.shared/types';
 import { getArgumentScores } from '../../analysis/argumentScoreHandler';
 import { getReactionCounts, getUserReactionsByGraphId } from './reactionOperations';
 import { getTimestamp } from '../getTimestamp';
@@ -8,6 +8,7 @@ import { query, queryMany, queryOne } from '../db';
 import { memoryCache, withCache } from '../../services/cacheService';
 import { getArgumentsByGraphId } from './argumentOperations';
 import { getEdgesByGraphId } from './edgeOperations';
+import { isGraphPrivate, isEmailWhitelisted } from './privateGraphOperations';
 
 /*
   Cached functions
@@ -65,14 +66,28 @@ export async function getGraphName(graphId: string): Promise<string> {
     60 * 60 * 1000, // 1 hour cache
     async () => {
       const result = await query('SELECT name FROM graphs WHERE id = $1', [graphId]);
-      return result.rows[0].name;
+      return result.rows[0]?.name;
     }
   );
 }
 
-export async function getFullGraph(graphId: string, userId?: string): Promise<Graph> {
-  console.log(`Getting full graph ${graphId} for user ${userId}`);
+export async function getFullGraph(graphId: string, user?: User): Promise<Graph> {
+  console.log(`Getting full graph ${graphId} for user ${user?.id}`);
   const startTime = performance.now();
+
+  // Check if graph is private
+  const isPrivate = await isGraphPrivate(graphId);
+  if (isPrivate) {
+    if (!user?.email) {
+      throw new Error('Authentication required to access private graph');
+    }
+    if (user?.role !== 'admin') {
+      const isWhitelisted = await isEmailWhitelisted(graphId, user.email);
+      if (!isWhitelisted) {
+        throw new Error('Access denied to private graph');
+      }
+    }
+  }
 
   const [
     name,
@@ -87,7 +102,7 @@ export async function getFullGraph(graphId: string, userId?: string): Promise<Gr
     getEdgesByGraphId(graphId),
     getReactionCounts(graphId),
     getArgumentScores(graphId),
-    userId ? getUserReactionsByGraphId(userId, graphId) : Promise.resolve([])
+    user?.id ? getUserReactionsByGraphId(user.id, graphId) : Promise.resolve([])
   ]);
 
   if (!name) {
@@ -126,14 +141,28 @@ export async function getFullGraph(graphId: string, userId?: string): Promise<Gr
 
   const endTime = performance.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
-  console.log(`Loaded graph "${name}" (${graphId}) for user ${userId || 'anonymous'} in ${duration}s`);
+  console.log(`Loaded graph "${name}" (${graphId}) for user ${user?.id || 'anonymous'} in ${duration}s`);
 
   return {
     id: graphId,
     name,
     arguments: args,
-    edges
+    edges,
+    isPrivate
   } as Graph;
+}
+
+export async function getAllGraphData(): Promise<GraphData[]> {
+  const cacheKey = 'all-graph-data';
+  return withCache(
+    cacheKey,
+    5 * 60 * 1000, // 5 minutes
+    async () => {
+      const dbGraphs = await getAllGraphsFromDb();
+      const graphIds = dbGraphs.map(g => g.id);
+      return getGraphDataFromDb(graphIds);
+    }
+  );
 }
 
 /*
@@ -146,12 +175,14 @@ async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
     `SELECT g.id, g.name,
       COUNT(DISTINCT a.id) as argument_count,
       COUNT(r.id) as reaction_count,
-      GREATEST(MAX(a.id), MAX(r.id)) as latest_activity
+      GREATEST(MAX(a.id), MAX(r.id)) as latest_activity,
+      CASE WHEN pg.graph_id IS NOT NULL THEN true ELSE false END as is_private
      FROM graphs g
      LEFT JOIN arguments a ON g.id = a.graph_id
      LEFT JOIN reactions r ON a.id = r.argument_id
+     LEFT JOIN private_graphs pg ON g.id = pg.graph_id
      WHERE g.id IN (${placeholders})
-     GROUP BY g.id, g.name
+     GROUP BY g.id, g.name, pg.graph_id
      ORDER BY GREATEST(MAX(a.id), MAX(r.id)) DESC NULLS FIRST`,
     graphIds
   );
@@ -165,7 +196,8 @@ async function getGraphDataFromDb(graphIds: string[]): Promise<GraphData[]> {
     name: row.name,
     argumentCount: parseInt(row.argument_count, 10),
     reactionCount: parseInt(row.reaction_count, 10),
-    lastActivity: row.latest_activity ? getTimestamp(row.latest_activity) : undefined
+    lastActivity: row.latest_activity ? getTimestamp(row.latest_activity) : undefined,
+    isPrivate: row.is_private
   }));
 }
 
@@ -177,7 +209,7 @@ export async function getGraphsFromDb(graphIds: string[]): Promise<DbGraph[]> {
   );
 }
 
-export async function getAllGraphsFromDb(): Promise<DbGraph[]> {
+async function getAllGraphsFromDb(): Promise<DbGraph[]> {
   return await queryMany<DbGraph>('SELECT * FROM graphs ORDER BY name');
 }
 

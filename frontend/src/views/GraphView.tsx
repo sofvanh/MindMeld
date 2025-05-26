@@ -10,13 +10,13 @@ import GraphVisualization from '../components/GraphVisualization';
 import ArgumentForm from '../components/ArgumentForm';
 import { Argument } from '../shared/types';
 import Legend from '../components/Legend';
-import { PiWarningDuotone } from 'react-icons/pi';
+import ErrorMessage from '../components/ErrorMessage';
 
 const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, layoutData, loading, addPendingReaction, removePendingReaction } = useGraphContext();
+  const { graph, layoutData, loading, error, addPendingReaction, removePendingReaction } = useGraphContext();
   const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
   const [argumentsInQueue, setArgumentsInQueue] = useState<number>(0);
 
@@ -55,6 +55,10 @@ const GraphView: React.FC = () => {
     }
   };
 
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
+
   if (loading && !graph) {
     return (
       <div className="flex-grow flex items-center justify-center h-full mt-8">
@@ -64,13 +68,7 @@ const GraphView: React.FC = () => {
   }
 
   if (!graph) {
-    return (
-      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
-        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
-        <h3 className="mb-0">Graph Not Available</h3>
-        <p><small>Failed to load graph. Please try again later.</small></p>
-      </div>
-    );
+    return <ErrorMessage title="Graph Not Available" message="Failed to load graph. Please try again later." />;
   }
 
   return (

@@ -2,18 +2,22 @@ import React, { useEffect } from 'react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useGraphContext } from '../contexts/GraphContext';
 import { ScoreTrendsGraph } from '../components/analysis/ScoreTrendsGraph';
-import { PiWarningDuotone } from "react-icons/pi";
 import { GraphInfo } from '../components/analysis/GraphInfo';
 import { TopStatements } from '../components/analysis/TopStatements';
+import ErrorMessage from '../components/ErrorMessage';
 
 
 export const AnalysisView: React.FC = () => {
-  const { graph, analysis, loading } = useGraphContext();
+  const { graph, analysis, loading, error } = useGraphContext();
 
   useEffect(() => {
     document.title = graph?.name ? `${graph.name} - Analysis - Nexus` : 'Loading analysis... - Nexus';
     return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
+
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
 
   if (loading) {
     return (
@@ -24,15 +28,7 @@ export const AnalysisView: React.FC = () => {
   }
 
   if (!analysis) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-grow">
-        <div className="flex flex-col items-center justify-center text-center px-4">
-          <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
-          <h3 className="mb-0">Analysis Not Available</h3>
-          <p>We couldn't load the analysis for this graph. Please try again later.</p>
-        </div>
-      </div>
-    );
+    return <ErrorMessage title="Analysis Not Available" message="We couldn't load the analysis for this graph. Please try again later." />;
   }
 
   return (

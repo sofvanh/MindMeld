@@ -1,7 +1,8 @@
 CREATE TABLE users (
     id VARCHAR(20) PRIMARY KEY,
     google_id VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    email VARCHAR(255) NOT NULL,
+    role VARCHAR(20)
 );
 
 CREATE TABLE graphs (
@@ -49,3 +50,11 @@ CREATE TABLE reactions (
 
 CREATE INDEX idx_reactions_user_id ON reactions(user_id);
 CREATE INDEX idx_reactions_argument_id ON reactions(argument_id);
+
+CREATE TABLE private_graphs (
+    graph_id VARCHAR(20) PRIMARY KEY,
+    whitelisted_emails TEXT[] NOT NULL,
+    FOREIGN KEY (graph_id) REFERENCES graphs(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_private_graphs_graph_id ON private_graphs(graph_id);

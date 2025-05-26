@@ -4,11 +4,11 @@ import { buttonStyles, tooltipClasses } from '../styles/defaultStyles';
 import { FeedCard } from '../components/FeedCard';
 import { UserReaction } from '../shared/types';
 import { useGraphContext } from '../contexts/GraphContext';
-import { PiWarningDuotone } from "react-icons/pi";
+import ErrorMessage from '../components/ErrorMessage';
 
 
 export const FeedView: React.FC = () => {
-  const { graph, feed, loading, onNextFeedArgument } = useGraphContext();
+  const { graph, feed, loading, error, onNextFeedArgument } = useGraphContext();
   const [currentUserReaction, setCurrentUserReaction] = useState<UserReaction>({});
 
   const hasActiveReaction = useMemo(() => {
@@ -20,6 +20,10 @@ export const FeedView: React.FC = () => {
     return () => { document.title = 'Nexus'; };
   }, [graph?.name]);
 
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
@@ -30,11 +34,10 @@ export const FeedView: React.FC = () => {
 
   if (!feed) {
     return (
-      <div className="flex flex-col flex-grow text-center items-center justify-center px-4">
-        <PiWarningDuotone className="text-red-500 text-4xl mb-4" />
-        <h3 className="mb-0">Feed Not Available</h3>
-        <p><small>We couldn't load the feed for this graph. Please try again later.</small></p>
-      </div>
+      <ErrorMessage
+        title="Feed Not Available"
+        message="We couldn't load the feed for this graph. Please try again later."
+      />
     );
   }
 

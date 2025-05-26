@@ -64,13 +64,21 @@ io.on('connection', (socket) => {
       handler(socket, io, data)
         .then(response => callback(response))
         .catch(error => {
-          console.error('Socket handler error:', error);
-          const errorMessage =
-            error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT'
-              ? 'Database connection issue (server) - please ensure IP is whitelisted'
+          console.error(error)
+          let errorMessage;
+          if (!error.message) {
+            console.error('Socket handler error:', error);
+          }
+          errorMessage =
+            error.message === 'Connection terminated due to connection timeout'
+              ? 'Server timeout. Likely caused by database connection issue - please ensure IP is whitelisted'
               : error.code === 'EADDRNOTAVAIL' || error.code === 'ENETUNREACH'
                 ? 'Network connection issue (server) - please check internet connection'
-                : 'Operation failed - please try again'
+                : error.message ? error.message
+                  : 'Operation failed - please try again'
+          if (error.code) {
+            errorMessage += ` (code: ${error.code})`;
+          }
           callback({
             success: false,
             error: errorMessage

@@ -30,7 +30,8 @@ export const handleAuthenticate: SocketHandler<AuthenticateData, AuthenticateRes
   const user: User = {
     id: dbUser.id,
     googleId: dbUser.google_id,
-    email: dbUser.email
+    email: dbUser.email,
+    role: dbUser.role
   };
   socket.data.user = user;
 

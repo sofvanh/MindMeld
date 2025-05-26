@@ -1,12 +1,20 @@
 import { SocketHandler } from "../../backendTypes";
-import { getAllGraphsFromDb } from "../../db/operations/graphOperations";
+import { getAllGraphData } from "../../db/operations/graphOperations";
+import { GraphData } from "../../.shared/types";
 
 interface GetGraphsResponse {
-  graphs: { id: string, name: string }[]
+  graphs: GraphData[];
 }
 
 export const handleGetGraphs: SocketHandler<{}, GetGraphsResponse> = async (socket, io, { }) => {
-  const graphs = await getAllGraphsFromDb();
+  if (!socket.data.user || socket.data.user.role !== 'admin') {
+    return {
+      success: false,
+      error: 'Admin privileges required'
+    };
+  }
+  const graphs = await getAllGraphData();
+  graphs.sort((a, b) => (b.lastActivity || 0) - (a.lastActivity || 0));
   return {
     success: true,
     data: { graphs }
