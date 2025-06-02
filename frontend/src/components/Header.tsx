@@ -37,6 +37,9 @@ const Header: React.FC = () => {
             <span className="text-stone-600 mx-2 sm:mx-4 text-sm sm:text-base">
               {nickname}
             </span>
+            {user.role && <span className={tagStyles.amber}>
+              {user.role}
+            </span>}
             <SignInOutButton />
           </div>
         )}
