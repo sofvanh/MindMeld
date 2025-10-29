@@ -132,11 +132,18 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
   }, [clusterViewEnabled, clusters, layoutData.nodes, clusterColors]);
 
   const nodeCanvasObject = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const radius = 5;
-    const color = nodeColors.get(node.id) || '#94a3b8';
+    const isPost = node.type === 'post';
+    const radius = isPost ? 3 : 5;
+    const color = isPost ? '#64748b' : (nodeColors.get(node.id) || '#94a3b8');
 
     ctx.beginPath();
-    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+    if (isPost) {
+      // Draw square for posts
+      ctx.rect(node.x - radius, node.y - radius, radius * 2, radius * 2);
+    } else {
+      // Draw circle for statements
+      ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+    }
     ctx.fillStyle = color;
     ctx.fill();
 
@@ -146,6 +153,27 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       ctx.stroke();
     }
   }, [nodeColors, selectedNodeId]);
+
+  const linkCanvasObject = useCallback((link: any, ctx: CanvasRenderingContext2D) => {
+    const start = link.source;
+    const end = link.target;
+
+    if (link.type === 'post-statement') {
+      // Colored edge for post-statement links
+      ctx.strokeStyle = link.voteType === 'agree' ? '#10b981' :
+                       link.voteType === 'disagree' ? '#ef4444' : '#f59e0b';
+      ctx.lineWidth = 2;
+    } else {
+      // Default style for similarity links
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+      ctx.lineWidth = 1;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+  }, []);
 
   return (
     <ForceGraph2D
@@ -158,6 +186,8 @@ const GraphVisualization: React.FC<GraphVisualizationProps> = ({
       enableNodeDrag={false}
       nodeCanvasObject={nodeCanvasObject}
       nodeCanvasObjectMode={() => 'replace'}
+      linkCanvasObject={linkCanvasObject}
+      linkCanvasObjectMode={() => 'replace'}
       nodeRelSize={15}
       autoPauseRedraw={true}
       d3AlphaDecay={0.01}

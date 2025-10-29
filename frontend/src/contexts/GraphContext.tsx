@@ -286,7 +286,8 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
     console.log('  - Graph arguments:', graph.arguments.length);
     console.log('  - Clusters:', clusters.length);
 
-    const newArguments: NodeData[] = graph.arguments.map(arg => {
+    // Create statement nodes
+    const statementNodes: NodeData[] = graph.arguments.map(arg => {
       const clusterId = clusters.find(cluster =>
         cluster.arguments.some(clusterArg => clusterArg.id === arg.id)
       )?.id;
@@ -294,24 +295,67 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
       return {
         id: arg.id,
         name: arg.statement,
-        clusterId
+        clusterId,
+        type: 'statement'
       };
     });
 
-    console.log('  - Nodes with cluster IDs:', newArguments.filter(n => n.clusterId !== undefined).length);
+    // Create post nodes for all posts linked to statements
+    const postNodes: NodeData[] = [];
+    const postStatementLinks: LinkData[] = [];
 
-    const newLinks: LinkData[] = graph.edges.map(edge => ({
-      source: newArguments.find(arg => arg.id === edge.sourceId) as NodeData,
-      target: newArguments.find(arg => arg.id === edge.targetId) as NodeData
+    graph.arguments.forEach(arg => {
+      if (arg.sourcePosts && arg.sourcePosts.length > 0) {
+        arg.sourcePosts.forEach((post, index) => {
+          const postNodeId = `post-${arg.id}-${index}`;
+
+          // Create post node
+          postNodes.push({
+            id: postNodeId,
+            name: `@${post.authorId}`,
+            type: 'post',
+            post: post
+          });
+
+          // Create link from post to statement (assume all are supporting for now)
+          const statementNode = statementNodes.find(n => n.id === arg.id);
+          if (statementNode) {
+            postStatementLinks.push({
+              source: { id: postNodeId, name: `@${post.authorId}`, type: 'post', post: post },
+              target: statementNode,
+              type: 'post-statement',
+              voteType: 'agree' // For now, assume all posts support their statements
+            });
+          }
+        });
+      }
+    });
+
+    // Combine all nodes
+    const allNodes = [...statementNodes, ...postNodes];
+
+    // Create similarity links between statements
+    const similarityLinks: LinkData[] = graph.edges.map(edge => ({
+      source: statementNodes.find(arg => arg.id === edge.sourceId) as NodeData,
+      target: statementNodes.find(arg => arg.id === edge.targetId) as NodeData,
+      type: 'similarity'
     }));
 
-    const hasNodesChanged = newArguments.map(node => node.id).sort().join(',') !== layoutData.nodes.map(node => node.id).sort().join(',');
-    const hasLinksChanged = newLinks.map(link => `${link.source}-${link.target}`).sort().join(',') !== layoutData.links.map(link => `${link.source}-${link.target}`).sort().join(',');
-    const hasClusterDataChanged = newArguments.filter(n => n.clusterId !== undefined).length !== layoutData.nodes.filter(n => n.clusterId !== undefined).length;
+    // Combine all links
+    const allLinks = [...similarityLinks, ...postStatementLinks];
+
+    console.log('  - Statement nodes:', statementNodes.length);
+    console.log('  - Post nodes:', postNodes.length);
+    console.log('  - Similarity links:', similarityLinks.length);
+    console.log('  - Post-statement links:', postStatementLinks.length);
+
+    const hasNodesChanged = allNodes.map(node => node.id).sort().join(',') !== layoutData.nodes.map(node => node.id).sort().join(',');
+    const hasLinksChanged = allLinks.map(link => `${link.source.id}-${link.target.id}`).sort().join(',') !== layoutData.links.map(link => `${link.source.id}-${link.target.id}`).sort().join(',');
+    const hasClusterDataChanged = statementNodes.filter(n => n.clusterId !== undefined).length !== layoutData.nodes.filter(n => n.clusterId !== undefined).length;
 
     if (hasNodesChanged || hasLinksChanged || hasClusterDataChanged) {
-      console.log('  - Updating layout data with cluster IDs');
-      setLayoutData({ nodes: newArguments, links: newLinks });
+      console.log('  - Updating layout data with posts and statements');
+      setLayoutData({ nodes: allNodes, links: allLinks });
     }
   }, [graph, clusters, layoutData.nodes, layoutData.links]);
 

@@ -1,4 +1,4 @@
-import { GraphData, Argument, Analysis, Edge } from '../shared/types';
+import { GraphData, Argument, Analysis, Edge, Post } from '../shared/types';
 import { generateEmbeddings, generateSimilarityEdges } from './embeddingsService';
 
 interface PrototypeVote {
@@ -124,7 +124,7 @@ export async function loadCsvDiscussion(graphId: string): Promise<{ graph: Graph
     console.log('Generating embeddings for', statementTexts.length, 'statements');
     const embeddingResults = await generateEmbeddings(statementTexts, statementIds);
 
-    // Convert to Nexus Argument format with embeddings
+    // Convert to Nexus Argument format with embeddings and posts
     const args: Argument[] = statementsData.map(row => {
       const statementVotes = votes.filter(v => v.statementId === row.statement_id);
       const agreeCount = statementVotes.filter(v => v.vote === 1).length;
@@ -135,12 +135,26 @@ export async function loadCsvDiscussion(graphId: string): Promise<{ graph: Graph
       // Find the embedding for this statement
       const embeddingResult = embeddingResults.find(e => e.id === row.statement_id);
 
+      // Parse source posts if they exist
+      let sourcePosts: Post[] = [];
+      if (row.source_posts && row.post_urls) {
+        const postUris = row.source_posts.split('|');
+        const postUrls = row.post_urls.split('|');
+
+        sourcePosts = postUris.map((uri: string, index: number) => ({
+          uri: uri.trim(),
+          url: postUrls[index]?.trim() || '',
+          authorId: row.author
+        }));
+      }
+
       return {
         id: row.statement_id,
         statement: row.statement_text,
         graphId: graphId,
         embedding: embeddingResult?.embedding || [], // Use generated embedding
         authorId: row.author,
+        sourcePosts: sourcePosts,
         reactionCounts: {
           agree: agreeCount,
           disagree: disagreeCount,
