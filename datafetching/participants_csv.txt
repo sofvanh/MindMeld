@@ -1,0 +1,16 @@
+participant_id,n_votes,n_agree,n_disagree,n_pass
+causalwizard,9,7,0,2
+carlosrof,9,5,0,4
+waynerad,9,8,0,1
+walesbioinfo,9,8,0,1
+haraldklinke,9,8,0,1
+spacecowboy,9,6,0,3
+cogqueries,9,4,0,5
+alastor8472,9,7,0,2
+sebastianraschka,9,8,0,1
+scaling_critic,9,4,3,2
+efficiency_expert,9,7,0,2
+arch_researcher,9,6,1,2
+param_specialist,9,8,0,1
+tiny_models_advocate,9,8,0,1
+llm_skeptic,9,3,4,2

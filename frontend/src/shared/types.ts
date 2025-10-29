@@ -9,6 +9,7 @@ export interface User {
 export interface NodeData {
   id: string;
   name: string;
+  clusterId?: number;
 }
 
 export interface ExtendedNodeData extends NodeData {

@@ -16,9 +16,18 @@ const GraphView: React.FC = () => {
   const { socket } = useWebSocket();
   const { user } = useAuth();
   const { graphId } = useParams<{ graphId: string }>();
-  const { graph, layoutData, loading, error, addPendingReaction, removePendingReaction } = useGraphContext();
+  const { graph, layoutData, clusters, loading, error, addPendingReaction, removePendingReaction } = useGraphContext();
   const [selectedArgument, setSelectedArgument] = useState<Argument | null>(null);
   const [argumentsInQueue, setArgumentsInQueue] = useState<number>(0);
+  const [clusterViewEnabled, setClusterViewEnabled] = useState<boolean>(false);
+
+  // Debug logging
+  console.log('🔍 GraphView Debug:');
+  console.log('  - Clusters length:', clusters.length);
+  console.log('  - Cluster view enabled:', clusterViewEnabled);
+  console.log('  - Clusters data:', clusters.map(c => ({ id: c.id, title: c.themeLabel?.title, nodeCount: c.arguments.length })));
+  console.log('  - Graph arguments length:', graph?.arguments?.length || 0);
+  console.log('  - Arguments with embeddings:', graph?.arguments?.filter(arg => arg.embedding && arg.embedding.length > 0).length || 0);
 
   const {
     selectedNodeId,
@@ -73,13 +82,39 @@ const GraphView: React.FC = () => {
 
   return (
     <div className="w-full relative flex flex-col flex-grow">
-      <div className="absolute top-4 left-4 z-10 ">
+      <div className="absolute top-4 left-4 z-10 space-y-2">
         <Legend />
+        {clusters.length > 0 && (
+          <div className="bg-white p-3 rounded-lg shadow-md border border-gray-200">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">
+                {clusterViewEnabled ? 'Clusters' : 'Graph'}
+              </span>
+              <button
+                onClick={() => setClusterViewEnabled(!clusterViewEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  clusterViewEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    clusterViewEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+              <span className="text-xs text-gray-500">
+                {clusters.length} themes
+              </span>
+            </div>
+          </div>
+        )}
       </div>
       <div className="flex-grow">
         <GraphVisualization
           graph={graph}
           layoutData={layoutData}
+          clusters={clusters}
+          clusterViewEnabled={clusterViewEnabled}
           selectedNodeId={selectedNodeId}
           onNodeClick={handleNodeClick}
         />

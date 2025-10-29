@@ -4,6 +4,7 @@ import { useGraphContext } from '../contexts/GraphContext';
 import { ScoreTrendsGraph } from '../components/analysis/ScoreTrendsGraph';
 import { GraphInfo } from '../components/analysis/GraphInfo';
 import { TopStatements } from '../components/analysis/TopStatements';
+import { StatementClusters } from '../components/analysis/StatementClusters';
 import ErrorMessage from '../components/ErrorMessage';
 
 
@@ -37,6 +38,7 @@ export const AnalysisView: React.FC = () => {
         <h2 className="text-2xl font-bold mb-6">Graph Analysis</h2>
         <GraphInfo />
         <TopStatements />
+        <StatementClusters />
         <ScoreTrendsGraph />
       </div>
     </div>

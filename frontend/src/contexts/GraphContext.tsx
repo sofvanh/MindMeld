@@ -3,12 +3,22 @@ import { Graph, ForceGraphData, NodeData, LinkData, ReactionAction, UserReaction
 import { useWebSocket } from './WebSocketContext';
 import { useAuth } from './AuthContext';
 import { applyReactionActions } from '../shared/reactionHelper';
+import { isCsvDiscussion, loadCsvDiscussion } from '../services/csvAdapter';
+import { clusterStatements, EmbeddingResult, generateThemeLabels, ThemeLabel } from '../services/embeddingsService';
+
+interface ClusterInfo {
+  id: number;
+  arguments: Argument[];
+  themeLabel?: ThemeLabel;
+  center?: { x: number; y: number };
+}
 
 interface GraphContextType {
   graph: Graph | null;
   layoutData: ForceGraphData;
   feed: Argument[] | null;
   analysis: Analysis | null;
+  clusters: ClusterInfo[];
   loading: boolean;
   error: string | null;
   addPendingReaction: (reaction: ReactionAction) => void;
@@ -40,6 +50,7 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   const [layoutData, setLayoutData] = useState<ForceGraphData>({ nodes: [], links: [] });
   const [feed, setFeed] = useState<Argument[] | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const [clusters, setClusters] = useState<ClusterInfo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const addPendingReaction = (reaction: ReactionAction) => {
     setPendingReactions(prev => [...prev, reaction]);
@@ -99,7 +110,43 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
   }, [serverGraph, pendingReactions]);
 
   useEffect(() => {
-    if (!socket || userLoading) return;
+    if (userLoading) return;
+
+    // Handle CSV discussions differently
+    if (isCsvDiscussion(graphId)) {
+      console.log('Loading CSV discussion:', graphId);
+      const loadCsvData = async () => {
+        try {
+          console.log('Fetching CSV data...');
+          const { graph: csvGraph, analysis: csvAnalysis, edges: csvEdges } = await loadCsvDiscussion(graphId);
+          console.log('CSV data loaded:', csvGraph, csvAnalysis, csvEdges);
+
+          // Convert to Graph format for compatibility
+          const graph: Graph = {
+            id: csvGraph.id,
+            name: csvGraph.name,
+            arguments: csvAnalysis.topStatements, // Use all arguments from analysis
+            edges: csvEdges || [], // Use similarity-based edges or empty array
+            isPrivate: csvGraph.isPrivate || false
+          };
+
+          console.log('Setting graph state:', graph);
+          setServerGraph(graph);
+          setFeed(csvAnalysis.topStatements); // Use same arguments for feed
+          setAnalysis(csvAnalysis);
+          console.log('CSV data loaded and state set');
+        } catch (err) {
+          console.error('Failed to load CSV discussion:', err);
+          setError('Failed to load CSV discussion');
+        }
+      };
+
+      loadCsvData();
+      return; // Don't set up socket listeners for CSV discussions
+    }
+
+    // Regular WebSocket-based discussions
+    if (!socket) return;
 
     socket.emit('join graph', { graphId }, (response: any) => {
       if (response.success) {
@@ -172,26 +219,108 @@ export const GraphProvider: React.FC<GraphProviderProps> = ({ children, graphId 
     };
   }, [socket, graphId, user, userLoading]);
 
+  // Generate clusters when graph changes
+  useEffect(() => {
+    if (!graph?.arguments || graph.arguments.length === 0) {
+      setClusters([]);
+      return;
+    }
+
+    const generateClusters = async () => {
+      console.log('🎯 Generating clusters...');
+
+      // Filter arguments that have embeddings
+      const argumentsWithEmbeddings = graph.arguments.filter(arg =>
+        arg.embedding && arg.embedding.length > 0
+      );
+
+      console.log('  - Arguments with embeddings:', argumentsWithEmbeddings.length);
+
+      if (argumentsWithEmbeddings.length === 0) {
+        setClusters([]);
+        return;
+      }
+
+      // Convert to EmbeddingResult format for clustering
+      const embeddingResults: EmbeddingResult[] = argumentsWithEmbeddings.map(arg => ({
+        id: arg.id,
+        text: arg.statement,
+        embedding: arg.embedding
+      }));
+
+      // Cluster with a similarity threshold of 0.6
+      const rawClusters = clusterStatements(embeddingResults, 0.6);
+      console.log('  - Raw clusters:', rawClusters.length, 'clusters with sizes:', rawClusters.map(c => c.length));
+
+      // Generate theme labels for clusters
+      const themeLabels = await generateThemeLabels(rawClusters);
+
+      // Convert to ClusterInfo format
+      const clusterInfos: ClusterInfo[] = rawClusters
+        .filter(cluster => cluster.length > 1) // Only show clusters with multiple statements
+        .map((cluster, index) => ({
+          id: index,
+          arguments: cluster.map(item =>
+            argumentsWithEmbeddings.find(arg => arg.id === item.id)!
+          ),
+          themeLabel: themeLabels[index]
+        }));
+
+      console.log('  - Final clusters:', clusterInfos.length);
+      console.log('  - Cluster details:', clusterInfos.map(c => ({
+        id: c.id,
+        title: c.themeLabel?.title,
+        argumentIds: c.arguments.map(a => a.id)
+      })));
+
+      setClusters(clusterInfos);
+    };
+
+    generateClusters().catch(console.error);
+  }, [graph?.arguments]);
+
   useEffect(() => {
     if (!graph) return;
-    const newArguments: NodeData[] = graph.arguments.map(arg => ({ id: arg.id, name: arg.statement }));
+
+    console.log('🔧 GraphContext: Building layout data');
+    console.log('  - Graph arguments:', graph.arguments.length);
+    console.log('  - Clusters:', clusters.length);
+
+    const newArguments: NodeData[] = graph.arguments.map(arg => {
+      const clusterId = clusters.find(cluster =>
+        cluster.arguments.some(clusterArg => clusterArg.id === arg.id)
+      )?.id;
+
+      return {
+        id: arg.id,
+        name: arg.statement,
+        clusterId
+      };
+    });
+
+    console.log('  - Nodes with cluster IDs:', newArguments.filter(n => n.clusterId !== undefined).length);
+
     const newLinks: LinkData[] = graph.edges.map(edge => ({
       source: newArguments.find(arg => arg.id === edge.sourceId) as NodeData,
       target: newArguments.find(arg => arg.id === edge.targetId) as NodeData
     }));
+
     const hasNodesChanged = newArguments.map(node => node.id).sort().join(',') !== layoutData.nodes.map(node => node.id).sort().join(',');
     const hasLinksChanged = newLinks.map(link => `${link.source}-${link.target}`).sort().join(',') !== layoutData.links.map(link => `${link.source}-${link.target}`).sort().join(',');
+    const hasClusterDataChanged = newArguments.filter(n => n.clusterId !== undefined).length !== layoutData.nodes.filter(n => n.clusterId !== undefined).length;
 
-    if (hasNodesChanged || hasLinksChanged) {
+    if (hasNodesChanged || hasLinksChanged || hasClusterDataChanged) {
+      console.log('  - Updating layout data with cluster IDs');
       setLayoutData({ nodes: newArguments, links: newLinks });
     }
-  }, [graph, layoutData.nodes, layoutData.links]);
+  }, [graph, clusters, layoutData.nodes, layoutData.links]);
 
   const value = {
     graph,
     layoutData,
     feed,
     analysis,
+    clusters,
     loading: !graph || !analysis || !feed,
     error,
     addPendingReaction,

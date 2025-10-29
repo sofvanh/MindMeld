@@ -1,0 +1,11 @@
+participant_id,n_votes,n_agree,n_disagree,n_pass
+ResearcherA,20,11,5,4
+IndustryDev,20,5,0,15
+SafetyFirst,20,11,2,7
+GradStudent,20,8,8,4
+Skeptic123,20,7,6,7
+OpenSciFan,20,6,3,11
+ProfTech,20,12,3,5
+Journalist,20,8,0,12
+StartupFounder,20,7,3,10
+PhysicistLurker,20,4,0,16

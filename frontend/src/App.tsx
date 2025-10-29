@@ -39,7 +39,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={
-              <Layout>
+              <Layout hideHeader hideFooter>
                 <LazyView>
                   <HomeView />
                 </LazyView>
@@ -63,7 +63,7 @@ function App() {
               </LazyView>
             } />
             <Route path="/graph/:graphId" element={
-              <Layout hideFooter>
+              <Layout hideFooter hideHeader>
                 <GraphLayout>
                   <LazyView>
                     <GraphView />
@@ -72,7 +72,7 @@ function App() {
               </Layout>
             } />
             <Route path="/feed/:graphId" element={
-              <Layout hideFooter>
+              <Layout hideFooter hideHeader>
                 <GraphLayout>
                   <LazyView>
                     <FeedView />
@@ -81,7 +81,7 @@ function App() {
               </Layout>
             } />
             <Route path="/analysis/:graphId" element={
-              <Layout hideFooter>
+              <Layout hideFooter hideHeader>
                 <GraphLayout>
                   <LazyView>
                     <AnalysisView />
