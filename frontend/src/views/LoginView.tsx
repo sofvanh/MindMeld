@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
-import { buttonStyles } from '../styles/defaultStyles';
 import { IoIosArrowBack } from 'react-icons/io';
 
 const LoginView: React.FC = () => {
@@ -61,20 +60,14 @@ const LoginView: React.FC = () => {
           </div>
         </div>
 
-        {/* TODO Add terms of service and privacy policy */}
-
-        {/* <div className="mt-8 text-center text-sm text-stone-500">
-          <p>
-            By signing in, you agree to our{' '}
-            <a href="#" className="text-emerald-600 hover:text-emerald-700">
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="#" className="text-emerald-600 hover:text-emerald-700">
-              Privacy Policy
-            </a>
-          </p>
-        </div> */}
+        <details className="mt-8 text-sm text-stone-500">
+          <summary className="cursor-pointer text-center hover:text-stone-700 my-4">
+            Privacy & data use
+          </summary>
+          <div className="mt-2 text-left text-xs bg-stone-100 px-4 py-1 rounded">
+            <p>When you sign in with Google, we receive your email address, which we use solely to identify you within the app. It is not visible to other users. We do not sell or share your data with third parties.</p>
+          </div>
+        </details>
       </div>
     </div>
   );
