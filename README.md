@@ -1,3 +1,5 @@
+> Branch note: Contains a "production" docker-compose setup, which isn't currently used (we have separate deployments of backend and frontend, one running on google cloud run, the other on netlify.) You can run it locally, but since the setup assumes a Google SQL database connection, pulling data will fail.
+
 # Nexus (formerly MindMeld)
 
 > **Note**: We're in the process of renaming the project from MindMeld to Nexus. Some parts of the codebase and documentation still use the old name.
@@ -59,6 +61,12 @@ docker compose -f docker-compose.dev.yml up
 ```
 
 Then access at `localhost:8080`
+
+To test the "production setup", simply run:
+
+```bash
+docker compose up
+```
 
 ## Useful Commands
 
