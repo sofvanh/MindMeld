@@ -59,27 +59,6 @@ const LoginView: React.FC = () => {
               size="large"
             />
           </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-stone-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-stone-500">
-                More options coming soon
-              </span>
-            </div>
-          </div>
-
-          {/* Placeholder for future authentication methods */}
-          <div className="opacity-50 pointer-events-none">
-            <button
-              disabled
-              className={`${buttonStyles.secondary} w-full flex justify-center items-center py-3 border border-stone-300 rounded-md`}
-            >
-              Email & Password
-            </button>
-          </div>
         </div>
 
         {/* TODO Add terms of service and privacy policy */}
