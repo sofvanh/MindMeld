@@ -28,9 +28,6 @@ const Header: React.FC = () => {
               Nexus
             </h1>
           </Link>
-          <span className={`${tagStyles.sky} ${tooltipClasses} ml-2`} data-tooltip="Under active development. Leave feedback or reach out to us to collaborate!">
-            Open Beta
-          </span>
         </div>
         {user && (
           <div className="flex items-center flex-wrap justify-end">
