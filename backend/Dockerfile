@@ -21,7 +21,7 @@ ENV FRONTEND_URLS="https://mindmeldtool.netlify.app,https://nexus-tool.com"
 ENV CLOUD_SQL_CONNECTION_NAME="mindmeld-backend:europe-west1:mindmeld-db"
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
