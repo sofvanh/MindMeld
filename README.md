@@ -42,12 +42,23 @@ The branding and design system documentation can be found at `/design`. You can 
 
 ## Docker Development
 
+### Individual backend container
+
 Build and run the development container:
 ```bash
 cd backend
-docker build -f Dockerfile.dev -t mindmeld-backend-dev .
-docker run -p 3001:3001 -v $(pwd):/app mindmeld-backend-dev
+docker build -f Dockerfile.dev -t mindmeld-backend-dev . --no-cache --platform linux/amd64
+docker run -p 3001:3001 -v $(pwd):/app -v /app/node_modules mindmeld-backend-dev
 ```
+
+### Docker compose
+
+With compose and nginx, run in root:
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+Then access at `localhost:8080`
 
 ## Useful Commands
 
