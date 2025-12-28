@@ -40,7 +40,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           data-tooltip={user ? "Agree" : "Agree (sign in to contribute)"}
           onClick={() => user && handleReaction('agree')}
           disabled={!user}
-          className={`${tooltipClasses} !p-1 gap-0.5 ${userReactions.agree ? buttonStyles.icon.green : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11 !w-11`}
+          className={`${tooltipClasses} !p-1 gap-0.5 ${!user ? buttonStyles.icon.disabled : (userReactions.agree ? buttonStyles.icon.green : buttonStyles.icon.default)} min-h-11 !w-11`}
         >
           <IoIosThumbsUp className={`${iconClasses} max-w-5`} />
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.agree || 0}</span>
@@ -49,7 +49,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           data-tooltip={user ? "Disagree" : "Disagree (sign in to contribute)"}
           onClick={() => user && handleReaction('disagree')}
           disabled={!user}
-          className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${userReactions.disagree ? buttonStyles.icon.red : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11`}
+          className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${!user ? buttonStyles.icon.disabled : (userReactions.disagree ? buttonStyles.icon.red : buttonStyles.icon.default)} min-h-11`}
         >
           <IoIosThumbsDown className={`${iconClasses} max-w-5`} />
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.disagree || 0}</span>
@@ -58,7 +58,7 @@ const ArgumentInfoSmall: React.FC<ArgumentInfoSmallProps> = ({
           data-tooltip={user ? "Low quality" : "Low quality (sign in to contribute)"}
           onClick={() => user && handleReaction('unclear')}
           disabled={!user}
-          className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${userReactions.unclear ? buttonStyles.icon.amber : buttonStyles.icon.default} ${!user && 'opacity-50'} min-h-11`}
+          className={`${tooltipClasses} !p-1 !w-11 gap-0.5 ${!user ? buttonStyles.icon.disabled : (userReactions.unclear ? buttonStyles.icon.amber : buttonStyles.icon.default)} min-h-11`}
         >
           <IoIosWarning className={`${iconClasses} max-w-5`} />
           <span className="text-xs w-4 inline-block text-center">{reactionCounts?.unclear || 0}</span>

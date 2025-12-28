@@ -1,4 +1,5 @@
 const secondaryButtonColors = "text-stone-700 hover:text-stone-900 hover:bg-stone-100";
+const disabledButtonColors = "text-stone-400";
 const linkButtonColors = "text-sky-500 hover:text-sky-600";
 const emeraldButtonColors = "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50";
 const redButtonColors = "text-red-500 hover:text-red-600 hover:bg-red-50";
@@ -8,6 +9,7 @@ const baseIconButtonClasses = `p-0 w-6 h-6 flex items-center justify-center`;
 export const buttonStyles = {
   primary: `bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4`,
   secondary: `${secondaryButtonColors} py-2 px-4`,
+  disabled: `${disabledButtonColors} py-2 px-4`,
   link: `${linkButtonColors} py-2 px-4`,
   green: `${emeraldButtonColors} py-2 px-4`,
   red: `${redButtonColors} py-2 px-4`,
@@ -15,6 +17,7 @@ export const buttonStyles = {
   icon: {
     base: `${baseIconButtonClasses}`,
     default: `${baseIconButtonClasses} ${secondaryButtonColors}`,
+    disabled: `${baseIconButtonClasses} ${disabledButtonColors}`,
     green: `${baseIconButtonClasses} ${emeraldButtonColors}`,
     red: `${baseIconButtonClasses} ${redButtonColors}`,
     amber: `${baseIconButtonClasses} ${amberButtonColors}`,
