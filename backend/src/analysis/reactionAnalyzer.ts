@@ -1,5 +1,5 @@
 import { getReactionsForAnalysis } from "../db/operations/reactionOperations";
-import { cosineSimilarityMatrix, computeAllSums } from "../utils/math";
+import { normalizedCosineSimilarityMatrix, computeAllSums } from "../utils/math";
 
 export interface ReactionAnalysis {
   userIndexMap: Map<string, number>;
@@ -41,7 +41,7 @@ export async function analyzeReactions(graphId: string): Promise<ReactionAnalysi
     }
   }
 
-  const userSimilarityMatrix: number[][] = cosineSimilarityMatrix(votingMatrix);
+  const userSimilarityMatrix: number[][] = normalizedCosineSimilarityMatrix(votingMatrix);
   const { sum_pos_pos, sum_pos_neg, sum_neg_pos, sum_neg_neg } = computeAllSums(userSimilarityMatrix, votingMatrix);
   const uniquenessMatrix = votingMatrix.map((row, i) => row.map((value, j) => {
     const sumIngroupAgree = sum_pos_pos[i][j];
