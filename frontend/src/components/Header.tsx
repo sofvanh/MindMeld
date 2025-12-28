@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import SignInOutButton from "./SignInOutButton";
 import { useAuth } from "../contexts/AuthContext";
 import { useState } from "react";
-import { tagStyles, tooltipClasses } from "../styles/defaultStyles";
+import { tagStyles } from "../styles/defaultStyles";
 
 const Header: React.FC = () => {
   const { user } = useAuth();
