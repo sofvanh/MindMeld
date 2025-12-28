@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
-import { ForceGraph2D } from 'react-force-graph';
+import ForceGraph2D from 'react-force-graph-2d';
 import { forceCollide } from 'd3-force';
 import { Graph, ForceGraphData } from '../shared/types';
 import { getColor } from '../utils/colors';
